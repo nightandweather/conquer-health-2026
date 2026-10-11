@@ -281,7 +281,7 @@
       "holdout_feedback_not_used_for_prompt_changes": true
     }
   },
-  "verified_at_utc": "2026-10-11T05:45:41+00:00",
+  "verified_at_utc": "2026-10-11T05:50:18+00:00",
   "refinement": {
     "status": "superseded_by_codex_verifier_protocol",
     "plan": "REFINEMENT_PLAN.md",
@@ -323,5 +323,27 @@
     "score_status": "independent_codex_review_required",
     "judge": "Codex checks original context, rubric coverage and primary evidence; gpt-oss only generates candidates",
     "codex_judge_api_implemented": false
+  },
+  "nova_dialogue_codex_review": {
+    "status": "qualitative_review_completed",
+    "source": "historical_saved_public_sample_dialogues; no new generation",
+    "case_ids": [
+      "C01",
+      "C03",
+      "C10"
+    ],
+    "interaction_turn_count": 84,
+    "grouped_review_flags": 21,
+    "environment_flags": 4,
+    "dialogue_or_record_flags": 17,
+    "doctor_hallucination_count": null,
+    "official_nova_score": null,
+    "numeric_quality_score": null,
+    "clinical_safety_certification": null,
+    "time_savings_seconds": null,
+    "public_transcripts_included": false,
+    "patient_and_tool_provenance_checked": true,
+    "simulator_environment_limits_not_counted_as_doctor_hallucinations": true,
+    "reviewed_at_utc": "2026-10-11T05:47:14.369622+00:00"
   }
 }
