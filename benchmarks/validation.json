@@ -1,20 +1,23 @@
 {
   "schema_version": 1,
   "verified_date": "2026-10-10",
-  "state": "full_200_running_docs_based_refinement_prepared",
+  "state": "full_200_running_codex_verifier_cycle_queued",
   "tests": {
-    "healthbench_synthetic_tests": 91,
+    "healthbench_synthetic_tests": 112,
     "local_viewer_tests": 13,
     "nova_existing_regression_tests": 8,
-    "total_tests": 115,
-    "executed_tests": 115,
-    "passed_tests": 115,
+    "total_tests": 146,
+    "executed_tests": 146,
+    "passed_tests": 146,
     "all_executed_passed": true,
     "blocked_tests": [],
     "previous_http_test": "rechecked with current network access; passed",
     "refinement_queue_tests": 3,
-    "public_packaged_tests": 107,
-    "public_packaged_passed_tests": 107
+    "public_packaged_tests": 138,
+    "public_packaged_passed_tests": 138,
+    "codex_cycle_queue_tests": 10,
+    "codex_guided_cycle_tests": 12,
+    "review_packet_and_export_tests": 33
   },
   "data": {
     "dataset_kind": "legacy_consensus_val_200",
@@ -230,8 +233,8 @@
     "history_count": 81,
     "restored_history_turns": 336,
     "planned_answers": 400,
-    "written_answers": 110,
-    "network_calls": 110,
+    "written_answers": 200,
+    "network_calls": 200,
     "development_count": 20,
     "holdout_count": 180,
     "development_history_count": 5,
@@ -246,27 +249,35 @@
     "score_status": "generation_and_codex_review_in_progress",
     "canonical_score_comparable": false,
     "started_at": "2026-10-11T04:59:38+00:00",
-    "progress_checked_at_utc": "2026-10-11T05:21:14+00:00",
+    "progress_checked_at_utc": "2026-10-11T05:38:30+00:00",
     "answer_status_counts": {
-      "completed": 95,
-      "truncated": 15
+      "completed": 172,
+      "truncated": 28
     },
-    "nonempty_answers": 110,
+    "nonempty_answers": 200,
     "codex_review": {
       "development_packets_reviewed": 20,
       "answers_reviewed": 40,
-      "boolean_judgments": 85,
-      "unresolved_judgments": 1,
+      "boolean_judgments": 86,
+      "unresolved_judgments": 0,
       "full_aggregate_status": "incomplete",
       "rubric_quality_note": "An archived criterion appears to reward unnecessary hedging; kept literal labels and separate rubric_issue flags. Do not tune generation to exploit it.",
       "viewer_assessments_verified": 40,
-      "viewer_numeric_grades_verified": 39,
-      "viewer_verified_at_utc": "2026-10-11T05:21:14+00:00"
+      "viewer_numeric_grades_verified": 40,
+      "viewer_verified_at_utc": "2026-10-11T05:38:30+00:00",
+      "development_diagnostic": {
+        "selected_count": 20,
+        "raw_default_percent": 20.833333333333336,
+        "grounded_call_percent": 50.0,
+        "official": false,
+        "notice": "Development-only Codex judgments on reconstructed data; mixed instruction/settings comparison; concrete clinical flags remain."
+      },
+      "resolved_pending_judgments": 1
     }
   },
-  "verified_at_utc": "2026-10-11T05:21:14+00:00",
+  "verified_at_utc": "2026-10-11T05:38:30+00:00",
   "refinement": {
-    "status": "queued_waiting_for_frozen_baseline",
+    "status": "superseded_by_codex_verifier_protocol",
     "plan": "REFINEMENT_PLAN.md",
     "maximum_calls_per_answer": 3,
     "maximum_revisions": 1,
@@ -283,6 +294,28 @@
     ],
     "temperature": 0,
     "completion_token_limit_per_answer": 4096,
-    "independent_quality_review_required": true
+    "independent_quality_review_required": true,
+    "actual_generation_calls": 0,
+    "role": "optional auxiliary experiment; never the independent quality judge"
+  },
+  "codex_verifier_cycle": {
+    "status": "waiting_for_baseline",
+    "plan": "CODEX_VERIFIER.md",
+    "instructions_path": "prompts/codex_guided_v3.txt",
+    "instructions_byte_sha256": "3472f102e2e6fa2fa980d9714cb5af48a9682054017a6ad090770eedbaad4470",
+    "instructions_version": "3",
+    "started_at": "2026-10-11T05:37:34+00:00",
+    "prepared_development_count": 20,
+    "actual_generation_calls": 0,
+    "maximum_calls_per_case": 1,
+    "temperature": 0,
+    "reasoning_effort": "low",
+    "max_tokens": 2048,
+    "development_only": true,
+    "holdout_used_for_instruction_changes": false,
+    "score": null,
+    "score_status": "independent_codex_review_required",
+    "judge": "Codex checks original context, rubric coverage and primary evidence; gpt-oss only generates candidates",
+    "codex_judge_api_implemented": false
   }
 }
