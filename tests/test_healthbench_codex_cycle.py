@@ -1,6 +1,7 @@
 """Synthetic generation-boundary/provenance tests with a temporary Git repo."""
 
 from copy import deepcopy
+from collections import Counter
 import hashlib
 import json
 from pathlib import Path
@@ -9,7 +10,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from benchmarks.healthbench import DEFAULT_MODEL, RequestFailure, canonical_hash
+from benchmarks.healthbench import (DEFAULT_BASE_URL, DEFAULT_MODEL, RequestFailure, arm_config,
+                                    canonical_hash, generate, load_dataset)
 from benchmarks.healthbench_codex_cycle import REVIEW_REQUIRED, make_payload, run_cycle
 
 
@@ -78,6 +80,33 @@ class CodexCycleTests(unittest.TestCase):
 
     def run_cycle(self, **kwargs):
         return run_cycle(self.data, self.baseline, self.instructions, self.out, **kwargs)
+
+    def finalize_partial_control(self):
+        _, dataset = load_dataset(self.data, limit=0)
+        self.baseline_value.update(status='partial', finished_at='2026-10-11T06:12:48+00:00',
+                                   dataset=dataset, selected_arms=['raw_default', 'grounded_call'],
+                                   config={'model': DEFAULT_MODEL, 'base_url': DEFAULT_BASE_URL},
+                                   arms=arm_config(('raw_default', 'grounded_call')))
+        self.write_baseline()
+        self.control_rows = []
+        for index, item in enumerate(self.items):
+            for arm in ('raw_default', 'grounded_call'):
+                transport = FakeTransport([RequestFailure('connection_error')] if index == 199 and arm == 'raw_default'
+                                          else [response(f'Synthetic source {index} {arm}')])
+                row = generate(item, arm, DEFAULT_MODEL, transport, dataset_sha256=dataset['sha256'])
+                row['model_digest'] = 'synthetic-digest'
+                self.control_rows.append(row)
+        self.write_control_rows()
+
+    def write_control_rows(self):
+        (self.baseline.parent / 'answers.jsonl').write_text(''.join(json.dumps(row) + '\n' for row in self.control_rows))
+        summary = {'status': self.baseline_value['status'], 'finished_at': self.baseline_value['finished_at'],
+                   'selected_prompt_ids': self.baseline_value['selected_prompt_ids'],
+                   'selected_arms': self.baseline_value['selected_arms'], 'planned_answers': 400,
+                   'written_answers': len(self.control_rows), 'unattempted_answers': 400 - len(self.control_rows),
+                   'answer_status_counts': dict(Counter(row['status'] for row in self.control_rows)),
+                   'calls': sum(len(row['attempts']) for row in self.control_rows)}
+        (self.baseline.parent / 'summary.json').write_text(json.dumps(summary))
 
     def test_payload_preserves_original_roles_text_and_excludes_evaluation_fields(self):
         item = deepcopy(self.items[0])
@@ -236,6 +265,119 @@ class CodexCycleTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'baseline-manifest'):
             run_cycle(self.data, None, self.instructions, self.out, prepare_only=True)
         self.assertFalse(self.out.exists())
+
+    def test_finalized_partial_control_requires_explicit_option_and_preserves_original_sources(self):
+        self.finalize_partial_control()
+        source_paths = [self.baseline, self.baseline.parent / 'summary.json', self.baseline.parent / 'answers.jsonl']
+        before = {path: path.read_bytes() for path in source_paths}
+        transport = FakeTransport([])
+        with self.assertRaisesRegex(ValueError, 'completed baseline'):
+            self.run_cycle(transport=transport)
+        self.assertEqual(transport.metadata_calls, 0)
+        transport = FakeTransport([response()] * 20)
+        summary, code = self.run_cycle(transport=transport, allow_finalized_dev_control=True)
+        self.assertEqual((summary['status'], summary['calls'], code), ('completed', 20, 0))
+        manifest = json.loads((self.out / 'manifest.json').read_text())
+        self.assertEqual(manifest['baseline']['status'], 'partial')
+        provenance = manifest['baseline']['development_control']
+        self.assertEqual(provenance['original_manifest_status'], 'partial')
+        self.assertEqual(provenance['validated_count'], 20)
+        self.assertEqual(provenance['answers_byte_sha256'], hashlib.sha256(before[source_paths[2]]).hexdigest())
+        for entry, row in zip(provenance['row_provenance'], [row for row in self.control_rows if row['arm'] == 'grounded_call'][:20]):
+            self.assertEqual(entry['full_row_sha256'], canonical_hash(row))
+        self.assertEqual(before, {path: path.read_bytes() for path in source_paths})
+
+    def test_prepared_explicit_control_records_provenance_without_network(self):
+        self.finalize_partial_control()
+        transport = FakeTransport([])
+        with patch('urllib.request.OpenerDirector.open', side_effect=AssertionError('No network')):
+            summary, code = self.run_cycle(prepare_only=True, allow_finalized_dev_control=True, transport=transport)
+        self.assertEqual((summary['calls'], code, transport.metadata_calls), (0, 0, 0))
+        self.assertFalse((self.out / 'answers.jsonl').exists())
+        manifest = json.loads((self.out / 'manifest.json').read_text())
+        self.assertEqual(manifest['baseline']['development_control']['validated_count'], 20)
+
+    def test_explicit_control_rejects_missing_duplicate_failed_truncated_empty_or_hash_mismatched_rows(self):
+        self.finalize_partial_control()
+        originals = deepcopy(self.control_rows)
+        variants = ('missing', 'duplicate', 'failed', 'truncated', 'empty', 'request_hash', 'input_hash',
+                    'model_digest', 'prompt_hash', 'attempt_settings', 'selected_attempt', 'answer_mismatch')
+        for variant in variants:
+            with self.subTest(variant=variant):
+                self.control_rows = deepcopy(originals)
+                row = self.control_rows[1]
+                if variant == 'missing':
+                    self.control_rows.pop(1)
+                elif variant == 'duplicate':
+                    self.control_rows.append(deepcopy(row))
+                elif variant in ('failed', 'truncated'):
+                    row['status'] = variant
+                elif variant == 'empty':
+                    row['answer'] = ' '
+                elif variant == 'request_hash':
+                    row['attempts'][0]['request_sha256'] = 'wrong'
+                elif variant == 'input_hash':
+                    row['input_sha256'] = 'wrong'
+                elif variant == 'model_digest':
+                    row['model_digest'] = 'different'
+                elif variant == 'prompt_hash':
+                    row['prompt_sha256'] = 'wrong'
+                elif variant == 'attempt_settings':
+                    row['attempts'][0]['reasoning_effort'] = 'high'
+                elif variant == 'selected_attempt':
+                    row['selected_attempt'] = True
+                else:
+                    row['attempts'][0]['answer'] = 'Different stored attempt answer'
+                self.write_control_rows()
+                transport = FakeTransport([])
+                with self.assertRaises(ValueError):
+                    self.run_cycle(transport=transport, allow_finalized_dev_control=True)
+                self.assertEqual((transport.metadata_calls, len(transport.payloads)), (0, 0))
+                self.assertFalse(self.out.exists())
+
+    def test_explicit_control_rejects_unfinalized_corrupt_summary_or_changed_config(self):
+        self.finalize_partial_control()
+        good = deepcopy(self.baseline_value)
+        for variant in ('running', 'finished_at', 'summary', 'config', 'endpoint', 'corrupt_json', 'duplicate_json_field'):
+            with self.subTest(variant=variant):
+                self.baseline_value = deepcopy(good)
+                self.write_baseline()
+                self.write_control_rows()
+                if variant == 'running':
+                    self.baseline_value['status'] = 'running'
+                    self.write_baseline()
+                elif variant == 'finished_at':
+                    self.baseline_value.pop('finished_at')
+                    self.write_baseline()
+                elif variant == 'summary':
+                    path = self.baseline.parent / 'summary.json'
+                    summary = json.loads(path.read_text())
+                    summary['written_answers'] = 399
+                    path.write_text(json.dumps(summary))
+                elif variant == 'config':
+                    self.baseline_value['arms']['grounded_call']['temperature'] = False
+                    self.write_baseline()
+                elif variant == 'endpoint':
+                    self.baseline_value['config']['base_url'] = 'https://example.org/v1'
+                    self.write_baseline()
+                else:
+                    path = self.baseline.parent / 'answers.jsonl'
+                    path.write_text('{invalid' if variant == 'corrupt_json' else '{"arm":"raw_default","arm":"grounded_call"}\n')
+                transport = FakeTransport([])
+                with self.assertRaises(ValueError):
+                    self.run_cycle(transport=transport, allow_finalized_dev_control=True)
+                self.assertEqual(transport.metadata_calls, 0)
+                self.assertFalse(self.out.exists())
+
+    def test_explicit_control_source_change_during_generation_stops_before_second_call(self):
+        self.finalize_partial_control()
+        def change_source():
+            self.control_rows[1]['private_metadata'] = 'Source changed during generation'
+            self.write_control_rows()
+        transport = FakeTransport([response()], on_complete=change_source)
+        summary, code = self.run_cycle(transport=transport, allow_finalized_dev_control=True)
+        self.assertEqual((summary['status'], summary['calls'], code), ('blocked', 1, 2))
+        self.assertEqual(summary['error']['code'], 'provenance_changed')
 
 
 if __name__ == '__main__':

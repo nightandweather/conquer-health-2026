@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "verified_date": "2026-10-10",
-  "state": "full_200_running_codex_verifier_cycle_queued",
+  "verified_date": "2026-10-11",
+  "state": "baseline_finalized_partial_codex_loop_prepared_network_blocked",
   "tests": {
     "healthbench_synthetic_tests": 112,
     "local_viewer_tests": 13,
@@ -17,7 +17,8 @@
     "public_packaged_passed_tests": 138,
     "codex_cycle_queue_tests": 10,
     "codex_guided_cycle_tests": 12,
-    "review_packet_and_export_tests": 33
+    "review_packet_and_export_tests": 33,
+    "previous_suite_verified_at_utc": "2026-10-11T05:50:18+00:00"
   },
   "data": {
     "dataset_kind": "legacy_consensus_val_200",
@@ -134,7 +135,7 @@
     "zip_bytes": 7275,
     "sha256": "f8c95613f13572d3ff1fb7142aec4550829053ef5f4f85260aafb60f98c5505e"
   },
-  "notice": "The frozen 200-item, 400-answer comparison is running. Progress is a timestamped snapshot; no final quality score is claimed. Follow-up bounded refinement is separate from the frozen run.",
+  "notice": "Frozen 200-case generation finalized partial: 343 completed, 56 truncated, 1 failed. Codex reviewed 80 answers; the full quality score remains incomplete. Candidate improvement remains unmeasured.",
   "viewer": {
     "status": "implemented_and_browser_opened",
     "host": "127.0.0.1",
@@ -225,7 +226,7 @@
     ]
   },
   "full_200": {
-    "status": "running",
+    "status": "partial",
     "dataset_kind": "legacy_consensus_val_roles_200",
     "dataset_sha256": "cd3516c601da6f67fc7b6db3439efdf2659a91534c09c6bc1c5d363889ed4033",
     "selected_count": 200,
@@ -233,8 +234,8 @@
     "history_count": 81,
     "restored_history_turns": 336,
     "planned_answers": 400,
-    "written_answers": 240,
-    "network_calls": 240,
+    "written_answers": 400,
+    "network_calls": 400,
     "development_count": 20,
     "holdout_count": 180,
     "development_history_count": 5,
@@ -246,15 +247,16 @@
     ],
     "grader": "Codex rubric review; not the official grading model",
     "score": null,
-    "score_status": "generation_and_codex_review_in_progress",
+    "score_status": "generation_finalized_codex_review_incomplete",
     "canonical_score_comparable": false,
     "started_at": "2026-10-11T04:59:38+00:00",
-    "progress_checked_at_utc": "2026-10-11T05:45:41+00:00",
+    "progress_checked_at_utc": "2026-10-11T20:58:27.566231+00:00",
     "answer_status_counts": {
-      "completed": 204,
-      "truncated": 36
+      "completed": 343,
+      "truncated": 56,
+      "failed": 1
     },
-    "nonempty_answers": 240,
+    "nonempty_answers": 399,
     "codex_review": {
       "development_packets_reviewed": 20,
       "answers_reviewed": 80,
@@ -278,10 +280,20 @@
       "development_unresolved_judgments": 0,
       "heldout_boolean_judgments": 83,
       "heldout_unresolved_judgments": 1,
-      "holdout_feedback_not_used_for_prompt_changes": true
+      "holdout_feedback_not_used_for_prompt_changes": true,
+      "packets_ready": 199,
+      "packets_pending": 1,
+      "review_snapshot_refreshed_at_utc": "2026-10-11T20:58:27.566231+00:00"
+    },
+    "finished_at": "2026-10-11T06:12:48+00:00",
+    "seconds": 4389.593,
+    "usage": {
+      "prompt_tokens": 119881,
+      "completion_tokens": 387104,
+      "total_tokens": 506985
     }
   },
-  "verified_at_utc": "2026-10-11T05:50:18+00:00",
+  "verified_at_utc": "2026-10-11T20:58:27.566231+00:00",
   "refinement": {
     "status": "superseded_by_codex_verifier_protocol",
     "plan": "REFINEMENT_PLAN.md",
@@ -305,7 +317,7 @@
     "role": "optional auxiliary experiment; never the independent quality judge"
   },
   "codex_verifier_cycle": {
-    "status": "waiting_for_baseline",
+    "status": "blocked",
     "plan": "CODEX_VERIFIER.md",
     "instructions_path": "prompts/codex_guided_v3.txt",
     "instructions_byte_sha256": "3472f102e2e6fa2fa980d9714cb5af48a9682054017a6ad090770eedbaad4470",
@@ -322,7 +334,26 @@
     "score": null,
     "score_status": "independent_codex_review_required",
     "judge": "Codex checks original context, rubric coverage and primary evidence; gpt-oss only generates candidates",
-    "codex_judge_api_implemented": false
+    "codex_judge_api_implemented": false,
+    "previous_queue_status": "blocked",
+    "previous_queue_reason": "baseline_partial",
+    "maximum_candidates": 3,
+    "stop_after_consecutive_no_improvement": 2,
+    "advance_requires_independent_codex_review": true,
+    "acceptance_requires_resolved_review": true,
+    "control_arm": "grounded_call",
+    "control_scope": "first 20 development cases only; original baseline remains partial",
+    "local_connection_status": "blocked_by_session_network_permissions",
+    "measured_quality_improvement": null,
+    "iteration_policy_enforcement": "Codex orchestrates and reviews each round; the Python runner executes one round only",
+    "reason": "model_metadata_unavailable",
+    "control_validation": "passed_on_actual_source",
+    "validated_control_count": 20,
+    "original_baseline_status": "partial",
+    "first_candidate_prepared": true,
+    "first_candidate_execution_attempted": true,
+    "prepared_manifest_network_calls": 0,
+    "independent_review_started": false
   },
   "nova_dialogue_codex_review": {
     "status": "qualitative_review_completed",
@@ -345,5 +376,18 @@
     "patient_and_tool_provenance_checked": true,
     "simulator_environment_limits_not_counted_as_doctor_hallucinations": true,
     "reviewed_at_utc": "2026-10-11T05:47:14.369622+00:00"
+  },
+  "current_change_tests": {
+    "verified_at_utc": "2026-10-11T21:00:49+00:00",
+    "targeted_tests": 33,
+    "targeted_passed": 33,
+    "full_private_executed": 157,
+    "full_private_passed": 156,
+    "full_private_permission_blocked": 1,
+    "blocked_test": "Existing HTTP listener test: sandbox bind Operation not permitted",
+    "all_network_checks_passed": false,
+    "public_targeted_tests": 33,
+    "public_targeted_passed": 33,
+    "independent_source_pinning_review": "passed"
   }
 }

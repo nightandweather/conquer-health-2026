@@ -1,6 +1,8 @@
 """One-shot queue dependency/source gates using synthetic model transports."""
 
 from copy import deepcopy
+from collections import Counter
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -8,7 +10,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from benchmarks.healthbench import DEFAULT_BASE_URL, DEFAULT_MODEL, RequestFailure, canonical_hash, load_dataset
+from benchmarks.healthbench import (DEFAULT_BASE_URL, DEFAULT_MODEL, RequestFailure, arm_config,
+                                    build_payload, canonical_hash, load_dataset)
 from benchmarks import healthbench_codex_cycle as cycle
 from scripts import run_codex_cycle_after_baseline as queue
 
@@ -93,6 +96,33 @@ class CodexCycleQueueTests(unittest.TestCase):
         return queue.run_queue(self.data, self.baseline, self.instructions, self.out,
                                cycle_runner=self.fake_cycle, packet_runner=self.fake_packets,
                                clock=self.clock, sleeper=sleeper or (lambda seconds: None), **kwargs)
+
+    def finalize_partial_control(self):
+        self.baseline_value.update(status='partial', finished_at='2026-10-11T06:12:48+00:00',
+                                   arms=arm_config(('raw_default', 'grounded_call')))
+        self.write_baseline()
+        for index, row in enumerate(self.baseline_rows):
+            if row['arm'] == 'grounded_call':
+                item = self.items[index // 2]
+                payload = build_payload(item, 'grounded_call')
+                row.update(finish_reason='stop', error=None, selected_attempt=1, fallback_used=False)
+                row['attempts'] = [{'number': 1, 'max_tokens': payload['max_tokens'],
+                                    'temperature': payload['temperature'], 'reasoning_effort': payload['reasoning_effort'],
+                                    'request_sha256': canonical_hash(payload), 'answer': row['answer'],
+                                    'status': 'completed', 'finish_reason': 'stop', 'error': None,
+                                    'response_received': True}]
+        self.baseline_rows[-2].update(status='failed', answer='')
+        self.write_control_rows()
+
+    def write_control_rows(self):
+        (self.baseline.parent / 'answers.jsonl').write_text(''.join(json.dumps(row) + '\n' for row in self.baseline_rows))
+        summary = {'status': self.baseline_value['status'], 'finished_at': self.baseline_value['finished_at'],
+                   'selected_prompt_ids': self.baseline_value['selected_prompt_ids'],
+                   'selected_arms': self.baseline_value['selected_arms'], 'planned_answers': 400,
+                   'written_answers': len(self.baseline_rows), 'unattempted_answers': 400 - len(self.baseline_rows),
+                   'answer_status_counts': dict(Counter(row['status'] for row in self.baseline_rows)),
+                   'calls': sum(len(row['attempts']) for row in self.baseline_rows)}
+        (self.baseline.parent / 'summary.json').write_text(json.dumps(summary))
 
     def test_running_dependency_waits_five_seconds_then_generates_only_dev_twenty(self):
         def complete(seconds):
@@ -270,6 +300,131 @@ class CodexCycleQueueTests(unittest.TestCase):
         self.assertEqual(len(candidates), 1)
         self.assertEqual(candidates[0]['status'], 'blocked')
         self.assertEqual(candidates[0]['error']['code'], 'connection_error')
+
+    def test_explicit_finalized_partial_control_generates_dev_pairs_without_relabeling_source(self):
+        self.finalize_partial_control()
+        source_paths = [self.baseline, self.baseline.parent / 'summary.json', self.baseline.parent / 'answers.jsonl']
+        original = {path: path.read_bytes() for path in source_paths}
+        self.assertEqual(self.run_queue(allow_finalized_dev_control=True), 0)
+        self.assertEqual(len(self.generated), 1)
+        self.assertTrue(self.generated[0][1]['allow_finalized_dev_control'])
+        state = json.loads((self.out / 'queue.json').read_text())
+        self.assertEqual(state['original_baseline_status'], 'partial')
+        self.assertNotIn('baseline_completed_byte_sha256', state)
+        self.assertEqual(state['validated_development_control']['validated_count'], 20)
+        self.assertEqual(state['validated_development_control']['answers_byte_sha256'],
+                         hashlib.sha256(original[source_paths[2]]).hexdigest())
+        comparison = json.loads((self.out / 'comparison' / 'manifest.json').read_text())
+        self.assertEqual(comparison['sources']['baseline']['original_manifest_status'], 'partial')
+        self.assertEqual(comparison['sources']['baseline']['validated_development_control'],
+                         state['validated_development_control'])
+        rows = [json.loads(line) for line in (self.out / 'comparison' / 'answers.jsonl').read_text().splitlines()]
+        self.assertEqual([row for row in rows if row['arm'] == 'grounded_call'],
+                         [row for row in self.baseline_rows if row['arm'] == 'grounded_call'][:20])
+        self.assertEqual(original, {path: path.read_bytes() for path in source_paths})
+
+    def test_explicit_partial_control_rejects_invalid_sources_before_invoking_runner(self):
+        self.finalize_partial_control()
+        good_rows, good_manifest = deepcopy(self.baseline_rows), deepcopy(self.baseline_value)
+        for variant in ('failed', 'truncated', 'missing', 'duplicate', 'request_hash', 'unfinalized', 'wrong_summary'):
+            with self.subTest(variant=variant):
+                self.out = self.root / 'results' / ('explicit-invalid-' + variant)
+                self.baseline_rows = deepcopy(good_rows)
+                self.baseline_value = deepcopy(good_manifest)
+                if variant in ('failed', 'truncated'):
+                    self.baseline_rows[1]['status'] = variant
+                elif variant == 'missing':
+                    self.baseline_rows.pop(1)
+                elif variant == 'duplicate':
+                    self.baseline_rows.append(deepcopy(self.baseline_rows[1]))
+                elif variant == 'request_hash':
+                    self.baseline_rows[1]['attempts'][0]['request_sha256'] = 'wrong'
+                elif variant == 'unfinalized':
+                    self.baseline_value.pop('finished_at')
+                self.write_baseline()
+                if variant != 'unfinalized':
+                    self.write_control_rows()
+                if variant == 'wrong_summary':
+                    summary_path = self.baseline.parent / 'summary.json'
+                    summary = json.loads(summary_path.read_text())
+                    summary['finished_at'] = '2026-10-11T07:00:00+00:00'
+                    summary_path.write_text(json.dumps(summary))
+                self.assertEqual(self.run_queue(allow_finalized_dev_control=True), 2)
+                self.assertEqual(self.generated, [])
+                self.assertFalse((self.out / 'candidate').exists())
+                state = json.loads((self.out / 'queue.json').read_text())
+                self.assertEqual(state['status'], 'blocked')
+
+    def test_explicit_comparison_rejects_control_changes_after_candidate_generation(self):
+        self.finalize_partial_control()
+        candidate = self.root / 'results' / 'candidate-source'
+        cycle.run_cycle(self.data, self.baseline, self.instructions, candidate,
+                        transport=FakeTransport(), allow_finalized_dev_control=True)
+        text, source = cycle.load_instructions(self.instructions, 'codex_guided_v3', 'codex_guided_v3')
+        self.baseline_rows[1]['private_metadata'] = 'Source changed after generation'
+        self.write_control_rows()
+        comparison = self.root / 'results' / 'comparison-source-changed'
+        with self.assertRaisesRegex(ValueError, 'changed after candidate generation'):
+            queue.comparison_snapshot(self.data, self.baseline, candidate, comparison,
+                                      'codex_guided_v3', text, source, packet_runner=self.fake_packets,
+                                      allow_finalized_dev_control=True)
+        self.assertFalse(comparison.exists())
+
+    def test_unavailable_model_metadata_is_recorded_as_blocked_with_zero_inference_calls(self):
+        self.finalize_partial_control()
+        class UnavailableTransport(FakeTransport):
+            def model_metadata(self, model):
+                return {'name': model, 'digest': None, 'metadata_status': 'unavailable'}
+        transport = UnavailableTransport()
+        def unavailable_cycle(*args, **kwargs):
+            return cycle.run_cycle(*args, **kwargs, transport=transport)
+        code = queue.run_queue(self.data, self.baseline, self.instructions, self.out,
+                               cycle_runner=unavailable_cycle, packet_runner=self.fake_packets,
+                               allow_finalized_dev_control=True)
+        self.assertEqual(code, 2)
+        self.assertEqual(transport.calls, 0)
+        state = json.loads((self.out / 'queue.json').read_text())
+        self.assertEqual((state['status'], state['reason']), ('blocked', 'model_metadata_unavailable'))
+        self.assertEqual(state['generation']['calls'], 0)
+        self.assertEqual(state['generation']['written_answers'], 0)
+        self.assertFalse((self.out / 'candidate').exists())
+
+    def test_queue_to_runner_control_mutation_blocks_before_model_metadata_or_inference(self):
+        self.finalize_partial_control()
+        transport = FakeTransport()
+        metadata_calls = []
+        original_metadata = transport.model_metadata
+        def metadata(model):
+            metadata_calls.append(model)
+            return original_metadata(model)
+        transport.model_metadata = metadata
+        def mutate_before_runner(*args, **kwargs):
+            self.baseline_rows[1]['private_metadata'] = 'Changed between queue gate and runner'
+            self.write_control_rows()
+            return cycle.run_cycle(*args, **kwargs, transport=transport)
+        code = queue.run_queue(self.data, self.baseline, self.instructions, self.out,
+                               cycle_runner=mutate_before_runner, packet_runner=self.fake_packets,
+                               allow_finalized_dev_control=True)
+        self.assertEqual(code, 2)
+        self.assertEqual((transport.calls, metadata_calls, self.packet_calls), (0, [], []))
+        self.assertFalse((self.out / 'candidate').exists())
+        state = json.loads((self.out / 'queue.json').read_text())
+        self.assertEqual(state['status'], 'blocked')
+
+    def test_finalized_status_matches_legacy_failed_semantics_without_rejecting_unselected_truncation(self):
+        self.finalize_partial_control()
+        self.baseline_value['status'] = 'completed'
+        self.write_baseline()
+        self.write_control_rows()
+        self.assertEqual(self.run_queue(allow_finalized_dev_control=True), 2)
+        self.assertEqual(self.generated, [])
+        # Legacy completed means every call finished without a failed answer;
+        # unrelated raw truncation does not disqualify completed dev controls.
+        self.baseline_rows[-2].update(status='truncated', answer='Synthetic unrelated partial raw answer')
+        self.write_control_rows()
+        self.out = self.root / 'results' / 'completed-with-raw-truncation'
+        self.assertEqual(self.run_queue(allow_finalized_dev_control=True), 0)
+        self.assertEqual(len(self.generated), 1)
 
 
 if __name__ == '__main__':

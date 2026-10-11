@@ -83,6 +83,12 @@ Harmony 특수 토큰은 프롬프트에 직접 붙이지 않습니다. Ollama�
 현재 비교의 평가 답변은 채점할 수 있지만 프롬프트 수정 근거로 사용하지 않습니다.
 대화 이력 압축 방식이나 temperature도 한 번에 하나씩 바꿔야 기여도를 구분할 수 있습니다.
 
+첫 개발 반복의 최대 후보 수는 3개이며, 연속 2개에서 품질 개선이 없으면 중단합니다.
+새 중대한 오류나 보류 판정이 있으면 채택을 멈춥니다. 이 중단 정책과 부분 완료 실행에서
+정상 완료된 개발 대조군만 검증하는 명시적 경로는
+[Codex 검증 과정](CODEX_VERIFIER.md)에 기록합니다. 새 후보 생성과 독립 검토가 끝나기 전에는
+반복 개선이 효과를 냈다고 표시하지 않습니다.
+
 문서상 평가 권고는 기준별 pass/fail, A/B 비교, 순서·길이 편향 통제, 사람 평가와의 대조입니다.
 여기서는 Codex가 기준별 판단을 하며 공식 HealthBench 점수나 임상 검증으로 표시하지 않습니다.
 [OpenAI Evaluation best practices](https://developers.openai.com/api/docs/guides/evaluation-best-practices),

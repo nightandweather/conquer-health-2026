@@ -21,7 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from benchmarks.healthbench import DEFAULT_BASE_URL, DEFAULT_MODEL, canonical_hash, load_dataset, utc_now, write_json
-from benchmarks.healthbench_codex_cycle import REVIEW_REQUIRED, _output_path, load_instructions, make_payload, run_cycle
+from benchmarks.healthbench_codex_cycle import (REVIEW_REQUIRED, ModelMetadataUnavailable, _output_path, codex_baseline_snapshot,
+                                               load_instructions, make_payload, run_cycle)
 from benchmarks.healthbench_score import _answer_index
 
 
@@ -62,7 +63,8 @@ def validate_baseline(value: dict, dataset: dict) -> None:
 
 def comparison_snapshot(data: Path, baseline_manifest: Path, candidate: Path, out: Path,
                         name: str, instructions: str, instructions_metadata: dict,
-                        *, packet_runner=None) -> dict:
+                        *, packet_runner=None, allow_finalized_dev_control: bool = False,
+                        expected_baseline_snapshot: dict | None = None) -> dict:
     """Validate immutable source snapshots, then preserve actual selected rows."""
     out = _output_path(out)
     items, dataset = load_dataset(data, limit=0)
@@ -70,10 +72,19 @@ def comparison_snapshot(data: Path, baseline_manifest: Path, candidate: Path, ou
     dev_ids = [item['prompt_id'] for item in items[:20]]
     baseline, baseline_raw = read_manifest(baseline_manifest)
     candidate_manifest, candidate_raw = read_manifest(candidate / 'manifest.json')
-    if baseline.get('status') != 'completed':
+    if baseline.get('status') != 'completed' and not allow_finalized_dev_control:
         raise ValueError('Comparison requires a completed baseline')
-    _, dev_dataset = load_dataset(data, limit=20)
+    dev_items, dev_dataset = load_dataset(data, limit=20)
     validate_baseline(baseline, dev_dataset)
+    frozen_baseline = codex_baseline_snapshot(baseline_manifest, prepare_only=False, dataset=dev_dataset,
+                                             selected=dev_items, model=DEFAULT_MODEL, base_url=DEFAULT_BASE_URL,
+                                             allow_finalized_dev_control=allow_finalized_dev_control)
+    if expected_baseline_snapshot is not None and frozen_baseline != expected_baseline_snapshot:
+        raise ValueError('Baseline source changed after the queue validated its development control')
+    if (allow_finalized_dev_control and
+            (candidate_manifest.get('baseline') != frozen_baseline
+             or frozen_baseline['sha256'] != _sha(baseline_raw))):
+        raise ValueError('Validated development control changed after candidate generation')
     if (candidate_manifest.get('dataset', {}).get('sha256') != dataset['sha256']
             or candidate_manifest.get('selected_prompt_ids') != dev_ids
             or candidate_manifest.get('selected_arms') != [name]
@@ -97,6 +108,11 @@ def comparison_snapshot(data: Path, baseline_manifest: Path, candidate: Path, ou
                           'original_manifest_status': manifest_value.get('status'),
                           'manifest_path': str((baseline_manifest if label == 'baseline' else candidate / 'manifest.json').resolve()),
                           'answers_path': str(path.resolve())}
+        if label == 'baseline' and allow_finalized_dev_control:
+            control = frozen_baseline['development_control']
+            if control['answers_byte_sha256'] != _sha(raw):
+                raise ValueError('Validated development control answers changed while building comparison')
+            sources[label]['validated_development_control'] = deepcopy(control)
     baseline_rows = {row['prompt_id']: row for row in source_rows['baseline'] if row['arm'] == 'grounded_call'}
     candidate_rows = {row['prompt_id']: row for row in source_rows['candidate']}
     if any(row['arm'] != name or row['prompt_id'] not in dev_ids for row in source_rows['candidate']):
@@ -150,14 +166,15 @@ def comparison_snapshot(data: Path, baseline_manifest: Path, candidate: Path, ou
 
 def run_queue(data: Path, baseline_manifest: Path, instructions_file: Path, out: Path, *,
               name: str = 'codex_guided_v3', version: str | None = None, maximum_wait_seconds: float = 7200,
-              cycle_runner=None, packet_runner=None, clock=time.monotonic, sleeper=time.sleep) -> int:
+              cycle_runner=None, packet_runner=None, clock=time.monotonic, sleeper=time.sleep,
+              allow_finalized_dev_control: bool = False) -> int:
     if (isinstance(maximum_wait_seconds, bool) or not isinstance(maximum_wait_seconds, (int, float))
             or not math.isfinite(maximum_wait_seconds) or maximum_wait_seconds <= 0):
         raise ValueError('Maximum wait must be positive and finite')
     out = _output_path(out)
     if out.exists():
         raise ValueError('Queue output must be a new private directory; no overwrite or resumption')
-    _, dataset = load_dataset(data, limit=20)
+    selected, dataset = load_dataset(data, limit=20)
     baseline, initial_raw = read_manifest(baseline_manifest)
     validate_baseline(baseline, dataset)
     instructions, instruction_metadata = load_instructions(instructions_file, name, name if version is None else version)
@@ -166,6 +183,7 @@ def run_queue(data: Path, baseline_manifest: Path, instructions_file: Path, out:
              'baseline_scope_sha256': frozen_scope, 'baseline_initial_byte_sha256': _sha(initial_raw),
              'dataset_sha256': dataset['sha256'], 'development_prompt_ids': dataset['selected_prompt_ids'],
              'instructions': instruction_metadata, 'model': deepcopy(baseline['model']),
+             'allow_finalized_dev_control': allow_finalized_dev_control,
              'score': None, 'score_status': REVIEW_REQUIRED}
     out.mkdir(parents=True, mode=0o700)
     write_json(out / 'queue.json', state)
@@ -174,6 +192,7 @@ def run_queue(data: Path, baseline_manifest: Path, instructions_file: Path, out:
         write_json(out / 'queue.json', state)
         return code
     deadline = clock() + maximum_wait_seconds
+    validated = None
     try:
         while True:
             current, raw = read_manifest(baseline_manifest)
@@ -184,7 +203,7 @@ def run_queue(data: Path, baseline_manifest: Path, instructions_file: Path, out:
             if _sha(instructions_file.read_bytes()) != instruction_metadata['byte_sha256']:
                 return stop('instructions_changed')
             status = current.get('status')
-            if status == 'completed':
+            if status == 'completed' or (allow_finalized_dev_control and status == 'partial'):
                 break
             if status != 'running':
                 return stop('baseline_' + str(status))
@@ -192,15 +211,28 @@ def run_queue(data: Path, baseline_manifest: Path, instructions_file: Path, out:
             if remaining <= 0:
                 return stop('maximum_wait_elapsed')
             sleeper(min(5, remaining))
-        state.update(status='running', baseline_completed_byte_sha256=_sha(raw))
+        if allow_finalized_dev_control:
+            validated = codex_baseline_snapshot(baseline_manifest, prepare_only=False, dataset=dataset,
+                                                selected=selected, model=DEFAULT_MODEL, base_url=DEFAULT_BASE_URL,
+                                                allow_finalized_dev_control=True)
+            if validated['sha256'] != _sha(raw):
+                return stop('baseline_changed_during_control_validation')
+            state['validated_development_control'] = validated['development_control']
+        state.update(status='running', baseline_finalized_byte_sha256=_sha(raw), original_baseline_status=status)
+        if status == 'completed':
+            state['baseline_completed_byte_sha256'] = _sha(raw)
         write_json(out / 'queue.json', state)
         runner = cycle_runner or run_cycle
         summary, code = runner(data, baseline_manifest, instructions_file, out / 'candidate',
-                               name=name, version=version, model=DEFAULT_MODEL, base_url=DEFAULT_BASE_URL)
+                               name=name, version=version, model=DEFAULT_MODEL, base_url=DEFAULT_BASE_URL,
+                               allow_finalized_dev_control=allow_finalized_dev_control,
+                               expected_baseline_snapshot=validated)
         state['generation'] = summary
         if (out / 'candidate' / 'answers.jsonl').exists():
             state['comparison'] = comparison_snapshot(data, baseline_manifest, out / 'candidate', out / 'comparison',
-                                                      name, instructions, instruction_metadata, packet_runner=packet_runner)
+                                                      name, instructions, instruction_metadata, packet_runner=packet_runner,
+                                                      allow_finalized_dev_control=allow_finalized_dev_control,
+                                                      expected_baseline_snapshot=validated)
         if code == 130:
             return stop('candidate_interrupted', 130)
         state.update(status='completed' if code == 0 and summary.get('status') == 'completed' else 'partial',
@@ -209,6 +241,11 @@ def run_queue(data: Path, baseline_manifest: Path, instructions_file: Path, out:
         return 0 if state['status'] == 'completed' else 1
     except KeyboardInterrupt:
         return stop('queue_interrupted', 130)
+    except ModelMetadataUnavailable:
+        state['generation'] = {'status': 'blocked', 'reason': 'model_metadata_unavailable',
+                               'calls': 0, 'written_answers': 0, 'unattempted_answers': len(selected),
+                               'score': None, 'score_status': REVIEW_REQUIRED}
+        return stop('model_metadata_unavailable')
     except (ValueError, OSError, TypeError, KeyError) as exc:
         return stop('queue_input_or_snapshot_error:' + type(exc).__name__)
 
@@ -220,11 +257,14 @@ def main(argv=None) -> int:
     parser.add_argument('--candidate-name', default='codex_guided_v3')
     parser.add_argument('--instructions-version')
     parser.add_argument('--maximum-wait-seconds', type=float, default=7200)
+    parser.add_argument('--allow-finalized-dev-control', action='store_true',
+                        help='Explicitly validate completed dev20 controls while retaining original partial baseline status')
     args = parser.parse_args(argv)
     try:
         code = run_queue(args.data, args.baseline_manifest, args.instructions_file, args.out,
                          name=args.candidate_name, version=args.instructions_version,
-                         maximum_wait_seconds=args.maximum_wait_seconds)
+                         maximum_wait_seconds=args.maximum_wait_seconds,
+                         allow_finalized_dev_control=args.allow_finalized_dev_control)
     except (ValueError, OSError) as exc:
         parser.error(str(exc))
     print('Codex-guided development queue finished; independent Codex review remains pending.', flush=True)
