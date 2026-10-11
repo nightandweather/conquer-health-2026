@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "verified_date": "2026-10-10",
+  "state": "local_smoke_completed_ungraded",
+  "tests": {
+    "healthbench_synthetic_tests": 34,
+    "nova_existing_regression_tests": 8,
+    "all_passed": true
+  },
+  "data": {
+    "dataset_kind": "legacy_consensus_val_200",
+    "normalized_context": true,
+    "lost_original_prompt_ids": true,
+    "canonical_score_comparable": false,
+    "count": 200,
+    "rubric_count": 438,
+    "history_count": 81,
+    "source_sha256": "1a6c39c254391679bf1ceeb9c49bc2470fbdae19e0923d26dca533082eed67ae",
+    "converted_sha256": "c42bebdd8d7687482dc95f8ec267662ee1a64db7586c558de7529cead0da171f"
+  },
+  "input_validation": {
+    "status": "dry_run",
+    "selected_count": 200,
+    "planned_answers": 400,
+    "network_calls": 0
+  },
+  "model_attempt": {
+    "model": "gpt-oss:20b",
+    "model_digest": "f38aa0c53da5f8c49d08c43a99df24ff53167fe68e24664a7777288e7656fdfe",
+    "model_details": {
+      "parent_model": "dhiltgen/gpt-oss:20b-llamacpp",
+      "format": "gguf",
+      "family": "gpt-oss",
+      "families": [
+        "gpt-oss"
+      ],
+      "parameter_size": "20.9B",
+      "quantization_level": "MXFP4",
+      "context_length": 131072,
+      "embedding_length": 2880,
+      "runner": "llamacpp"
+    },
+    "endpoint": "local Ollama",
+    "status": "completed",
+    "started_at": "2026-10-11T04:16:22+00:00",
+    "finished_at": "2026-10-11T04:20:47+00:00",
+    "selected_count": 3,
+    "selection": "first 3 sorted normalized prompt IDs; smoke check",
+    "planned_answers": 6,
+    "written_answers": 6,
+    "nonempty_answers": 6,
+    "attempted_chat_requests": 9,
+    "responses_received": 9,
+    "seconds": 264.897,
+    "answer_status_counts": {
+      "truncated": 1,
+      "completed": 5
+    },
+    "attempt_status_counts": {
+      "truncated": 2,
+      "completed": 5,
+      "failed": 2
+    },
+    "usage": {
+      "prompt_tokens": 1347,
+      "completion_tokens": 26478,
+      "total_tokens": 27825
+    },
+    "score": null,
+    "score_status": "not_scored",
+    "arms": {
+      "raw_default": {
+        "answers": 3,
+        "status_counts": {
+          "truncated": 1,
+          "completed": 2
+        },
+        "finish_reason_counts": {
+          "length": 1,
+          "stop": 2
+        },
+        "calls": 3,
+        "fallback_answers": 0,
+        "seconds": 53.857,
+        "usage": {
+          "prompt_tokens": 251,
+          "completion_tokens": 4835,
+          "total_tokens": 5086
+        }
+      },
+      "lunit_call": {
+        "answers": 3,
+        "status_counts": {
+          "completed": 3
+        },
+        "finish_reason_counts": {
+          "stop": 3
+        },
+        "calls": 6,
+        "fallback_answers": 3,
+        "seconds": 211.039,
+        "usage": {
+          "prompt_tokens": 1096,
+          "completion_tokens": 21643,
+          "total_tokens": 22739
+        },
+        "first_attempt_counts": {
+          "length_with_nonempty_answer": 1,
+          "length_with_empty_answer": 2
+        }
+      }
+    }
+  },
+  "canonical_301": {
+    "selection_ids_verified": 301,
+    "main_dataset_available": false,
+    "ids_sha256": "e4047a7adb607cda11270d3d76b80270e75bff8081bdb64f20f78f77f963c8b9"
+  },
+  "submission_check": {
+    "offline_import_prepare": "passed",
+    "files": 3,
+    "zip_bytes": 7275,
+    "sha256": "f8c95613f13572d3ff1fb7142aec4550829053ef5f4f85260aafb60f98c5505e"
+  },
+  "notice": "Six nonempty candidate answers were generated. Five finished with stop and one raw_default answer was truncated. All three lunit_call answers used a low-effort fallback. No criterion judgments or HealthBench scores were obtained; this smoke check does not establish clinical quality or improvement."
+}
