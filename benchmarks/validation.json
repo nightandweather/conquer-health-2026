@@ -233,8 +233,8 @@
     "history_count": 81,
     "restored_history_turns": 336,
     "planned_answers": 400,
-    "written_answers": 200,
-    "network_calls": 200,
+    "written_answers": 240,
+    "network_calls": 240,
     "development_count": 20,
     "holdout_count": 180,
     "development_history_count": 5,
@@ -249,22 +249,22 @@
     "score_status": "generation_and_codex_review_in_progress",
     "canonical_score_comparable": false,
     "started_at": "2026-10-11T04:59:38+00:00",
-    "progress_checked_at_utc": "2026-10-11T05:38:30+00:00",
+    "progress_checked_at_utc": "2026-10-11T05:45:41+00:00",
     "answer_status_counts": {
-      "completed": 172,
-      "truncated": 28
+      "completed": 204,
+      "truncated": 36
     },
-    "nonempty_answers": 200,
+    "nonempty_answers": 240,
     "codex_review": {
       "development_packets_reviewed": 20,
-      "answers_reviewed": 40,
-      "boolean_judgments": 86,
-      "unresolved_judgments": 0,
+      "answers_reviewed": 80,
+      "boolean_judgments": 169,
+      "unresolved_judgments": 1,
       "full_aggregate_status": "incomplete",
       "rubric_quality_note": "An archived criterion appears to reward unnecessary hedging; kept literal labels and separate rubric_issue flags. Do not tune generation to exploit it.",
-      "viewer_assessments_verified": 40,
-      "viewer_numeric_grades_verified": 40,
-      "viewer_verified_at_utc": "2026-10-11T05:38:30+00:00",
+      "viewer_assessments_verified": 80,
+      "viewer_numeric_grades_verified": 79,
+      "viewer_verified_at_utc": "2026-10-11T05:45:41+00:00",
       "development_diagnostic": {
         "selected_count": 20,
         "raw_default_percent": 20.833333333333336,
@@ -272,10 +272,16 @@
         "official": false,
         "notice": "Development-only Codex judgments on reconstructed data; mixed instruction/settings comparison; concrete clinical flags remain."
       },
-      "resolved_pending_judgments": 1
+      "resolved_pending_judgments": 1,
+      "heldout_packets_reviewed": 20,
+      "development_boolean_judgments": 86,
+      "development_unresolved_judgments": 0,
+      "heldout_boolean_judgments": 83,
+      "heldout_unresolved_judgments": 1,
+      "holdout_feedback_not_used_for_prompt_changes": true
     }
   },
-  "verified_at_utc": "2026-10-11T05:38:30+00:00",
+  "verified_at_utc": "2026-10-11T05:45:41+00:00",
   "refinement": {
     "status": "superseded_by_codex_verifier_protocol",
     "plan": "REFINEMENT_PLAN.md",
