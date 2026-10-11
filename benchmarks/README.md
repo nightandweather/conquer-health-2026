@@ -143,8 +143,11 @@ python3 -m benchmarks.healthbench \
 역할 복원 자료 SHA-256:
 `cd3516c601da6f67fc7b6db3439efdf2659a91534c09c6bc1c5d363889ed4033`.
 
-공식 문서에서 확인한 gpt-oss·Ollama 설정과 최대 3호출의 검토·수정 흐름은
-[후속 개선 실험](REFINEMENT_PLAN.md)에 있습니다. 현재 전수 실행의 지침이나 설정은 바꾸지 않습니다.
+**gpt-oss는 답변을 생성하고 Codex가 검증·개선·재검증을 담당합니다.** 개발 20문항의 실패를
+보고 일반 지침을 바꾼 뒤 같은 생성 조건으로 다시 비교하는 절차와 후보는
+[Codex 검증 과정](CODEX_VERIFIER.md)에 있습니다. 자기 검토는 보조 실험입니다.
+공식 문서에서 확인한 gpt-oss·Ollama 설정은 [후속 개선 실험](REFINEMENT_PLAN.md)에 있습니다.
+현재 전수 실행의 지침이나 설정은 바꾸지 않습니다.
 
 Main 원본과 CoEval 목록이 준비되면:
 

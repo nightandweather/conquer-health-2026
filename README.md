@@ -99,7 +99,10 @@ API 키도 제거했습니다. `LUNIT_FM_API_KEY` 환경변수로 주입하십�
 답변 화면에 Markdown 읽기 모드와 200문항 탐색을 추가했습니다. 역할을 복원한 200문항의
 기본·개선 400답변 생성을 시작했고 Codex가 개발용 20문항의 답변을 기준별로 검토했습니다.
 전체 점수는 아직 미완료이며 진행 기록은 [validation.json](benchmarks/validation.json)에 있습니다.
-공식 gpt-oss·Ollama 문서에서 확인한 설정과 최대 3호출의 반복 검토 흐름은
-[후속 개선 실험](benchmarks/REFINEMENT_PLAN.md)에 기록했습니다. 기준선 완료 후 개발용
-20문항의 low·medium 실험을 순서대로 실행하도록 연결했고, 평가 180문항은 지침 수정에 사용하지 않습니다.
+후속 개선에서는 **gpt-oss가 답변을 생성하고 Codex가 독립 검증·지침 수정·재검증을 담당합니다.**
+개발 20문항의 실패를 보고 일반 지침을 고친 뒤 같은 생성 조건으로 다시 비교하는
+[Codex 검증 과정](benchmarks/CODEX_VERIFIER.md)을 준비했습니다. 자기 검토는 보조 실험이며
+자동 실행 대기 큐는 생성 전에 종료했습니다. 평가 180문항은 지침 수정에 사용하지 않습니다.
+공식 gpt-oss·Ollama 문서에서 확인한 설정과 보조 실험은
+[후속 개선 실험](benchmarks/REFINEMENT_PLAN.md)에 기록했습니다.
 [정확도와 시간 검토 계획](benchmarks/EVALUATION_PLAN.md)에 고정 조건과 Codex 검토 절차를 기록했습니다.
