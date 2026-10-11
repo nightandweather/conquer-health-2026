@@ -3,7 +3,7 @@
 루닛 Conquer Health에서 사용한 호출 설정을 로컬 Ollama `gpt-oss:20b`에 적용해,
 같은 의료 대화에 대한 기본 호출과 비교하는 실험입니다. Python 3.12와 표준 라이브러리만 사용합니다.
 
-2026-10-10 로컬 동작 검증에서 **3문항 × 2설정의 답변 6개를 생성**했습니다.
+최초 2026-10-10 로컬 동작 검증에서 **3문항 × 2설정의 답변 6개를 생성**했습니다.
 총 264.897초, 재호출 포함 9번의 요청이었으며, HealthBench 기준별 채점은 수행하지 않았습니다.
 
 | 설정 | stop으로 완료 | 출력 한도에 걸림 | 호출 수 | 호출 시간 합 | 재호출 |
@@ -18,7 +18,29 @@
 사고 토큰과 최종 답변 토큰은 별도로 분리해 저장하지 않았습니다.
 세부 설정·모델 digest·토큰·시간은 [검증 기록](validation.json)에 있습니다.
 
-## 비교 조건
+## 개선 설정과 대화 화면
+
+`grounded_call`은 제공된 환자 사실만 사용하고, 누락된 진단·진찰·수치·약·계획은
+빈칸으로 표시하도록 요구하는 별도 실험입니다. 불확실한 임상시험·약물 용량을
+추측하지 말고, 요청 범위 안에서 간결하게 답하도록 합니다. temperature 0,
+reasoning_effort low, 2,048토큰, 한 번의 호출을 사용합니다.
+학습이나 파인튜닝을 수행하지 않으며, 기존 기본·루닛 조건은 보존합니다.
+
+```sh
+python3 -m benchmarks.healthbench \
+  --data private_data/healthbench/legacy_consensus_val.json \
+  --arms raw_default,lunit_call,grounded_call \
+  --limit 3 --out results/healthbench-three-arms
+
+python3 -m local_tools.dialogue_server --port 8766
+```
+
+[로컬 대화 화면 사용법](../local_tools/README.md)에 실행법이 있습니다.
+`http://127.0.0.1:8766`에서 세 답변을 비교하고 새 답변이 생성되는 동안 볼 수 있습니다.
+`--arms`를 생략한 CLI 기본값은 기존 두 설정이며, 채점 manifest에는 실제 실행한
+설정만 넣습니다. 표시된 과거 기록과 새 기록은 각 열의 실행 이름으로 구분합니다.
+
+## 기존 비교 조건
 
 | 항목 | `raw_default` | `lunit_call` |
 |---|---|---|
@@ -140,7 +162,7 @@ python3 -m benchmarks.healthbench_score \
 python3 -m unittest discover -s tests -p '*healthbench*.py' -v
 ```
 
-[검증 기록](validation.json)에 합성 검사 34개, NOVA 기존 검사 8개 및 로컬 답변 생성 결과를 기록합니다.
+[검증 기록](validation.json)에 HealthBench 합성 검사 43개, 대화 화면 검사 5개, NOVA 기존 검사 8개 및 로컬 답변 생성 결과를 기록합니다.
 공개 검증 기록에는 문항·답변 원문이 없습니다.
 
 호출 방식의 기준 코드는

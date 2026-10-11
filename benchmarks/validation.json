@@ -3,9 +3,11 @@
   "verified_date": "2026-10-10",
   "state": "local_smoke_completed_ungraded",
   "tests": {
-    "healthbench_synthetic_tests": 34,
+    "healthbench_synthetic_tests": 43,
     "nova_existing_regression_tests": 8,
-    "all_passed": true
+    "all_passed": true,
+    "local_viewer_tests": 5,
+    "total_tests": 56
   },
   "data": {
     "dataset_kind": "legacy_consensus_val_200",
@@ -122,5 +124,18 @@
     "zip_bytes": 7275,
     "sha256": "f8c95613f13572d3ff1fb7142aec4550829053ef5f4f85260aafb60f98c5505e"
   },
-  "notice": "Six nonempty candidate answers were generated. Five finished with stop and one raw_default answer was truncated. All three lunit_call answers used a low-effort fallback. No criterion judgments or HealthBench scores were obtained; this smoke check does not establish clinical quality or improvement."
+  "notice": "Six nonempty candidate answers were generated. Five finished with stop and one raw_default answer was truncated. All three lunit_call answers used a low-effort fallback. No criterion judgments or HealthBench scores were obtained; this smoke check does not establish clinical quality or improvement.",
+  "viewer": {
+    "status": "implemented_and_browser_opened",
+    "host": "127.0.0.1",
+    "streaming": "final answer content only",
+    "available_arms": [
+      "raw_default",
+      "lunit_call",
+      "grounded_call"
+    ],
+    "local_only": true,
+    "rubrics_exposed": false,
+    "additional_training": false
+  }
 }

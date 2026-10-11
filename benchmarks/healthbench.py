@@ -2,6 +2,9 @@
 
 This is one free-response call per prompt/arm, not the NOVA consultation agent.
 Rubrics are validated as dataset fields but never sent to the generation model.
+The default arms remain raw_default and lunit_call; --arms can select a different
+ordered subset, such as raw_default,grounded_call. These are inference settings,
+not changes to model weights.
 """
 
 from __future__ import annotations
@@ -27,12 +30,21 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BASE_URL = 'http://127.0.0.1:11434/v1'
 DEFAULT_MODEL = 'gpt-oss:20b'
 ARMS = ('raw_default', 'lunit_call')
+AVAILABLE_ARMS = ARMS + ('grounded_call',)
 SUFFIX = ("Do not substitute 'consult a professional' for an answer; answer as far as you can. "
           "Address every distinct thing the user asked about, and state the warning signs that would "
           "require prompt medical attention. If the user offers information you would need — lab or "
           "imaging results, a medication list, measurements — ask them for it. If one decisive detail "
           "is missing and your answer would change because of it, ask for that one thing, while still "
           "answering as far as you can without it.")
+GROUNDED_SUFFIX = (
+    'Use only explicitly provided facts for patient-specific statements. Do not infer undocumented '
+    'diagnoses, negative symptoms, normal examination findings, measurements, medicines, or treatment '
+    'plans. In factual templates or notes, mark missing information clearly with placeholders such as '
+    '[not provided]; never fabricate it. Do not guess when supporting evidence, the existence of a '
+    'clinical trial, or a medication dose is uncertain; state the uncertainty. Ask for additional '
+    'information only when it is necessary to complete the request safely and accurately. Answer '
+    'concisely within the requested scope.')
 FALLBACK_NOTE = ('Named high/low levels adapt L2 on/off; low is reduced effort, '
                  'not equivalent to disabling reasoning.')
 
@@ -44,6 +56,24 @@ def utc_now() -> str:
 def canonical_hash(value) -> str:
     return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True,
                                     separators=(',', ':')).encode('utf-8')).hexdigest()
+
+
+def normalize_arms(arms=ARMS) -> tuple[str, ...]:
+    """Validate an ordered CLI comma list or API list/tuple of generation arms."""
+    if isinstance(arms, str):
+        names = arms.split(',')
+    elif isinstance(arms, (list, tuple)):
+        names = arms
+    else:
+        raise ValueError('--arms must be a comma-separated string or an ordered list/tuple')
+    if not names or any(not isinstance(name, str) or not name.strip() for name in names):
+        raise ValueError('--arms requires at least one nonempty generation arm')
+    chosen = tuple(name.strip() for name in names)
+    if len(set(chosen)) != len(chosen):
+        raise ValueError('--arms contains duplicate generation arms')
+    if any(name not in AVAILABLE_ARMS for name in chosen):
+        raise ValueError('--arms contains an unsupported generation arm; choose from ' + ','.join(AVAILABLE_ARMS))
+    return chosen
 
 
 def dataset_provenance(path: Path, sha256: str, count: int) -> dict:
@@ -125,13 +155,16 @@ def load_dataset(path: Path, limit: int = 3) -> tuple[list[dict], dict]:
 
 
 def build_payload(item: dict, arm: str, model: str = DEFAULT_MODEL, *, fallback: bool = False) -> dict:
-    if arm not in ARMS or (fallback and arm != 'lunit_call'):
+    if arm not in AVAILABLE_ARMS or (fallback and arm != 'lunit_call'):
         raise ValueError('Unsupported generation arm or fallback')
     messages = deepcopy(item['prompt'])
     body = {'model': model, 'messages': messages, 'max_tokens': 2048}
     if arm == 'lunit_call':
         messages[-1]['content'] += '\n\n[' + SUFFIX + ']'
         body.update(temperature=0, max_tokens=6144, reasoning_effort='low' if fallback else 'high')
+    elif arm == 'grounded_call':
+        messages[-1]['content'] += '\n\n[' + GROUNDED_SUFFIX + ']'
+        body.update(temperature=0, reasoning_effort='low')
     return body
 
 
@@ -284,20 +317,26 @@ def write_json(path: Path, value) -> None:
     path.chmod(0o600)
 
 
-def arm_config() -> dict:
-    return {'raw_default': {'max_tokens': 2048, 'temperature': 'omitted; server default unknown',
-                            'reasoning_effort': 'omitted; server default unknown', 'max_attempts': 1},
-            'lunit_call': {'max_tokens': 6144, 'temperature': 0, 'reasoning_effort': 'high',
-                           'suffix': SUFFIX, 'max_attempts': 2, 'fallback_reasoning_effort': 'low',
-                           'fallback_condition': 'empty answer or finish_reason=length',
-                           'fallback_note': FALLBACK_NOTE}}
+def arm_config(arms=ARMS) -> dict:
+    """Return only the selected arms; the no-argument configuration is unchanged."""
+    chosen = normalize_arms(arms)
+    configs = {'raw_default': {'max_tokens': 2048, 'temperature': 'omitted; server default unknown',
+                              'reasoning_effort': 'omitted; server default unknown', 'max_attempts': 1},
+               'lunit_call': {'max_tokens': 6144, 'temperature': 0, 'reasoning_effort': 'high',
+                             'suffix': SUFFIX, 'max_attempts': 2, 'fallback_reasoning_effort': 'low',
+                             'fallback_condition': 'empty answer or finish_reason=length',
+                             'fallback_note': FALLBACK_NOTE},
+               'grounded_call': {'max_tokens': 2048, 'temperature': 0, 'reasoning_effort': 'low',
+                                 'suffix': GROUNDED_SUFFIX, 'max_attempts': 1}}
+    return {arm: configs[arm] for arm in chosen}
 
 
 def run_experiment(data: Path, out: Path, *, limit: int = 3, base_url: str = DEFAULT_BASE_URL,
                    model: str = DEFAULT_MODEL, timeout: float = 300, dry_run: bool = False,
-                   transport=None) -> tuple[dict, int]:
+                   transport=None, arms=ARMS) -> tuple[dict, int]:
     if not isinstance(model, str) or not model.strip():
         raise ValueError('--model must be a nonempty model name')
+    chosen_arms = normalize_arms(arms)
     selected, dataset = load_dataset(data, limit)
     if any((out / name).exists() for name in ('manifest.json', 'answers.jsonl', 'summary.json')):
         raise ValueError('Output already contains experiment artifacts; choose a new --out directory')
@@ -305,21 +344,22 @@ def run_experiment(data: Path, out: Path, *, limit: int = 3, base_url: str = DEF
     out.mkdir(parents=True, exist_ok=True)
     out.chmod(0o700)
     started_at = utc_now()
-    order = [{'prompt_id': item['prompt_id'], 'arms': list(ARMS if index % 2 == 0 else reversed(ARMS))}
+    order = [{'prompt_id': item['prompt_id'], 'arms': list(chosen_arms if index % 2 == 0 else reversed(chosen_arms))}
              for index, item in enumerate(selected)]
     # Dry runs intentionally do not inspect the model server or generate an answers file.
     metadata = {'name': model, 'digest': None, 'metadata_status': 'not_requested'}
     manifest = {'schema_version': 1, 'started_at': started_at, 'status': 'dry_run' if dry_run else 'running',
                 'benchmark': 'HealthBench', 'experiment': 'single free-response generation; not NOVA consultation agent',
                 'dataset': dataset, 'selected_prompt_ids': dataset['selected_prompt_ids'],
+                'selected_arms': list(chosen_arms),
                 'config': {'data': str(data.resolve()), 'out': str(out.resolve()), 'limit': limit,
                            'base_url': base_url.rstrip('/'), 'model': model, 'timeout': timeout, 'dry_run': dry_run,
-                           'api_key_env': 'HEALTHBENCH_API_KEY'},
-                'model': metadata, 'arms': arm_config(), 'execution_order': order,
+                           'api_key_env': 'HEALTHBENCH_API_KEY', 'arms': list(chosen_arms)},
+                'model': metadata, 'arms': arm_config(chosen_arms), 'execution_order': order,
                 'score': None, 'score_status': 'not_scored'}
     # Validate every planned request even when no transport calls are requested.
     for item in selected:
-        for arm in ARMS:
+        for arm in chosen_arms:
             build_payload(item, arm, model)
     write_json(out / 'manifest.json', manifest)
     if not dry_run:
@@ -353,8 +393,9 @@ def run_experiment(data: Path, out: Path, *, limit: int = 3, base_url: str = DEF
             status, exit_code = 'partial', 1
     summary = {'status': status, 'started_at': started_at, 'finished_at': utc_now(),
                'seconds': round(time.monotonic() - started, 3), 'selected_prompt_ids': dataset['selected_prompt_ids'],
-               'planned_answers': len(selected) * len(ARMS), 'written_answers': len(records),
-               'unattempted_answers': len(selected) * len(ARMS) - len(records),
+               'selected_arms': list(chosen_arms),
+               'planned_answers': len(selected) * len(chosen_arms), 'written_answers': len(records),
+               'unattempted_answers': len(selected) * len(chosen_arms) - len(records),
                'answer_status_counts': dict(Counter(record['status'] for record in records)),
                'attempt_status_counts': dict(Counter(attempt['status'] for record in records for attempt in record['attempts'])),
                'calls': sum(len(record['attempts']) for record in records),
@@ -373,6 +414,8 @@ def main(argv=None) -> int:
     parser.add_argument('--limit', type=int, default=3, help='First N sorted prompt IDs; 0 means all')
     parser.add_argument('--base-url', default=DEFAULT_BASE_URL, help='Explicit OpenAI-compatible endpoint')
     parser.add_argument('--model', default=DEFAULT_MODEL)
+    parser.add_argument('--arms', default=','.join(ARMS),
+                        help='Ordered comma-separated arms: ' + ','.join(AVAILABLE_ARMS))
     parser.add_argument('--timeout', type=float, default=300)
     parser.add_argument('--dry-run', action='store_true', help='Validate inputs/configuration without network access')
     args = parser.parse_args(argv)
@@ -382,7 +425,7 @@ def main(argv=None) -> int:
         parser.error('--out must be inside this repository\'s private results/ directory')
     try:
         summary, code = run_experiment(args.data, args.out, limit=args.limit, base_url=args.base_url,
-                                       model=args.model, timeout=args.timeout, dry_run=args.dry_run)
+                                       model=args.model, timeout=args.timeout, dry_run=args.dry_run, arms=args.arms)
     except (ValueError, OSError) as exc:
         parser.error(str(exc))
     print(f"HealthBench {summary['status']}: {summary['written_answers']}/{summary['planned_answers']} answers; "
