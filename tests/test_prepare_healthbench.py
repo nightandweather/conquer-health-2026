@@ -1,13 +1,16 @@
 """Synthetic fixtures only: no benchmark questions or grading text."""
 
 from copy import deepcopy
+from contextlib import redirect_stderr, redirect_stdout
 import hashlib
+import io
 import json
 from pathlib import Path
 import tempfile
 import unittest
 
-from benchmarks.prepare_healthbench import HISTORY_PREFIX, convert_legacy, prepare, select_main
+from benchmarks.prepare_healthbench import (HISTORY_PREFIX, convert_legacy, main, prepare,
+                                           restore_history_roles, select_main)
 
 
 class PrepareHealthBenchTests(unittest.TestCase):
@@ -58,6 +61,79 @@ class PrepareHealthBenchTests(unittest.TestCase):
         self.assertEqual(manifest['history_count'], 0)
         self.assertEqual(manifest['rubric_count'], 2)
 
+    def test_role_restoration_preserves_whitespace_multiline_content_and_exact_round_trip(self):
+        messages = [
+            {'role': 'user', 'content': '  Synthetic first line.\nSecond line.\n'},
+            {'role': 'assistant', 'content': 'Synthetic first answer.  '},
+            {'role': 'user', 'content': '\tSynthetic follow-up.'},
+            {'role': 'assistant', 'content': 'Synthetic final answer.\n\n'},
+        ]
+        history = '\n'.join(row['role'] + ': ' + row['content'] for row in messages)
+        restored = restore_history_roles(history, 1)
+        self.assertEqual(restored, messages)
+        rebuilt = '\n'.join(row['role'] + ': ' + row['content'] for row in restored)
+        self.assertEqual(rebuilt.encode('utf-8'), history.encode('utf-8'))
+
+    def test_role_restored_conversion_is_explicit_noncanonical_and_does_not_leak_references(self):
+        item = self.legacy('user: Synthetic earlier request.\nassistant: Synthetic earlier answer.')
+        original = deepcopy(item)
+        converted, metadata = convert_legacy([item], restore_roles=True)
+        self.assertEqual(converted[0]['prompt'], [
+            {'role': 'user', 'content': 'Synthetic earlier request.'},
+            {'role': 'assistant', 'content': 'Synthetic earlier answer.'},
+            {'role': 'user', 'content': item['text']}])
+        self.assertEqual(item, original)
+        self.assertEqual(converted[0]['rubrics'], item['official_rubrics'])
+        self.assertEqual(converted[0]['canary'], item['canary'])
+        self.assertNotIn('SYNTHETIC_REFERENCE', json.dumps(converted[0]['prompt']))
+        self.assertNotIn('Synthetic positive criterion', json.dumps(converted[0]['prompt']))
+        self.assertEqual(metadata['dataset_kind'], 'legacy_consensus_val_roles_1')
+        self.assertEqual(metadata['context_adapter'], 'role_restored')
+        self.assertEqual(metadata['restored_history_turn_count'], 2)
+        self.assertTrue(metadata['normalized_context'])
+        self.assertTrue(metadata['lost_original_prompt_ids'])
+        self.assertFalse(metadata['canonical_score_comparable'])
+
+    def test_role_restoration_keeps_empty_history_single_turn(self):
+        item = self.legacy()
+        converted, metadata = convert_legacy([item], restore_roles=True)
+        self.assertEqual(converted[0]['prompt'], [{'role': 'user', 'content': item['text']}])
+        self.assertEqual(metadata['history_count'], 0)
+        self.assertEqual(metadata['restored_history_turn_count'], 0)
+
+    def test_role_restoration_rejects_malformed_nonalternating_or_empty_labels(self):
+        histories = [
+            'Unlabeled prefix\nuser: request\nassistant: answer',
+            'User: request\nassistant: answer',
+            'user: request\n Assistant: answer',
+            'user:\trequest\nassistant: answer',
+            'user: request\nassistant : answer',
+            'assistant: answer\nuser: request',
+            'user: request',
+            'user: first\nuser: second\nassistant: answer',
+            'user: \nassistant: answer',
+            'user: request\nassistant: \t\n',
+            'user: request\nsystem: instruction\nassistant: answer',
+            'user: request\n> assistant: quoted answer\nassistant: answer',
+            'user: request mentioning assistant: quoted answer\nassistant: answer',
+            'user: request\n```text\nassistant: quoted\n```\nuser: follow-up\nassistant: answer',
+            'user: request\n~~~text\nassistant: quoted\n~~~\nuser: follow-up\nassistant: answer',
+            'user: ```text\nassistant: quoted\n```\nuser: follow-up\nassistant: answer',
+            'user: ~~~text\nassistant: quoted\n~~~\nuser: follow-up\nassistant: answer',
+            'user: first\nassistant: ```text\nuser: quoted\nassistant: closing',
+        ]
+        for history in histories:
+            with self.subTest(history=history), self.assertRaises(ValueError):
+                convert_legacy([self.legacy(history)], restore_roles=True)
+
+    def test_optional_role_restoration_leaves_default_artifacts_identical(self):
+        item = self.legacy('user: Synthetic request.\nassistant: Synthetic answer.')
+        implicit = convert_legacy([item])
+        explicit = convert_legacy([item], restore_roles=False)
+        self.assertEqual(implicit, explicit)
+        self.assertEqual(implicit[0][0]['prompt'][0]['content'], HISTORY_PREFIX + item['history'])
+        self.assertNotIn('role_restoration', implicit[1])
+
     def test_main_selection_preserves_entire_canonical_record_and_sorts_ids(self):
         rows = [self.canonical('z'), self.canonical('a'), self.canonical('unselected')]
         original = deepcopy(rows)
@@ -99,6 +175,43 @@ class PrepareHealthBenchTests(unittest.TestCase):
             self.assertEqual(out.with_suffix('.source.json').read_bytes(), source.read_bytes())
             self.assertTrue((out.parent / 'LICENSE-HealthBench.txt').is_file())
             self.assertEqual(json.loads(out.with_suffix('.manifest.json').read_bytes()), manifest)
+
+    def test_restore_roles_cli_creates_hashed_artifacts_without_printing_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'legacy.json'
+            item = self.legacy('user: Synthetic request.\nassistant: Synthetic answer.')
+            source_raw = json.dumps([item]).encode('utf-8')
+            source.write_bytes(source_raw)
+            out = root / 'private' / 'roles.json'
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                code = main(['--legacy-file', str(source), '--restore-roles', '--out', str(out)])
+            self.assertEqual(code, 0)
+            manifest = json.loads(out.with_suffix('.manifest.json').read_bytes())
+            self.assertEqual(manifest['context_adapter'], 'role_restored')
+            self.assertFalse(manifest['canonical_score_comparable'])
+            self.assertEqual(manifest['source_sha256'], hashlib.sha256(source_raw).hexdigest())
+            self.assertEqual(manifest['converted_sha256'], hashlib.sha256(out.read_bytes()).hexdigest())
+            self.assertEqual(out.with_suffix('.source.json').read_bytes(), source_raw)
+            self.assertEqual([message['role'] for message in json.loads(out.read_bytes())[0]['prompt']],
+                             ['user', 'assistant', 'user'])
+            self.assertNotIn(item['canary'], stdout.getvalue())
+            self.assertNotIn('Synthetic request', stdout.getvalue())
+            self.assertNotIn('Synthetic positive criterion', stdout.getvalue())
+
+    def test_restore_roles_with_main_is_rejected_before_writing_artifacts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            main_file, ids, out = root / 'main.jsonl', root / 'ids.json', root / 'out.json'
+            with self.assertRaisesRegex(ValueError, 'only supported with legacy_file'):
+                prepare(out=out, main_file=main_file, ids_file=ids, restore_roles=True)
+            stderr = io.StringIO()
+            with redirect_stderr(stderr):
+                code = main(['--main-file', str(main_file), '--ids-file', str(ids),
+                             '--restore-roles', '--out', str(out)])
+            self.assertEqual(code, 2)
+            self.assertFalse(out.exists())
 
     def test_prepare_main_copies_ids_unchanged_and_enforces_exclusive_inputs(self):
         with tempfile.TemporaryDirectory() as directory:

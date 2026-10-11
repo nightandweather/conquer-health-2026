@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import importlib
 import json
+import math
 from pathlib import Path
 import secrets
 import sys
@@ -71,11 +72,30 @@ def visible_record(row, run_name):
                 'calls': len(row.get('attempts', [])), 'run': run_name}
 
 
+def visible_assessment(value, row):
+    """Display only a review explicitly tied to these saved answer bytes."""
+    hb = importlib.import_module('benchmarks.healthbench')
+    if (not isinstance(value, dict)
+            or value.get('answer_sha256') != hb.canonical_hash(row.get('answer', ''))
+            or value.get('status') not in {'reviewed', 'pending', 'uncertain', 'needs_review'}):
+        return None
+    score = value.get('score')
+    if score is not None and (isinstance(score, bool) or not isinstance(score, (int, float))
+                              or not math.isfinite(score) or not 0 <= score <= 100):
+        return None
+    if value['status'] != 'reviewed' and score is not None:
+        return None
+    note = value.get('note', '')
+    return {'status': value['status'], 'score': score,
+            'note': note[:500] if isinstance(note, str) else ''}
+
+
 class ComparisonStore:
     def __init__(self, data: Path, limit: int = 3):
         hb = importlib.import_module('benchmarks.healthbench')
         self.items, metadata = hb.load_dataset(data, limit)
         self.data, self.limit, self.dataset_hash = data, limit, metadata['sha256']
+        self.prompt_hashes = metadata['selected_prompt_sha256']
         self.lock = threading.RLock()
         self.busy, self.active, self.run_name, self.error = False, None, None, None
         self.live = {}
@@ -88,14 +108,29 @@ class ComparisonStore:
         candidates = sorted((ROOT / 'results').glob('healthbench-*/answers.jsonl'),
                             key=lambda p: p.stat().st_mtime)
         for path in candidates:
+            review_path = path.parent / 'assessments.json'
+            reviews = {}
+            if review_path.exists() and review_path.stat().st_size <= 1_000_000:
+                try:
+                    report = json.loads(review_path.read_text(encoding='utf-8'))
+                    for review in report.get('answers', []):
+                        if isinstance(review, dict):
+                            reviews[(review.get('prompt_id'), review.get('arm'))] = review
+                except (ValueError, AttributeError, TypeError):
+                    pass
             for line in path.read_text(encoding='utf-8').splitlines():
                 try:
                     row = json.loads(line)
                 except ValueError:
                     continue  # A writer may currently be flushing its last line.
-                if (row.get('dataset_sha256') == self.dataset_hash
+                if ((row.get('dataset_sha256') == self.dataset_hash
+                     or row.get('prompt_sha256') == self.prompt_hashes.get(row.get('prompt_id')))
                         and row.get('prompt_id') in allowed and row.get('arm') in VARIANTS):
-                    records[(row['prompt_id'], row['arm'])] = visible_record(row, path.parent.name)
+                    key = (row['prompt_id'], row['arm'])
+                    records[key] = visible_record(row, path.parent.name)
+                    assessment = visible_assessment(reviews.get(key), row)
+                    if assessment is not None:
+                        records[key]['assessment'] = assessment
         return records
 
     def snapshot(self):
@@ -286,8 +321,8 @@ def main():
     parser.add_argument('--limit', type=int, default=3)
     parser.add_argument('--start-arms', help='Optional explicit comparison to start after serving')
     args = parser.parse_args()
-    if not 1 <= args.limit <= 3 or not 1024 <= args.port <= 65535:
-        parser.error('Use 1–3 prompts and a port between 1024 and 65535')
+    if not 1 <= args.limit <= 200 or not 1024 <= args.port <= 65535:
+        parser.error('Use 1–200 prompts and a port between 1024 and 65535')
     store = ComparisonStore(args.data, args.limit)
     host = f'127.0.0.1:{args.port}'
     server = ThreadingHTTPServer(('127.0.0.1', args.port), make_handler(store, secrets.token_urlsafe(32), host))

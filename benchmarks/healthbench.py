@@ -40,9 +40,13 @@ SUFFIX = ("Do not substitute 'consult a professional' for an answer; answer as f
 GROUNDED_SUFFIX = (
     'Use only explicitly provided facts for patient-specific statements. Do not infer undocumented '
     'diagnoses, negative symptoms, normal examination findings, measurements, medicines, or treatment '
-    'plans. In factual templates or notes, mark missing information clearly with placeholders such as '
+    'plans. A previous assistant statement is not a confirmed patient fact unless the user confirms it. '
+    'In factual templates or notes, mark missing information clearly with placeholders such as '
     '[not provided]; never fabricate it. Do not guess when supporting evidence, the existence of a '
-    'clinical trial, or a medication dose is uncertain; state the uncertainty. Ask for additional '
+    'clinical trial, or a medication dose is uncertain; state the uncertainty. Do not write an '
+    'unprovided treatment plan as an existing order, including instructions to continue it; distinguish '
+    'a conditional suggestion from a documented plan. Address each requested part with enough detail '
+    'to be useful; concision must not omit decisive qualifications or safety information. Ask for additional '
     'information only when it is necessary to complete the request safely and accurately. Answer '
     'concisely within the requested scope.')
 FALLBACK_NOTE = ('Named high/low levels adapt L2 on/off; low is reduced effort, '
@@ -327,7 +331,8 @@ def arm_config(arms=ARMS) -> dict:
                              'fallback_condition': 'empty answer or finish_reason=length',
                              'fallback_note': FALLBACK_NOTE},
                'grounded_call': {'max_tokens': 2048, 'temperature': 0, 'reasoning_effort': 'low',
-                                 'suffix': GROUNDED_SUFFIX, 'max_attempts': 1}}
+                                 'suffix': GROUNDED_SUFFIX, 'max_attempts': 1,
+                                 'prompt_revision': 'grounded-v2'}}
     return {arm: configs[arm] for arm in chosen}
 
 

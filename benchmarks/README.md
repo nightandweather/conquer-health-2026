@@ -20,11 +20,24 @@
 
 ## 개선 설정과 대화 화면
 
+최근 3문항 × 3설정 실행에서는 9개 답변이 모두 `stop`으로 끝났습니다.
+기본·루닛·개선 설정의 호출 시간 합은 각각 46.519초, 222.363초, 6.116초였습니다.
+정성 검토에서는 개선 설정도 미확인 치료 계획과 근거 설명 문제가 남았습니다.
+루닛 설정의 임상시험 부재 단정은 발표된
+[무작위 예비시험](https://pubmed.ncbi.nlm.nih.gov/36416492/)과 맞지 않았습니다.
+이 시간 차이를 정확도 향상으로 해석하지 않습니다. 이 기록은 변경 전 개선 지침이며,
+200문항 실행에는 치료 계획과 이전 모델 답변의 사실화를 막는 `grounded-v2`를 고정합니다.
+
 `grounded_call`은 제공된 환자 사실만 사용하고, 누락된 진단·진찰·수치·약·계획은
 빈칸으로 표시하도록 요구하는 별도 실험입니다. 불확실한 임상시험·약물 용량을
 추측하지 말고, 요청 범위 안에서 간결하게 답하도록 합니다. temperature 0,
 reasoning_effort low, 2,048토큰, 한 번의 호출을 사용합니다.
 학습이나 파인튜닝을 수행하지 않으며, 기존 기본·루닛 조건은 보존합니다.
+
+답변 화면은 Markdown 읽기 모드가 기본이며 원문으로 전환할 수 있습니다.
+제목·목록·표·코드·링크를 로컬에서 렌더링하고 모델 출력의 실행 가능한 HTML과
+이미지는 표시하지 않습니다. 200문항에서는 선택·검색·이전/다음으로 탐색합니다.
+검토가 끝나기 전에는 점수를 표시하지 않습니다.
 
 ```sh
 python3 -m benchmarks.healthbench \
@@ -67,9 +80,10 @@ HealthBench 입력에 적용하지 않습니다. 로컬 양자화 모델과 NOVA
 두 자료를 구분합니다.
 
 - **복구된 Consensus 검증 자료:** 당시 도구가 변환한 200문항, 기준 438개.
-  81문항의 이전 대화는 텍스트로 저장되어 있습니다. 원래 메시지 경계를 복원할 수 없으므로
-  텍스트 맥락으로 보존합니다. 원본 prompt ID도 남아 있지 않습니다. 이 자료는
-  `legacy_consensus_val_200`으로 표시하며 공식 Consensus 전체 평가와 같다고 주장하지 않습니다.
+  81문항의 이전 대화는 텍스트로 저장되어 있습니다. 기존 변환은 이 텍스트를 보존합니다.
+  `--restore-roles`는 명확한 역할 표식·교대 순서·원문 재조립을 검증해 336개 발화를 복원합니다.
+  새 자료는 `legacy_consensus_val_roles_200`이며 이전 파일을 덮어쓰지 않습니다.
+  원본 prompt ID가 없어 두 자료 모두 공식 Consensus 전체 평가와 직접 비교하지 않습니다.
 - **리더보드 재현용 Main 부분집합:** CoEval의 301개 prompt ID 목록은 확인했습니다.
   Main JSONL 원본은 이 Mac에서 찾지 못했습니다. 원본을 제공하면 대화 구조와 ID를
   그대로 유지해 301문항을 구성합니다. 복구된 Consensus 자료와 교집합을 만들지 않습니다.
@@ -110,6 +124,24 @@ NOVA 로컬 저장소에서는 `python3` 대신 `.venv/bin/python`을 사용할 
 `--limit 0`은 제공한 자료 전체를 선택합니다. 기본 선택은 prompt ID 정렬순 첫 3문항입니다.
 공식 전체 평가의 무작위 표집과 구분되는 동작 확인용 선택입니다.
 
+200문항의 동일 이력으로 기본·개선 400개 답변을 비교하려면:
+
+```sh
+python3 -m benchmarks.prepare_healthbench \
+  --legacy-file /path/to/hb_val.json --restore-roles \
+  --out private_data/healthbench/legacy_consensus_val_roles.json
+
+python3 -m benchmarks.healthbench \
+  --data private_data/healthbench/legacy_consensus_val_roles.json \
+  --arms raw_default,grounded_call --limit 0 \
+  --out results/healthbench-full-200
+```
+
+현재 200문항·400개 요청의 입력 검증은 완료했으며 실제 전수 생성은 아직 시작하지 않았습니다.
+개발 20문항과 평가 180문항을 구분하는 [검토 계획](EVALUATION_PLAN.md)을 따릅니다.
+역할 복원 자료 SHA-256:
+`cd3516c601da6f67fc7b6db3439efdf2659a91534c09c6bc1c5d363889ed4033`.
+
 Main 원본과 CoEval 목록이 준비되면:
 
 ```sh
@@ -135,6 +167,20 @@ python3 -m benchmarks.healthbench \
 답변 생성만으로 HealthBench 점수가 나오지는 않습니다. 별도 채점기가 각 기준에 대한
 `criteria_met`을 판정해야 합니다. 이 코드는 준비된 판정 JSONL을 집계하며 채점 모델을 호출하지 않습니다.
 공식 채점기와 로컬 자체 채점은 결과에 구분해서 명시해야 합니다.
+
+Codex 검토용 A/B 패킷을 만들 때는 설정 이름·시간·토큰 수를 제외합니다.
+부분 실행에서도 생성된 쌍만 추가하며, 기존 후보 답변이 바뀌면 덮어쓰기를 거부합니다.
+
+```sh
+python3 -m benchmarks.healthbench_review \
+  --data private_data/healthbench/legacy_consensus_val_roles.json \
+  --answers results/healthbench-full-200/answers.jsonl \
+  --manifest results/healthbench-full-200/manifest.json \
+  --out results/healthbench-full-200/review
+```
+
+판단 보류 항목을 성공·실패로 자동 변환하지 않습니다. 점수와 검토 완료 비율,
+사실 오류·정보 누락·환자 정보 임의 생성에 대한 메모를 함께 기록합니다.
 
 판정 파일의 한 행 형식은 다음과 같습니다. 이 예시는 합성 ID입니다.
 
@@ -162,7 +208,7 @@ python3 -m benchmarks.healthbench_score \
 python3 -m unittest discover -s tests -p '*healthbench*.py' -v
 ```
 
-[검증 기록](validation.json)에 HealthBench 합성 검사 43개, 대화 화면 검사 5개, NOVA 기존 검사 8개 및 로컬 답변 생성 결과를 기록합니다.
+[검증 기록](validation.json)에 합성 검사와 실제 실행 상태를 기록합니다.
 공개 검증 기록에는 문항·답변 원문이 없습니다.
 
 호출 방식의 기준 코드는

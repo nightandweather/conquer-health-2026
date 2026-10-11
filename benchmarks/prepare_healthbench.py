@@ -1,8 +1,9 @@
 """Prepare local HealthBench data without downloading or calling a model.
 
-Legacy archives lost the original message roles and prompt IDs. Their adapter
-preserves flattened history as a single user message; it cannot restore the
-canonical benchmark. Canonical Main selection retains every original field.
+Legacy archives lost the original prompt IDs. Their default adapter preserves
+flattened history as a single user message. Optional strict role restoration
+uses explicit archive labels and verifies an exact history round trip; neither
+adapter restores the canonical benchmark. Main selection retains every field.
 """
 
 from __future__ import annotations
@@ -14,12 +15,16 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import sys
 import tempfile
 
 
 HISTORY_PREFIX = 'Prior conversation saved as text (roles are labels in this archive):\n'
 LICENSE_PATH = Path(__file__).with_name('LICENSE-HealthBench.txt')
+HISTORY_HEADER = re.compile(r'(?m)^(user|assistant): ')
+HISTORY_ROLE_LIKE = re.compile(r'(?i)\b(?:user|assistant)[ \t]*:')
+UNSUPPORTED_HISTORY_ROLE = re.compile(r'(?im)^[ \t]*(?:system|developer|tool|function|human|ai|patient|doctor)[ \t]*:')
 
 
 def sha256(raw: bytes) -> str:
@@ -61,7 +66,54 @@ def validate_rubrics(rubrics, record_number: int) -> None:
             raise ValueError(f'Record {record_number} has an invalid rubric')
 
 
-def convert_legacy(records: list[dict]) -> tuple[list[dict], dict]:
+def restore_history_roles(history: str, record_number: int) -> list[dict]:
+    """Split only audited labels; retain content bytes, including whitespace."""
+    if not history:
+        return []
+    headers = list(HISTORY_HEADER.finditer(history))
+    failure = f'Legacy record {record_number} has malformed or ambiguous history role labels'
+    if not headers or headers[0].start() != 0:
+        raise ValueError(failure)
+    # Quoted, indented, differently cased, inline or malformed role-like labels
+    # cannot be distinguished safely from the archive's unescaped delimiters.
+    if ({match.start() for match in HISTORY_ROLE_LIKE.finditer(history)}
+            != {match.start() for match in headers}
+            or UNSUPPORTED_HISTORY_ROLE.search(history)):
+        raise ValueError(failure)
+    roles = [header.group(1) for header in headers]
+    if (roles[0] != 'user' or roles[-1] != 'assistant'
+            or any(left == right for left, right in zip(roles, roles[1:]))):
+        raise ValueError(failure)
+    fence = None
+    for line in history.splitlines():
+        if fence is not None and HISTORY_HEADER.match(line):
+            raise ValueError(failure)
+        # A content fence can start on the header's own line. Inspect that
+        # content too, so quoted labels cannot become apparently valid turns.
+        fence_line = HISTORY_HEADER.sub('', line, count=1) if fence is None else line
+        marker = re.match(r'^[ \t]*(`{3,}|~{3,})(.*)$', fence_line)
+        if marker:
+            token, tail = marker.groups()
+            if fence is None:
+                fence = token
+            elif token[0] == fence[0] and len(token) >= len(fence) and not tail.strip():
+                fence = None
+    messages = []
+    for index, header in enumerate(headers):
+        # The one LF before the next header is the archive's separator. Every
+        # other character remains in the message content, including final LF.
+        end = headers[index + 1].start() - 1 if index + 1 < len(headers) else len(history)
+        content = history[header.end():end]
+        if not content.strip():
+            raise ValueError(f'Legacy record {record_number} has an empty history turn')
+        messages.append({'role': header.group(1), 'content': content})
+    reconstructed = '\n'.join(message['role'] + ': ' + message['content'] for message in messages)
+    if reconstructed.encode('utf-8') != history.encode('utf-8'):
+        raise ValueError(f'Legacy record {record_number} failed exact history reconstruction')
+    return messages
+
+
+def convert_legacy(records: list[dict], *, restore_roles: bool = False) -> tuple[list[dict], dict]:
     if not isinstance(records, list) or not records:
         raise ValueError('Legacy input must be a nonempty JSON array')
     converted, seen = [], set()
@@ -83,11 +135,14 @@ def convert_legacy(records: list[dict]) -> tuple[list[dict], dict]:
         prompt = []
         if history:
             history_count += 1
-            prompt.append({'role': 'user', 'content': HISTORY_PREFIX + history})
+            if restore_roles:
+                prompt.extend(restore_history_roles(history, number))
+            else:
+                prompt.append({'role': 'user', 'content': HISTORY_PREFIX + history})
         prompt.append({'role': 'user', 'content': text})
         converted.append({'canary': item['canary'], 'prompt_id': qid,
                           'prompt': prompt, 'rubrics': deepcopy(item['official_rubrics'])})
-    return converted, {
+    metadata = {
         'dataset_kind': f'legacy_consensus_val_{len(converted)}',
         'normalized_context': True,
         'lost_original_prompt_ids': True,
@@ -98,6 +153,12 @@ def convert_legacy(records: list[dict]) -> tuple[list[dict], dict]:
         'rubric_count': sum(len(item['rubrics']) for item in converted),
         'history_count': history_count,
     }
+    if restore_roles:
+        metadata.update(dataset_kind=f'legacy_consensus_val_roles_{len(converted)}',
+                        context_adapter='role_restored',
+                        role_restoration='explicit lowercase user/assistant labels; exact source history round trip',
+                        restored_history_turn_count=sum(len(item['prompt']) - 1 for item in converted))
+    return converted, metadata
 
 
 def select_main(records: list[dict], ids_document: dict) -> tuple[list[dict], dict]:
@@ -169,19 +230,22 @@ def atomic_write(path: Path, raw: bytes) -> None:
 
 
 def prepare(*, out: Path, legacy_file: Path | None = None,
-            main_file: Path | None = None, ids_file: Path | None = None) -> dict:
+            main_file: Path | None = None, ids_file: Path | None = None,
+            restore_roles: bool = False) -> dict:
     if (legacy_file is None) == (main_file is None):
         raise ValueError('Choose exactly one of legacy_file or main_file')
     if legacy_file is not None and ids_file is not None:
         raise ValueError('ids_file is only supported with main_file')
     if main_file is not None and ids_file is None:
         raise ValueError('main_file requires ids_file')
+    if restore_roles and legacy_file is None:
+        raise ValueError('restore_roles is only supported with legacy_file')
     license_raw = LICENSE_PATH.read_bytes()
     manifest_path = out.with_suffix('.manifest.json')
     copies = {out.parent / 'LICENSE-HealthBench.txt': license_raw}
     if legacy_file is not None:
         records, source_raw = read_json(legacy_file)
-        converted, metadata = convert_legacy(records)
+        converted, metadata = convert_legacy(records, restore_roles=restore_roles)
         source_path = legacy_file
         source_copy = out.with_suffix('.source.json')
         copies[source_copy] = source_raw
@@ -223,11 +287,14 @@ def main(argv: list[str] | None = None) -> int:
     source.add_argument('--legacy-file', type=Path)
     source.add_argument('--main-file', type=Path)
     parser.add_argument('--ids-file', type=Path)
+    parser.add_argument('--restore-roles', action='store_true',
+                        help='Strictly restore explicit history role labels; only with --legacy-file')
     parser.add_argument('--out', required=True, type=Path)
     args = parser.parse_args(argv)
     try:
         metadata = prepare(out=args.out, legacy_file=args.legacy_file,
-                           main_file=args.main_file, ids_file=args.ids_file)
+                           main_file=args.main_file, ids_file=args.ids_file,
+                           restore_roles=args.restore_roles)
     except (ValueError, OSError) as exc:
         print(f'Preparation failed: {exc}', file=sys.stderr)
         return 2

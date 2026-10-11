@@ -25,3 +25,28 @@ python3 -m local_tools.dialogue_server \
 외부 서비스·CDN 없이 작동합니다. 스트리밍 API는
 [Ollama OpenAI 호환 API](https://docs.ollama.com/api/openai-compatibility)를 사용합니다.
 이 도구는 대회 제출 ZIP과 NOVA Docker 빌드에서 제외됩니다.
+
+## 읽기 모드와 200문항
+
+답변은 기본적으로 Markdown 읽기 모드로 표시됩니다. 제목·목록·표·코드·링크를
+읽기 쉽게 정리하며 `원문 보기`로 전환할 수 있습니다. 모델이 출력한 HTML이나
+이미지를 실행하거나 자동으로 가져오지 않습니다.
+
+역할 표식으로 복원한 자료로 200문항을 표시하고 기본·개선 400개 답변을 생성하려면:
+
+```sh
+python3 -m local_tools.dialogue_server \
+  --data private_data/healthbench/legacy_consensus_val_roles.json \
+  --limit 200 --port 8766 --start-arms raw_default,grounded_call
+```
+
+같은 포트의 기존 서버가 있으면 종료한 뒤 실행합니다. `--start-arms`를 생략하면
+과거 기록만 표시하고 생성 버튼을 눌렀을 때 시작합니다. 문항 선택·검색·이전/다음으로
+이동합니다. 과거 루닛 답변은 동일한 입력 해시인 경우에만 해당 문항에 표시합니다.
+각 답변의 실행 이름을 확인하세요.
+
+Codex 검토 결과는 실행 폴더의 `assessments.json`에서 읽습니다. 원문 답변 해시가
+일치하는 검토만 표시하고, 판정이 없는 답변에는 점수를 만들어 넣지 않습니다.
+표시 필드는 `prompt_id`, `arm`, `answer_sha256`(canonical JSON hash), `status`,
+`score`(0–100 또는 null), `note`입니다. 채점 기준 원문은 화면에 전달하지 않습니다.
+검토 절차는 [200문항 평가 계획](../benchmarks/EVALUATION_PLAN.md)에 있습니다.

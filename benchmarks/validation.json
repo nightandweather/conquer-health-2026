@@ -1,13 +1,19 @@
 {
   "schema_version": 1,
   "verified_date": "2026-10-10",
-  "state": "local_smoke_completed_ungraded",
+  "state": "three_arm_smoke_completed_full_200_ready_network_blocked",
   "tests": {
-    "healthbench_synthetic_tests": 43,
+    "healthbench_synthetic_tests": 62,
+    "local_viewer_tests": 13,
     "nova_existing_regression_tests": 8,
-    "all_passed": true,
-    "local_viewer_tests": 5,
-    "total_tests": 56
+    "total_tests": 83,
+    "executed_tests": 82,
+    "passed_tests": 82,
+    "all_executed_passed": true,
+    "blocked_tests": [
+      "unchanged HTTP socket test: current network sandbox blocks listener"
+    ],
+    "previous_http_test": "passed before permission change"
   },
   "data": {
     "dataset_kind": "legacy_consensus_val_200",
@@ -124,7 +130,7 @@
     "zip_bytes": 7275,
     "sha256": "f8c95613f13572d3ff1fb7142aec4550829053ef5f4f85260aafb60f98c5505e"
   },
-  "notice": "Six nonempty candidate answers were generated. Five finished with stop and one raw_default answer was truncated. All three lunit_call answers used a low-effort fallback. No criterion judgments or HealthBench scores were obtained; this smoke check does not establish clinical quality or improvement.",
+  "notice": "Nine nonempty three-arm smoke answers were generated and qualitatively reviewed. No numeric HealthBench quality score is claimed. The 200-item roles-restored dataset and 400-answer plan passed offline validation; generation is not started because current network sandbox blocks local model connections. 82 offline tests passed; one unchanged HTTP listener check cannot be repeated under that sandbox.",
   "viewer": {
     "status": "implemented_and_browser_opened",
     "host": "127.0.0.1",
@@ -136,6 +142,107 @@
     ],
     "local_only": true,
     "rubrics_exposed": false,
-    "additional_training": false
+    "additional_training": false,
+    "markdown_read_mode": true,
+    "maximum_cases": 200,
+    "grade_display": "Only reviews matching exact answer hash; pending answers have no score",
+    "visual_verification": "Previous plaintext UI opened; current Markdown renderer checked offline; browser refresh pending"
+  },
+  "latest_comparison": {
+    "status": "completed",
+    "started_at": "2026-10-11T04:31:07+00:00",
+    "finished_at": "2026-10-11T04:35:43+00:00",
+    "seconds": 275.0,
+    "planned_answers": 9,
+    "written_answers": 9,
+    "calls": 12,
+    "usage": {
+      "prompt_tokens": 1916,
+      "completion_tokens": 26493,
+      "total_tokens": 28409
+    },
+    "answer_status_counts": {
+      "completed": 9
+    },
+    "selected_count": 3,
+    "selected_arms": [
+      "raw_default",
+      "lunit_call",
+      "grounded_call"
+    ],
+    "score": null,
+    "score_status": "qualitative_review_only",
+    "prompt_revision": "grounded-v1; archived before the 200-item grounded-v2 plan",
+    "arms": {
+      "raw_default": {
+        "answers": 3,
+        "calls": 3,
+        "seconds": 46.519,
+        "usage": {
+          "prompt_tokens": 251,
+          "completion_tokens": 4239,
+          "total_tokens": 4490
+        },
+        "status_counts": {
+          "completed": 3
+        }
+      },
+      "lunit_call": {
+        "answers": 3,
+        "calls": 6,
+        "seconds": 222.363,
+        "usage": {
+          "prompt_tokens": 1096,
+          "completion_tokens": 21643,
+          "total_tokens": 22739
+        },
+        "status_counts": {
+          "completed": 3
+        }
+      },
+      "grounded_call": {
+        "answers": 3,
+        "calls": 3,
+        "seconds": 6.116,
+        "usage": {
+          "prompt_tokens": 569,
+          "completion_tokens": 611,
+          "total_tokens": 1180
+        },
+        "status_counts": {
+          "completed": 3
+        }
+      }
+    },
+    "quality_observations": [
+      "Grounding reduced undocumented exam findings and measurements but still introduced an unprovided treatment-maintenance plan.",
+      "The Lunit arm contained a clinical-trial absence claim contradicted by a published randomized pilot.",
+      "Shorter answers and stop finish reasons do not establish clinical accuracy."
+    ]
+  },
+  "full_200": {
+    "status": "ready_not_started_network_blocked",
+    "dataset_kind": "legacy_consensus_val_roles_200",
+    "dataset_sha256": "cd3516c601da6f67fc7b6db3439efdf2659a91534c09c6bc1c5d363889ed4033",
+    "selected_count": 200,
+    "rubric_count": 438,
+    "history_count": 81,
+    "restored_history_turns": 336,
+    "planned_answers": 400,
+    "written_answers": 0,
+    "network_calls": 0,
+    "development_count": 20,
+    "holdout_count": 180,
+    "development_history_count": 5,
+    "holdout_history_count": 76,
+    "prompt_revision": "grounded-v2",
+    "selected_arms": [
+      "raw_default",
+      "grounded_call"
+    ],
+    "grader": "Codex rubric review; not the official grading model",
+    "score": null,
+    "score_status": "not_generated_or_scored",
+    "canonical_score_comparable": false
   }
 }
