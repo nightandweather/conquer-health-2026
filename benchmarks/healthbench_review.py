@@ -109,9 +109,55 @@ def _identity(prompt_id: str, dataset_sha256: str) -> str:
     return canonical_hash([prompt_id, dataset_sha256])
 
 
-def _packet(item: dict, rows: dict, dataset_sha256: str, reviewer_index: int) -> tuple[dict, dict]:
+def _paired_arms(value=PAIRED_ARMS) -> tuple[str, str]:
+    if (not isinstance(value, (list, tuple)) or len(value) != 2
+            or any(not isinstance(name, str) or not name.strip() or name != name.strip() for name in value)
+            or value[0] == value[1]):
+        raise ValueError("paired_arms must contain exactly two unique nonempty ordered arm names")
+    return tuple(value)
+
+
+def _arm_configs(manifest: dict, arms: set[str], paired_arms: tuple[str, str]) -> dict:
+    if arms != set(paired_arms):
+        raise ValueError("Manifest and answers must declare exactly the paired arms")
+    if "selected_arms" in manifest:
+        declared = manifest["selected_arms"]
+        if not isinstance(declared, list) or set(_paired_arms(declared)) != set(paired_arms):
+            raise ValueError("manifest.selected_arms must declare exactly the paired arms")
+    configs = manifest.get("arms")
+    if not isinstance(configs, dict):
+        if paired_arms != PAIRED_ARMS:
+            raise ValueError("Custom paired arms require their original manifest arm configurations")
+        return {}  # Retain support for legacy default manifests with arm-name lists.
+    if set(configs) != set(paired_arms):
+        raise ValueError("Manifest arm configurations must match exactly the paired arms")
+    for arm, config in configs.items():
+        if not isinstance(config, dict):
+            raise ValueError("Manifest arm configurations must be objects")
+        if any(key in config and config[key] != arm for key in ("arm", "name")):
+            raise ValueError("Manifest arm configuration identity does not match its arm")
+    return configs
+
+
+def _validate_arm_identity(row: dict, configs: dict) -> None:
+    identity_fields = {"instructions_name", "instructions_version", "instructions_byte_sha256"}
+    if not identity_fields.intersection(row):
+        return  # Original baseline rows do not have instruction-source metadata.
+    config = configs.get(row["arm"], {})
+    suffix, version = config.get("suffix"), config.get("prompt_revision")
+    if (not isinstance(suffix, str) or not suffix.strip()
+            or not isinstance(version, str) or not version.strip()
+            or row.get("instructions_name") != row["arm"]
+            or row.get("instructions_version") != version
+            or row.get("instructions_byte_sha256") != hashlib.sha256(suffix.encode("utf-8")).hexdigest()):
+        raise ValueError("Answer instructions identity does not match its original arm configuration")
+
+
+def _packet(item: dict, rows: dict, dataset_sha256: str, reviewer_index: int,
+            *, paired_arms: tuple[str, str] = PAIRED_ARMS) -> tuple[dict, dict]:
+    paired_arms = _paired_arms(paired_arms)
     packet_id = _identity(item["prompt_id"], dataset_sha256)
-    order = PAIRED_ARMS if int(packet_id[-1], 16) % 2 == 0 else tuple(reversed(PAIRED_ARMS))
+    order = paired_arms if int(packet_id[-1], 16) % 2 == 0 else tuple(reversed(paired_arms))
     mapping = dict(zip(("A", "B"), order))
     candidates = {label: {"answer": rows[(arm, item["prompt_id"])]["answer"],
                           "status": rows[(arm, item["prompt_id"])]["status"]}
@@ -131,7 +177,8 @@ def _packet(item: dict, rows: dict, dataset_sha256: str, reviewer_index: int) ->
     return packet, private
 
 
-def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path) -> dict:
+def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path,
+                          *, paired_arms: tuple[str, str] = PAIRED_ARMS) -> dict:
     """Validate a generation snapshot, then append immutable blinded packets.
 
     Validation of every input and existing packet completes before any output
@@ -139,6 +186,7 @@ def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path) 
     which it was created; later appended records do not change that provenance.
     Invoke serially when generation is in progress; retry a partial JSONL read.
     """
+    paired_arms = _paired_arms(paired_arms)
     out = _output_path(Path(out))
     items, dataset = load_dataset(Path(data), limit=0)
     _data_index(items)  # Validate finite signed points and positive denominators.
@@ -149,13 +197,7 @@ def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path) 
     rows = _answer_rows(snapshot)
     answer_kinds = _answer_index(rows, data_rows)
     selected, _, arms = _manifest_selection(manifest_value, data_rows, answer_kinds)
-    if arms != set(PAIRED_ARMS):
-        raise ValueError("Manifest and answers must declare exactly raw_default and grounded_call")
-    if "selected_arms" in manifest_value:
-        declared = manifest_value["selected_arms"]
-        if (not isinstance(declared, list) or len(declared) != 2
-                or any(not isinstance(arm, str) for arm in declared) or set(declared) != set(PAIRED_ARMS)):
-            raise ValueError("manifest.selected_arms must declare exactly the paired arms")
+    configs = _arm_configs(manifest_value, arms, paired_arms)
     generation_data = manifest_value.get("dataset")
     if not isinstance(generation_data, dict) or generation_data.get("sha256") != dataset["sha256"]:
         raise ValueError("Manifest dataset SHA does not match the dataset file")
@@ -173,12 +215,13 @@ def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path) 
         raise ValueError("Manifest selected prompt SHAs do not match the dataset prompts")
     row_index = {}
     for row in rows:
-        if row.get("arm") not in PAIRED_ARMS or row["prompt_id"] not in selected_set:
+        if row.get("arm") not in paired_arms or row["prompt_id"] not in selected_set:
             raise ValueError("Answers include an arm or ID outside the paired selection")
         if row.get("dataset_sha256") != dataset["sha256"]:
             raise ValueError("Answer dataset SHA does not match the dataset file")
         if row.get("prompt_sha256") != expected_hashes[row["prompt_id"]]:
             raise ValueError("Answer prompt SHA does not match its dataset prompt")
+        _validate_arm_identity(row, configs)
         row_index[(row["arm"], row["prompt_id"])] = row
 
     scope = {"dataset_sha256": dataset["sha256"], "selected_prompt_ids": selected,
@@ -187,8 +230,12 @@ def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path) 
                          "dataset_sha256": dataset["sha256"], "generation_scope_sha256": canonical_hash(scope),
                          "selected_prompt_ids": selected, "reviewer_count": REVIEWER_COUNT,
                          "reviewer_assignment": "sorted original manifest index modulo 4", "packets": {}}
+    if paired_arms != PAIRED_ARMS:
+        expected_manifest["paired_arms"] = list(paired_arms)
     previous = _read_existing(out / "private_manifest.json")
     if previous is not None:
+        if _paired_arms(previous.get("paired_arms", PAIRED_ARMS)) != paired_arms:
+            raise ValueError("Existing review manifest belongs to a different paired arm order")
         if any(previous.get(key) != value for key, value in expected_manifest.items() if key != "packets"):
             raise ValueError("Existing review manifest belongs to a different generation selection or configuration")
         entries = previous.get("packets")
@@ -203,7 +250,7 @@ def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path) 
     planned, pending = {}, []
     for index, prompt_id in enumerate(selected):
         unavailable = []
-        for arm in PAIRED_ARMS:
+        for arm in paired_arms:
             row = row_index.get((arm, prompt_id))
             if row is None:
                 unavailable.append({"arm": arm, "reason": "missing_answer"})
@@ -216,7 +263,8 @@ def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path) 
         if unavailable:
             pending.append({"prompt_id": prompt_id, "unavailable": unavailable})
             continue
-        packet, private = _packet(data_rows[prompt_id], row_index, dataset["sha256"], index % REVIEWER_COUNT)
+        packet, private = _packet(data_rows[prompt_id], row_index, dataset["sha256"], index % REVIEWER_COUNT,
+                                  paired_arms=paired_arms)
         planned[packet["packet_id"]] = (packet, private)
 
     # Refuse all candidate/content mutations before creating directories/files.
@@ -246,7 +294,7 @@ def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path) 
             raise ValueError("A new packet path already exists without a mapping")
     old_progress = _read_existing(out / "progress.json")
     progress = {"schema_version": 1, "status": "ready" if not pending else "pending_answers",
-                "selected_count": len(selected), "expected_answer_count": len(selected) * len(PAIRED_ARMS),
+                "selected_count": len(selected), "expected_answer_count": len(selected) * len(paired_arms),
                 "observed_answer_count": len(rows), "ready_packet_count": len(planned),
                 "new_packet_count": len(set(planned) - set(entries)), "pending_count": len(pending),
                 "answers_snapshot_sha256": snapshot_sha, "pending": pending, "grading_status": "not_graded"}
@@ -273,9 +321,13 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     for option in ("data", "answers", "manifest", "out"):
         parser.add_argument("--" + option, type=Path, required=True)
+    parser.add_argument("--paired-arms", help="Explicit ordered comma-separated pair of original arm names")
     args = parser.parse_args(argv)
     try:
-        progress = create_review_packets(args.data, args.answers, args.manifest, args.out)
+        paired_arms = PAIRED_ARMS if args.paired_arms is None else tuple(
+            name.strip() for name in args.paired_arms.split(","))
+        progress = create_review_packets(args.data, args.answers, args.manifest, args.out,
+                                         paired_arms=paired_arms)
     except (ValueError, OSError) as exc:
         parser.error(str(exc))
     print(f"Review packets: {progress['ready_packet_count']}/{progress['selected_count']} ready; "

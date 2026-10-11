@@ -133,18 +133,16 @@ def export_reviews(data: Path, answers: Path, manifest: Path, review_dir: Path,
     data_rows = {item['prompt_id']: item for item in items}
     manifest_raw = _read(Path(manifest))
     manifest_value = _json(manifest_raw, 'generation manifest')
+    private_raw = _read(review_dir / 'private_manifest.json')
+    private = _json(private_raw, 'private manifest')
+    paired_arms = packets._paired_arms(private.get('paired_arms', packets.PAIRED_ARMS))
     snapshot = _read(Path(answers))  # One immutable snapshot; never reread during export.
     rows = [_json(line.encode('utf-8'), f'answer line {number}')
             for number, line in enumerate(snapshot.decode('utf-8').splitlines(), 1) if line.strip()]
     answer_kinds = _answer_index(rows, data_rows)
     selected, _, arms = _manifest_selection(manifest_value, data_rows, answer_kinds)
     selected = sorted(selected)
-    if arms != set(packets.PAIRED_ARMS):
-        raise ValueError('Generation must contain exactly the paired arms')
-    declared = manifest_value.get('selected_arms', list(packets.PAIRED_ARMS))
-    if (not isinstance(declared, list) or len(declared) != 2
-            or any(not isinstance(arm, str) for arm in declared) or set(declared) != set(packets.PAIRED_ARMS)):
-        raise ValueError('Generation selected_arms must declare the paired arms')
+    configs = packets._arm_configs(manifest_value, arms, paired_arms)
     generation_data = manifest_value.get('dataset')
     prompt_hashes = {prompt_id: canonical_hash(data_rows[prompt_id]['prompt']) for prompt_id in selected}
     if (not isinstance(generation_data, dict) or generation_data.get('sha256') != dataset['sha256']
@@ -160,11 +158,10 @@ def export_reviews(data: Path, answers: Path, manifest: Path, review_dir: Path,
         if (row.get('dataset_sha256') != dataset['sha256']
                 or row.get('prompt_sha256') != prompt_hashes[row['prompt_id']]):
             raise ValueError('Answer dataset or prompt hash changed')
+        packets._validate_arm_identity(row, configs)
         row_index[(row['arm'], row['prompt_id'])] = row
     scope = {'dataset_sha256': dataset['sha256'], 'selected_prompt_ids': selected,
              'selected_prompt_sha256': prompt_hashes, 'arms': manifest_value.get('arms')}
-    private_raw = _read(review_dir / 'private_manifest.json')
-    private = _json(private_raw, 'private manifest')
     expected_private = {'schema_version': 1, 'review_kind': 'blinded qualitative rubric review; ungraded',
                         'dataset_sha256': dataset['sha256'], 'generation_scope_sha256': canonical_hash(scope),
                         'selected_prompt_ids': selected, 'reviewer_count': packets.REVIEWER_COUNT,
@@ -184,13 +181,14 @@ def export_reviews(data: Path, answers: Path, manifest: Path, review_dir: Path,
         prompt_id = entry.get('prompt_id')
         if prompt_id not in selected:
             raise ValueError('Private packet selects an unknown prompt')
-        for arm in packets.PAIRED_ARMS:
+        for arm in paired_arms:
             row = row_index.get((arm, prompt_id))
             if (row is None or row['status'] not in packets.REVIEWABLE
                     or not isinstance(row.get('answer'), str) or not row['answer'].strip()):
                 raise ValueError('Previously packaged answer is missing or no longer reviewable')
         expected_packet, expected_entry = packets._packet(
-            data_rows[prompt_id], row_index, dataset['sha256'], selected.index(prompt_id) % packets.REVIEWER_COUNT)
+            data_rows[prompt_id], row_index, dataset['sha256'], selected.index(prompt_id) % packets.REVIEWER_COUNT,
+            paired_arms=paired_arms)
         if packet_id != expected_packet['packet_id'] or any(
                 entry.get(key) != value for key, value in expected_entry.items()):
             raise ValueError('Private packet candidate or mapping changed')

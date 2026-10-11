@@ -59,6 +59,28 @@ python3 -m benchmarks.healthbench_codex_cycle \
 Codex의 기준별 판정과 답변 해시가 일치하는 검토 결과가 있어야 점수를 계산합니다.
 이 CLI가 Codex 채점 API를 자동 호출하는 기능은 없습니다.
 
+기준선 완료를 기다린 뒤 한 번 실행하고 검토 패킷까지 준비하려면:
+
+```sh
+python3 scripts/run_codex_cycle_after_baseline.py \
+  --data private_data/healthbench/legacy_consensus_val_roles.json \
+  --baseline-manifest results/BASELINE_RUN/manifest.json \
+  --instructions-file benchmarks/prompts/codex_guided_v3.txt \
+  --candidate-name codex_guided_v3 --instructions-version 3 \
+  --out results/codex-guided-v3-queue
+```
+
+큐는 고정 기준선의 조건·자료·지침이 유지되는지 확인하고, 완료 후 `candidate/`에
+개발용 답변을 생성합니다. `comparison/`에는 원래 grounded 답변과 새 후보를 이름 변경
+없이 보존하고 출처 해시를 남깁니다. `comparison/review/`의 A/B 패킷을 Codex가 검토해야
+품질 판정이 생깁니다. 기준선 실패·중단이나 조건 변경은 새 호출을 시작하지 않습니다.
+
+개발 20문항의 기존 답변 40개에는 86개 기준별 판정이 있습니다. 이 개발 자료의
+가중 기준 점수 평균은 기본 20.83%, grounded-v2 50.00%입니다. 같은 조건에서 지침만
+바꾼 비교는 아니며, 복구된 자료·Codex 판정·작은 개발 범위의 진단값입니다.
+채점 기준과 별도로 의료 오류·누락을 표시했고 역방향으로 작성된 기준도 따로 기록했습니다.
+새 후보의 점수나 품질 향상은 아직 확인되지 않았습니다.
+
 ## 여러 턴의 검증
 
 HealthBench의 복원 이력에서는 이전 assistant의 주장을 환자 사실로 취급하는지,

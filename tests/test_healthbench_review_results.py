@@ -83,6 +83,91 @@ class ReviewResultTests(unittest.TestCase):
                  self.review / 'review_export.json', self.run / 'assessments.json']
         return {str(path): (path.read_bytes(), path.stat().st_mtime_ns) for path in paths if path.exists()}
 
+    def custom_pair(self):
+        pair = ('grounded_call', 'codex_guided_v3')
+        suffix = 'Synthetic general candidate instructions\n'
+        self.manifest_value['selected_arms'] = list(pair)
+        self.manifest_value['arms'] = {
+            'grounded_call': {'suffix': 'Original baseline instructions', 'prompt_revision': 'grounded-v2'},
+            'codex_guided_v3': {'suffix': suffix, 'prompt_revision': '3', 'max_tokens': 2048}}
+        controls = {row['prompt_id']: row for row in self.rows if row['arm'] == pair[0]}
+        self.rows = [row for item in self.items for row in (
+            controls[item['prompt_id']], dict(controls[item['prompt_id']], arm=pair[1],
+                answer='Synthetic new candidate', instructions_name=pair[1], instructions_version='3',
+                instructions_byte_sha256=hashlib.sha256(suffix.encode()).hexdigest()))]
+        self.manifest.write_text(json.dumps(self.manifest_value))
+        self.write_answers(self.rows)
+        self.review = self.run / 'custom-review'
+        self.shard = self.review / 'supplied.json'
+        create_review_packets(self.data, self.answers, self.manifest, self.review, paired_arms=pair)
+        self.shard_value = self.make_shard()
+        self.write_shard()
+        return pair
+
+    def test_custom_pair_exports_and_scores_original_arm_names(self):
+        pair = self.custom_pair()
+        private = json.loads((self.review / 'private_manifest.json').read_text())
+        for packet in self.shard_value['packets']:
+            mapping = private['packets'][packet['packet_id']]['candidate_map']
+            label = next(label for label, arm in mapping.items() if arm == pair[1])
+            for judgment in packet['candidates'][label]['judgments']:
+                judgment['criteria_met'] = False
+        self.write_shard()
+        report = self.export()
+        self.assertEqual(report['boolean_judgment_count'], 8)
+        summary = json.loads((self.review / 'score_summary.json').read_text())
+        self.assertEqual(set(summary['arms']), set(pair))
+        self.assertEqual(summary['arms'][pair[0]]['score_percent'], 60)
+        self.assertEqual(summary['arms'][pair[1]]['score_percent'], 0)
+        judgments = [json.loads(line) for line in (self.review / 'judgments.jsonl').read_text().splitlines()]
+        self.assertEqual({row['arm'] for row in judgments}, set(pair))
+        assessments = json.loads((self.run / 'assessments.json').read_text())['answers']
+        for assessment in assessments:
+            source = next(row for row in self.rows if row['arm'] == assessment['arm']
+                          and row['prompt_id'] == assessment['prompt_id'])
+            self.assertEqual(assessment['answer_sha256'], canonical_hash(source['answer']))
+        self.assertEqual(report['review_provenance']['generation_manifest_byte_sha256'],
+                         hashlib.sha256(self.manifest.read_bytes()).hexdigest())
+
+    def test_custom_pair_manifest_or_order_tampering_preserves_export(self):
+        pair = self.custom_pair()
+        self.export()
+        before = self.outputs()
+        path = self.review / 'private_manifest.json'
+        original = json.loads(path.read_text())
+        for declared in (list(reversed(pair)), [pair[0], 'fake_arm'], [pair[0], pair[0]],
+                         [pair[0]], [pair[0], pair[1], 'extra'], ','.join(pair), None):
+            with self.subTest(declared=declared):
+                path.write_text(json.dumps(original | {'paired_arms': declared}))
+                with self.assertRaises(ValueError):
+                    self.export()
+                self.assertEqual(self.outputs(), before)
+        path.write_text(json.dumps(original))
+        self.manifest_value['arms'][pair[1]]['max_tokens'] = 4096
+        self.manifest.write_text(json.dumps(self.manifest_value))
+        with self.assertRaisesRegex(ValueError, 'generation identity changed'):
+            self.export()
+        self.assertEqual(self.outputs(), before)
+
+    def test_custom_pair_instruction_identity_and_arm_rename_are_rejected(self):
+        self.custom_pair()
+        self.export()
+        before = self.outputs()
+        original = deepcopy(self.rows)
+        mutations = [lambda row: row.update(arm='raw_default'),
+                     lambda row: row.update(instructions_name='grounded_call'),
+                     lambda row: row.update(instructions_version='wrong'),
+                     lambda row: row.update(instructions_byte_sha256='0' * 64),
+                     lambda row: row.pop('instructions_version')]
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                rows = deepcopy(original)
+                mutation(rows[1])
+                self.write_answers(rows)
+                with self.assertRaises(ValueError):
+                    self.export()
+                self.assertEqual(self.outputs(), before)
+
     def test_weights_exact_answer_hash_and_private_viewer_shape(self):
         report = self.export()
         self.assertEqual(report['boolean_judgment_count'], 8)
