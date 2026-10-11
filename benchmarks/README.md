@@ -137,10 +137,14 @@ python3 -m benchmarks.healthbench \
   --out results/healthbench-full-200
 ```
 
-현재 200문항·400개 요청의 입력 검증은 완료했으며 실제 전수 생성은 아직 시작하지 않았습니다.
+2026-10-11 04:59:38 UTC에 실제 200문항·400개 답변 생성을 시작했습니다.
+진행 상태는 [검증 기록](validation.json)의 확인 시점 기준이며, 최종 품질 점수는 아직 없습니다.
 개발 20문항과 평가 180문항을 구분하는 [검토 계획](EVALUATION_PLAN.md)을 따릅니다.
 역할 복원 자료 SHA-256:
 `cd3516c601da6f67fc7b6db3439efdf2659a91534c09c6bc1c5d363889ed4033`.
+
+공식 문서에서 확인한 gpt-oss·Ollama 설정과 최대 3호출의 검토·수정 흐름은
+[후속 개선 실험](REFINEMENT_PLAN.md)에 있습니다. 현재 전수 실행의 지침이나 설정은 바꾸지 않습니다.
 
 Main 원본과 CoEval 목록이 준비되면:
 

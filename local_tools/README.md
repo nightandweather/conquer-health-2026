@@ -37,10 +37,11 @@ python3 -m local_tools.dialogue_server \
 ```sh
 python3 -m local_tools.dialogue_server \
   --data private_data/healthbench/legacy_consensus_val_roles.json \
-  --limit 200 --port 8766 --start-arms raw_default,grounded_call
+  --limit 200 --port 8767 --start-arms raw_default,grounded_call
 ```
 
-같은 포트의 기존 서버가 있으면 종료한 뒤 실행합니다. `--start-arms`를 생략하면
+위 예시는 기존 8766 화면과 다른 포트를 사용합니다. 같은 포트에 본인이 실행한 서버가 있으면
+그 서버를 종료하거나 다른 포트를 지정하세요. `--start-arms`를 생략하면
 과거 기록만 표시하고 생성 버튼을 눌렀을 때 시작합니다. 문항 선택·검색·이전/다음으로
 이동합니다. 과거 루닛 답변은 동일한 입력 해시인 경우에만 해당 문항에 표시합니다.
 각 답변의 실행 이름을 확인하세요.

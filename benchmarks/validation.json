@@ -1,19 +1,20 @@
 {
   "schema_version": 1,
   "verified_date": "2026-10-10",
-  "state": "three_arm_smoke_completed_full_200_ready_network_blocked",
+  "state": "full_200_running_docs_based_refinement_prepared",
   "tests": {
-    "healthbench_synthetic_tests": 62,
+    "healthbench_synthetic_tests": 90,
     "local_viewer_tests": 13,
     "nova_existing_regression_tests": 8,
-    "total_tests": 83,
-    "executed_tests": 82,
-    "passed_tests": 82,
+    "total_tests": 114,
+    "executed_tests": 114,
+    "passed_tests": 114,
     "all_executed_passed": true,
-    "blocked_tests": [
-      "unchanged HTTP socket test: current network sandbox blocks listener"
-    ],
-    "previous_http_test": "passed before permission change"
+    "blocked_tests": [],
+    "previous_http_test": "rechecked with current network access; passed",
+    "refinement_queue_tests": 3,
+    "public_packaged_tests": 106,
+    "public_packaged_passed_tests": 106
   },
   "data": {
     "dataset_kind": "legacy_consensus_val_200",
@@ -130,7 +131,7 @@
     "zip_bytes": 7275,
     "sha256": "f8c95613f13572d3ff1fb7142aec4550829053ef5f4f85260aafb60f98c5505e"
   },
-  "notice": "Nine nonempty three-arm smoke answers were generated and qualitatively reviewed. No numeric HealthBench quality score is claimed. The 200-item roles-restored dataset and 400-answer plan passed offline validation; generation is not started because current network sandbox blocks local model connections. 82 offline tests passed; one unchanged HTTP listener check cannot be repeated under that sandbox.",
+  "notice": "The frozen 200-item, 400-answer comparison is running. Progress is a timestamped snapshot; no final quality score is claimed. Follow-up bounded refinement is separate from the frozen run.",
   "viewer": {
     "status": "implemented_and_browser_opened",
     "host": "127.0.0.1",
@@ -221,7 +222,7 @@
     ]
   },
   "full_200": {
-    "status": "ready_not_started_network_blocked",
+    "status": "running",
     "dataset_kind": "legacy_consensus_val_roles_200",
     "dataset_sha256": "cd3516c601da6f67fc7b6db3439efdf2659a91534c09c6bc1c5d363889ed4033",
     "selected_count": 200,
@@ -229,8 +230,8 @@
     "history_count": 81,
     "restored_history_turns": 336,
     "planned_answers": 400,
-    "written_answers": 0,
-    "network_calls": 0,
+    "written_answers": 88,
+    "network_calls": 88,
     "development_count": 20,
     "holdout_count": 180,
     "development_history_count": 5,
@@ -242,7 +243,43 @@
     ],
     "grader": "Codex rubric review; not the official grading model",
     "score": null,
-    "score_status": "not_generated_or_scored",
-    "canonical_score_comparable": false
+    "score_status": "generation_and_codex_review_in_progress",
+    "canonical_score_comparable": false,
+    "started_at": "2026-10-11T04:59:38+00:00",
+    "progress_checked_at_utc": "2026-10-11T05:17:18+00:00",
+    "answer_status_counts": {
+      "completed": 75,
+      "truncated": 13
+    },
+    "nonempty_answers": 88,
+    "codex_review": {
+      "development_packets_reviewed": 20,
+      "answers_reviewed": 40,
+      "boolean_judgments": 85,
+      "unresolved_judgments": 1,
+      "full_aggregate_status": "incomplete",
+      "rubric_quality_note": "An archived criterion appears to reward unnecessary hedging; kept literal labels and separate rubric_issue flags. Do not tune generation to exploit it."
+    }
+  },
+  "verified_at_utc": "2026-10-11T05:17:18+00:00",
+  "refinement": {
+    "status": "queued_waiting_for_frozen_baseline",
+    "plan": "REFINEMENT_PLAN.md",
+    "maximum_calls_per_answer": 3,
+    "maximum_revisions": 1,
+    "generation_started": false,
+    "development_only": true,
+    "offline_tests_passed": 17,
+    "review_export_tests_passed": 11,
+    "queue_tests_passed": 3,
+    "prepared_low_count": 20,
+    "prepared_medium_count": 20,
+    "trials": [
+      "draft_low_review_medium_revision_medium",
+      "draft_medium_review_medium_revision_medium"
+    ],
+    "temperature": 0,
+    "completion_token_limit_per_answer": 4096,
+    "independent_quality_review_required": true
   }
 }
