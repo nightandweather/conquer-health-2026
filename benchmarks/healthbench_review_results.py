@@ -254,11 +254,17 @@ def export_reviews(data: Path, answers: Path, manifest: Path, review_dir: Path,
                                   'packet_id': packet_id, 'packet_byte_sha256': packet_bytes[packet_id],
                                   'reviewer': 'Codex', 'official': False})
             uncertain = any(item['criteria_met'] is None for item in candidate['judgments'])
-            status = 'uncertain' if uncertain else 'needs_review' if candidate['flags'] else 'reviewed'
+            # The running viewer permits a numeric score only for reviewed.
+            # This status means complete rubric grading, never clinical approval.
+            status = 'uncertain' if uncertain else 'reviewed'
+            quality_status = 'uncertain' if uncertain else 'needs_review' if candidate['flags'] else 'no_flags_recorded'
             note = candidate['note'] or '; '.join(flag['category'] + ': ' + flag['explanation']
                                                  for flag in candidate['flags'])
+            if candidate['flags']:
+                note = '추가 검토 필요: ' + note
             assessments.append({'prompt_id': prompt_id, 'arm': arm, 'answer_sha256': answer_sha,
-                                'status': status, 'score': None, 'note': note[:500]})
+                                'status': status, 'quality_status': quality_status,
+                                'score': None, 'note': note[:500]})
     summary = build_summary(items, rows, judgments, manifest_value)
     for assessment in assessments:
         case = next(case for case in summary['arms'][assessment['arm']]['cases']

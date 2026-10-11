@@ -12,6 +12,7 @@ from unittest.mock import patch
 from benchmarks.healthbench import canonical_hash
 from benchmarks.healthbench_review import create_review_packets
 from benchmarks.healthbench_review_results import export_reviews
+from local_tools.dialogue_server import visible_assessment
 
 
 class ReviewResultTests(unittest.TestCase):
@@ -97,7 +98,9 @@ class ReviewResultTests(unittest.TestCase):
             self.assertEqual(assessment['answer_sha256'], canonical_hash(source['answer']))
             self.assertEqual(assessment['score'], 60)
             self.assertEqual(assessment['status'], 'reviewed')
-            self.assertEqual(set(assessment), {'prompt_id', 'arm', 'answer_sha256', 'status', 'score', 'note'})
+            self.assertEqual(assessment['quality_status'], 'no_flags_recorded')
+            self.assertEqual(set(assessment), {'prompt_id', 'arm', 'answer_sha256', 'status',
+                                               'quality_status', 'score', 'note'})
         encoded = json.dumps(assessments)
         self.assertNotIn('criterion', encoded)
         self.assertNotIn('sources', encoded)
@@ -117,6 +120,7 @@ class ReviewResultTests(unittest.TestCase):
                      if row['status'] == 'uncertain']
         self.assertEqual(len(uncertain), 1)
         self.assertIsNone(uncertain[0]['score'])
+        self.assertEqual(uncertain[0]['quality_status'], 'uncertain')
         summary = json.loads((self.review / 'score_summary.json').read_text())
         self.assertIsNone(summary['arms'][uncertain[0]['arm']]['score'])
         self.assertEqual(summary['status'], 'incomplete')
@@ -139,10 +143,38 @@ class ReviewResultTests(unittest.TestCase):
         self.write_shard()
         self.export()
         flagged = [row for row in json.loads((self.run / 'assessments.json').read_text())['answers']
-                   if row['status'] == 'needs_review']
+                   if row['quality_status'] == 'needs_review']
         self.assertEqual(len(flagged), 1)
+        self.assertEqual(flagged[0]['status'], 'reviewed')
         self.assertEqual(flagged[0]['score'], 60)
         self.assertEqual(len(flagged[0]['note']), 500)
+        self.assertTrue(flagged[0]['note'].startswith('추가 검토 필요: '))
+
+    def test_running_viewer_displays_completed_grade_with_flags_and_uncertainty(self):
+        completed = self.shard_value['packets'][0]['candidates']['A']
+        completed['flags'] = [{'category': 'rubric_issue', 'explanation': 'Needs independent review.', 'sources': []}]
+        completed['note'] = 'The supplied reviewer note remains visible.'
+        uncertain = self.shard_value['packets'][0]['candidates']['B']
+        uncertain['judgments'][0]['criteria_met'] = None
+        uncertain['flags'] = [{'category': 'grounding', 'explanation': 'Still unresolved.', 'sources': []}]
+        self.write_shard()
+        self.export()
+        assessments = json.loads((self.run / 'assessments.json').read_text())['answers']
+        for quality in ('needs_review', 'uncertain'):
+            assessment = next(row for row in assessments if row['quality_status'] == quality)
+            answer = next(row for row in self.rows if row['arm'] == assessment['arm']
+                          and row['prompt_id'] == assessment['prompt_id'])
+            visible = visible_assessment(assessment, answer)
+            self.assertIsNotNone(visible)
+            self.assertTrue(visible['note'].startswith('추가 검토 필요: '))
+            self.assertNotIn('quality_status', visible)
+            if quality == 'needs_review':
+                self.assertEqual(visible['status'], 'reviewed')
+                self.assertEqual(visible['score'], 60)
+                self.assertIn(completed['note'], visible['note'])
+            else:
+                self.assertEqual(visible['status'], 'uncertain')
+                self.assertIsNone(visible['score'])
 
     def test_invalid_shard_preserves_all_existing_output_bytes_and_times(self):
         self.export()

@@ -3,18 +3,18 @@
   "verified_date": "2026-10-10",
   "state": "full_200_running_docs_based_refinement_prepared",
   "tests": {
-    "healthbench_synthetic_tests": 90,
+    "healthbench_synthetic_tests": 91,
     "local_viewer_tests": 13,
     "nova_existing_regression_tests": 8,
-    "total_tests": 114,
-    "executed_tests": 114,
-    "passed_tests": 114,
+    "total_tests": 115,
+    "executed_tests": 115,
+    "passed_tests": 115,
     "all_executed_passed": true,
     "blocked_tests": [],
     "previous_http_test": "rechecked with current network access; passed",
     "refinement_queue_tests": 3,
-    "public_packaged_tests": 106,
-    "public_packaged_passed_tests": 106
+    "public_packaged_tests": 107,
+    "public_packaged_passed_tests": 107
   },
   "data": {
     "dataset_kind": "legacy_consensus_val_200",
@@ -230,8 +230,8 @@
     "history_count": 81,
     "restored_history_turns": 336,
     "planned_answers": 400,
-    "written_answers": 88,
-    "network_calls": 88,
+    "written_answers": 110,
+    "network_calls": 110,
     "development_count": 20,
     "holdout_count": 180,
     "development_history_count": 5,
@@ -246,22 +246,25 @@
     "score_status": "generation_and_codex_review_in_progress",
     "canonical_score_comparable": false,
     "started_at": "2026-10-11T04:59:38+00:00",
-    "progress_checked_at_utc": "2026-10-11T05:17:18+00:00",
+    "progress_checked_at_utc": "2026-10-11T05:21:14+00:00",
     "answer_status_counts": {
-      "completed": 75,
-      "truncated": 13
+      "completed": 95,
+      "truncated": 15
     },
-    "nonempty_answers": 88,
+    "nonempty_answers": 110,
     "codex_review": {
       "development_packets_reviewed": 20,
       "answers_reviewed": 40,
       "boolean_judgments": 85,
       "unresolved_judgments": 1,
       "full_aggregate_status": "incomplete",
-      "rubric_quality_note": "An archived criterion appears to reward unnecessary hedging; kept literal labels and separate rubric_issue flags. Do not tune generation to exploit it."
+      "rubric_quality_note": "An archived criterion appears to reward unnecessary hedging; kept literal labels and separate rubric_issue flags. Do not tune generation to exploit it.",
+      "viewer_assessments_verified": 40,
+      "viewer_numeric_grades_verified": 39,
+      "viewer_verified_at_utc": "2026-10-11T05:21:14+00:00"
     }
   },
-  "verified_at_utc": "2026-10-11T05:17:18+00:00",
+  "verified_at_utc": "2026-10-11T05:21:14+00:00",
   "refinement": {
     "status": "queued_waiting_for_frozen_baseline",
     "plan": "REFINEMENT_PLAN.md",
@@ -270,7 +273,7 @@
     "generation_started": false,
     "development_only": true,
     "offline_tests_passed": 17,
-    "review_export_tests_passed": 11,
+    "review_export_tests_passed": 12,
     "queue_tests_passed": 3,
     "prepared_low_count": 20,
     "prepared_medium_count": 20,

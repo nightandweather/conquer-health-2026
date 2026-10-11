@@ -51,3 +51,7 @@ Codex 검토 결과는 실행 폴더의 `assessments.json`에서 읽습니다. �
 표시 필드는 `prompt_id`, `arm`, `answer_sha256`(canonical JSON hash), `status`,
 `score`(0–100 또는 null), `note`입니다. 채점 기준 원문은 화면에 전달하지 않습니다.
 검토 절차는 [200문항 평가 계획](../benchmarks/EVALUATION_PLAN.md)에 있습니다.
+
+`reviewed`는 기준별 채점이 끝났다는 뜻이며 임상적으로 안전하다는 판정이 아닙니다.
+오류·누락 또는 채점 기준 문제가 있으면 점수와 함께 `추가 검토 필요` 메모를 표시합니다.
+판정 보류가 있는 답변은 `uncertain`이며 숫자 점수를 표시하지 않습니다.
