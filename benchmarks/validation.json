@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "verified_date": "2026-10-12",
-  "state": "instruction_placement_preflight_verified_generation_not_ready",
+  "state": "instruction_placement_runner_verified_before_runtime_check",
   "tests": {
     "scope": "Current private full regression and public disjoint placement/budget/runner/queue/viewer modules",
-    "total_tests": 305,
-    "executed_tests": 305,
-    "passed_tests": 305,
+    "total_tests": 331,
+    "executed_tests": 331,
+    "passed_tests": 331,
     "all_executed_passed": true,
     "blocked_tests": [],
-    "public_targeted_executed": 182,
-    "public_targeted_passed": 182,
-    "public_targeted_scope": "8 explicit placement/budget/preflight/runner/queue/viewer/Markdown modules; not full public suite",
-    "verified_at_utc": "2026-10-12T04:53:46.700416+00:00"
+    "public_targeted_executed": 208,
+    "public_targeted_passed": 208,
+    "public_targeted_scope": "9 explicit placement/budget/preflight/runner/queue/viewer/Markdown modules; not full public suite",
+    "verified_at_utc": "2026-10-12T05:09:05.563264+00:00"
   },
   "data": {
     "dataset_kind": "legacy_consensus_val_200",
@@ -1147,8 +1147,8 @@
   },
   "current_change_tests": {
     "verified_at_utc": "2026-10-12T04:53:46.700416+00:00",
-    "full_private_executed": 305,
-    "full_private_passed": 305,
+    "full_private_executed": 331,
+    "full_private_passed": 331,
     "placement_prepare_tests": 51,
     "placement_prepare_passed": 51,
     "existing_gate_scenarios_through_placement_api": 41,
@@ -1157,8 +1157,13 @@
     "existing_default_payload_builder_changed": false,
     "existing_low_control_gate_changed": false,
     "public_full_suite_executed": false,
-    "public_targeted_executed": 182,
-    "public_targeted_passed": 182
+    "public_targeted_executed": 208,
+    "public_targeted_passed": 208,
+    "placement_cycle_synthetic_tests": 23,
+    "placement_cycle_synthetic_passed": 23,
+    "independent_placement_runner_audit": "passed",
+    "default_request_bytes_preserved": true,
+    "old_low_gate_and_default_general_cli_unchanged": true
   },
   "historical_test_snapshot": {
     "healthbench_synthetic_tests": 112,
@@ -1637,6 +1642,37 @@
       "reason": "role-aware actual generation runner is absent"
     },
     "earlier_budget_review_and_scores_unchanged": true,
+    "official": false
+  },
+  "instruction_placement_cycle": {
+    "status": "runner_verified_before_runtime_check",
+    "source_control_status_counts": {
+      "completed": 17,
+      "failed": 3
+    },
+    "control_max_tokens": 2048,
+    "candidate_max_tokens": 2048,
+    "reasoning_effort": "medium",
+    "temperature": 0,
+    "instructions_revision": "grounded-v2",
+    "instruction_wording_and_exact_block_unchanged": true,
+    "original_conversation_preserved": true,
+    "changed_fields": [
+      "messages"
+    ],
+    "factor_components": [
+      "role",
+      "message_boundary",
+      "position"
+    ],
+    "planned_cases": 20,
+    "generation_calls": 0,
+    "model_tag_queries": 0,
+    "template_queries": 0,
+    "expected_template_sha256": "fa6710a93d78da62641e192361344be7a8c0a1c3737f139cf89f20ce1626b99c",
+    "local_runtime_metadata_checked": false,
+    "adopted": false,
+    "quality_improvement": null,
     "official": false
   }
 }

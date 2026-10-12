@@ -9,6 +9,7 @@ uses a new immutable output directory; automatic resumption is not supported.
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 from collections import Counter
 from datetime import datetime
 import hashlib
@@ -21,7 +22,7 @@ import subprocess
 import sys
 import time
 
-from .healthbench import (DEFAULT_BASE_URL, DEFAULT_MODEL, ROOT, RequestFailure, arm_config,
+from .healthbench import (DEFAULT_BASE_URL, DEFAULT_MODEL, GROUNDED_SUFFIX, ROOT, RequestFailure, arm_config,
                           Transport, build_payload, canonical_hash, load_dataset,
                           sum_usage, usage_values, utc_now, write_json)
 from .healthbench_refine import DEVELOPMENT_LIMIT, baseline_snapshot
@@ -221,28 +222,47 @@ def load_instructions(path: Path, name: str, version: str) -> tuple[str, dict]:
 
 
 def make_payload(item: dict, instructions: str, model: str = DEFAULT_MODEL, *,
-                 reasoning_effort: str = 'low', max_tokens: int = 2048) -> dict:
-    """Keep original roles/text, appending only the generic last-user suffix."""
+                 reasoning_effort: str = 'low', max_tokens: int = 2048,
+                 instruction_placement: str = 'user_suffix') -> dict:
+    """Keep legacy suffix bytes or relocate the exact block before raw messages."""
     validate_reasoning_effort(reasoning_effort)
     if type(max_tokens) is not int or max_tokens not in (2048, 4096):
         raise ValueError('max_tokens must be the integer 2048 or 4096')
+    if instruction_placement not in ('user_suffix', 'system_prefix'):
+        raise ValueError('instruction_placement must be user_suffix or system_prefix')
+    if instruction_placement == 'system_prefix' and any(message['role'] == 'system' for message in item['prompt']):
+        raise ValueError('system_prefix requires no preexisting system messages')
     body = build_payload(item, 'grounded_call', model)
     body['reasoning_effort'] = reasoning_effort
     body['max_tokens'] = max_tokens
-    body['messages'][-1]['content'] = item['prompt'][-1]['content'] + '\n\n[' + instructions + ']'
+    block = '\n\n[' + instructions + ']'
+    if instruction_placement == 'system_prefix':
+        body['messages'] = [{'role': 'system', 'content': block}, *deepcopy(item['prompt'])]
+    else:
+        body['messages'][-1]['content'] = item['prompt'][-1]['content'] + block
     return body
 
 
 def generate_candidate(item: dict, instructions: str, name: str, model: str, transport,
                        *, dataset_sha256: str, block_on_transport_failure: bool = False,
-                       reasoning_effort: str = 'low', max_tokens: int = 2048) -> dict:
-    body = make_payload(item, instructions, model, reasoning_effort=reasoning_effort, max_tokens=max_tokens)
+                       reasoning_effort: str = 'low', max_tokens: int = 2048,
+                       instruction_placement: str = 'user_suffix') -> dict:
+    placement_arm = 'grounded_medium_system2048_v1'
+    if ((instruction_placement == 'system_prefix' or name == placement_arm)
+            and (instruction_placement != 'system_prefix' or name != placement_arm
+                 or model != DEFAULT_MODEL or reasoning_effort != 'medium' or max_tokens != 2048
+                 or instructions != GROUNDED_SUFFIX)):
+        raise ValueError('system_prefix generation requires the fixed medium2048 placement arm and frozen instructions')
+    body = make_payload(item, instructions, model, reasoning_effort=reasoning_effort, max_tokens=max_tokens,
+                        instruction_placement=instruction_placement)
     started = time.monotonic()
     attempt = {'number': 1, 'max_tokens': body['max_tokens'], 'temperature': body['temperature'],
                'reasoning_effort': body['reasoning_effort'], 'request_sha256': canonical_hash(body),
                'input_sha256': canonical_hash(body['messages']), 'answer': '', 'finish_reason': None,
                'usage': {'prompt_tokens': None, 'completion_tokens': None, 'total_tokens': None},
                'status': 'failed', 'error': None, 'response_received': False}
+    if name == placement_arm:
+        attempt['instruction_placement'] = instruction_placement
     try:
         response = transport.complete(body)
         choices = response.get('choices') if isinstance(response, dict) else None
@@ -264,13 +284,16 @@ def generate_candidate(item: dict, instructions: str, name: str, model: str, tra
         attempt.update(status='blocked' if block_on_transport_failure and not attempt['response_received'] else 'failed',
                        error={'code': exc.code, 'http_status': exc.http_status})
     attempt['seconds'] = round(time.monotonic() - started, 3)
-    return {'prompt_id': item['prompt_id'], 'arm': name, 'model': model,
+    record = {'prompt_id': item['prompt_id'], 'arm': name, 'model': model,
             'dataset_sha256': dataset_sha256, 'prompt_sha256': canonical_hash(item['prompt']),
             'input_sha256': attempt['input_sha256'], 'request_sha256': attempt['request_sha256'],
             'answer': attempt['answer'], 'status': attempt['status'], 'finish_reason': attempt['finish_reason'],
             'error': attempt['error'], 'attempts': [attempt], 'usage': sum_usage([attempt]),
             'seconds': attempt['seconds'], 'fallback_used': False, 'selected_attempt': 1,
             'score': None, 'score_status': REVIEW_REQUIRED}
+    if name == placement_arm:
+        record['instruction_placement'] = instruction_placement
+    return record
 
 
 def run_cycle(data: Path, baseline_manifest: Path, instructions_file: Path, out: Path, *,

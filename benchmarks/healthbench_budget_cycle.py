@@ -45,17 +45,35 @@ class _ArtifactChanged(_Blocked):
 
 
 class _SafeTransport:
-    def __init__(self, client):
+    def __init__(self, client, *, template_pin=None):
         self.client, self.calls, self.metadata_calls, self.interrupted = client, 0, 0, False
         self.last_digest, self.metadata_status = None, 'not_requested'
         self.expected_request_sha256 = None
+        self.template_pin, self.template_queries = template_pin, 0
+        self.last_template_sha256, self.template_status = None, 'not_requested'
 
     def complete(self, payload):
         if canonical_hash(payload) != self.expected_request_sha256:
             raise _Blocked('candidate_request_changed')
         self.calls += 1
         try:
-            return self.client.complete(payload)
+            response = self.client.complete(payload)
+            if self.template_pin is not None:
+                choices = response.get('choices') if isinstance(response, dict) else None
+                if (not isinstance(choices, list) or not choices or not isinstance(choices[0], dict)
+                        or not isinstance(choices[0].get('message'), dict)):
+                    raise RequestFailure('invalid_provider_response')
+                choice = choices[0]
+                answer, finish = choice['message'].get('content'), choice.get('finish_reason')
+                if ((answer is not None and not isinstance(answer, str))
+                        or not isinstance(finish, str) or finish not in ('stop', 'length')):
+                    raise RequestFailure('invalid_provider_response')
+                try:
+                    if answer is not None:
+                        answer.encode('utf-8')
+                except UnicodeError:
+                    raise RequestFailure('invalid_provider_response') from None
+            return response
         except KeyboardInterrupt:
             self.interrupted = True
             raise RequestFailure('interrupted') from None
@@ -69,6 +87,8 @@ class _SafeTransport:
     def metadata(self, expected_digest):
         self.metadata_calls += 1
         self.last_digest, self.metadata_status = None, 'unavailable'
+        if self.template_pin is not None:
+            self.template_status = 'not_checked_after_latest_model_query'
         try:
             value = self.client.model_metadata(DEFAULT_MODEL)
         except Exception:
@@ -80,6 +100,28 @@ class _SafeTransport:
             self.last_digest, self.metadata_status = value['digest'], 'digest_mismatch'
             raise _Blocked('model_digest_changed')
         self.last_digest, self.metadata_status = value['digest'], 'available'
+        if self.template_pin is not None:
+            self.template_queries += 1
+            self.last_template_sha256, self.template_status = None, 'unavailable'
+            try:
+                value = self.client.request('POST', DEFAULT_BASE_URL.removesuffix('/v1') + '/api/show',
+                                            {'model': DEFAULT_MODEL}, authenticated=False)
+            except KeyboardInterrupt:
+                self.template_status = 'interrupted'
+                raise
+            except Exception:
+                raise _Blocked('model_template_unavailable') from None
+            template = value.get('template') if isinstance(value, dict) else None
+            if not isinstance(template, str) or not template.strip():
+                raise _Blocked('model_template_unavailable')
+            try:
+                self.last_template_sha256 = gate._sha(template.encode('utf-8'))
+            except UnicodeError:
+                raise _Blocked('model_template_unavailable') from None
+            if self.last_template_sha256 != self.template_pin:
+                self.template_status = 'hash_mismatch'
+                raise _Blocked('model_template_changed')
+            self.template_status = 'available'
 
 
 class _Files:
@@ -200,8 +242,15 @@ def _guard(snapshots, client=None, digest=None, files=None):
             files.verify()
 
 
-def _verify_record(row, request):
+def _verify_record(row, request, *, experiment='max_tokens'):
     try:
+        gate._require(type(experiment) is str and experiment in ('max_tokens', 'instruction_placement'),
+                      'Unknown fixed experiment')
+        if experiment == 'instruction_placement':
+            from .healthbench_placement_cycle import CANDIDATE_ARM as candidate_arm
+            max_tokens = 2048
+        else:
+            candidate_arm, max_tokens = CANDIDATE_ARM, 4096
         attempt = row['attempts'][0]
         gate._require(len(row['attempts']) == 1 and type(row['selected_attempt']) is int
                       and row['selected_attempt'] == 1 and row['fallback_used'] is False
@@ -211,11 +260,18 @@ def _verify_record(row, request):
             gate._equal(row[key], attempt[key], 'Candidate row and selected attempt disagree')
         for key in ('input_sha256', 'request_sha256'):
             gate._require(row[key] == attempt[key] == request[key], 'Candidate request provenance changed')
-        for key, expected in {'max_tokens': 4096, 'temperature': 0, 'reasoning_effort': 'medium'}.items():
+        for key, expected in {'max_tokens': max_tokens, 'temperature': 0, 'reasoning_effort': 'medium'}.items():
             gate._equal(attempt[key], expected, 'Candidate attempt settings changed')
-        gate._require(row['arm'] == CANDIDATE_ARM and row['prompt_sha256'] == request['prompt_sha256']
+        gate._require(row['arm'] == candidate_arm and row['prompt_sha256'] == request['prompt_sha256']
                       and isinstance(row['answer'], str) and row['score'] is None
                       and row['score_status'] == REVIEW_REQUIRED, 'Candidate row identity changed')
+        if experiment == 'instruction_placement':
+            gate._require(row['instruction_placement'] == attempt['instruction_placement'] == 'system_prefix'
+                          and row['model'] == DEFAULT_MODEL and row['prompt_id'] == request['prompt_id'],
+                          'Candidate placement identity changed')
+            for key in ('dataset_sha256', 'model_digest', 'instructions_byte_sha256',
+                        'instructions_name', 'instructions_version'):
+                gate._require(row[key] == request[key], 'Candidate placement provenance changed')
         if row['status'] == 'completed':
             gate._require(row['answer'].strip() and row['finish_reason'] == 'stop' and row['error'] is None
                           and attempt['response_received'] is True, 'Candidate completion evidence changed')
@@ -225,6 +281,18 @@ def _verify_record(row, request):
         else:
             gate._require(row['status'] in {'failed', 'blocked'} and isinstance(row['error'], dict),
                           'Candidate failure evidence changed')
+            if experiment == 'instruction_placement':
+                gate._require(set(row['error']) == {'code', 'http_status'}, 'Candidate failure fields changed')
+                if row['status'] == 'failed':
+                    gate._require(attempt['response_received'] is True and row['error']['http_status'] is None
+                                  and row['error']['code'] in {'empty_answer', 'unexpected_finish_reason'},
+                                  'Candidate received failure evidence changed')
+                    if row['error']['code'] == 'empty_answer':
+                        gate._require(not row['answer'].strip(), 'Empty-answer failure content changed')
+                else:
+                    gate._require(attempt['response_received'] is False
+                                  and row['error']['code'] in TRANSPORT_CODES | {'transport_failure', 'interrupted'},
+                                  'Candidate transport failure evidence changed')
     except (ValueError, KeyError, TypeError, IndexError):
         raise _Blocked('candidate_record_invalid') from None
 
@@ -242,11 +310,13 @@ def _row_summary(rows, status, started_at, started, client, error):
             'usage': sum_usage(attempts), 'error': error, 'score': None, 'score_status': REVIEW_REQUIRED}
 
 
-def run_budget_cycle(data: Path, source_manifest: Path, source_comparison_manifest: Path,
+def _run_fixed_cycle(data: Path, source_manifest: Path, source_comparison_manifest: Path,
                      instructions_file: Path, out: Path, *, expected_comparison_sha256: str,
                      expected_source_summary_sha256: str, transport=None, timeout=300,
-                     prepare_only: bool = False) -> tuple[dict, int]:
-    """Preserve the cached control and make at most 20 single 4096 calls."""
+                     prepare_only: bool = False, experiment: str) -> tuple[dict, int]:
+    """Share integrity guards for exactly two fixed recipes; accept no payload overrides."""
+    gate._require(type(experiment) is str and experiment in ('max_tokens', 'instruction_placement'),
+                  'Only the two fixed budget and placement experiments are supported')
     gate._require(type(prepare_only) is bool, 'prepare_only must be boolean')
     gate._require(type(timeout) in (int, float) and math.isfinite(timeout) and timeout > 0,
                   'timeout must be finite and positive')
@@ -256,21 +326,51 @@ def run_budget_cycle(data: Path, source_manifest: Path, source_comparison_manife
         expected_source_summary_sha256=expected_source_summary_sha256)
     _data_index(items)
     digest, ids = proof['model']['digest'], proof['selected_prompt_ids']
-    payloads = [make_payload(item, GROUNDED_SUFFIX, reasoning_effort='medium', max_tokens=4096) for item in items]
+    placement = experiment == 'instruction_placement'
+    template_pin = None
+    if placement:
+        from .healthbench_placement_cycle import (CANDIDATE_ARM as candidate_arm,
+                                                 EXPECTED_TEMPLATE_SHA256, _prepare_placement_plan)
+        proof, payloads = _prepare_placement_plan(proof, items, controls, source)
+        max_tokens, instruction_placement, changed_fields = 2048, 'system_prefix', ['messages']
+        template_pin = EXPECTED_TEMPLATE_SHA256
+        runner, description = 'healthbench_placement_cycle', 'cached medium2048 user suffix versus medium2048 system prefix; development20 only'
+    else:
+        candidate_arm, max_tokens, instruction_placement, changed_fields = CANDIDATE_ARM, 4096, 'user_suffix', ['max_tokens']
+        payloads = [make_payload(item, GROUNDED_SUFFIX, reasoning_effort='medium', max_tokens=4096) for item in items]
+        runner, description = 'healthbench_budget_cycle', 'cached medium2048 versus medium4096; development20 only'
+    paired_arms = (gate.ARM, candidate_arm)
     requests = [{'prompt_id': item['prompt_id'], 'prompt_sha256': canonical_hash(item['prompt']),
                  'input_sha256': canonical_hash(payload['messages']), 'request_sha256': canonical_hash(payload)}
                 for item, payload in zip(items, payloads)]
     for request, source_proof in zip(requests, proof['row_provenance']):
-        gate._require(request['input_sha256'] == source_proof['input_sha256']
-                      and request['request_sha256'] == source_proof['candidate_request_sha256'],
-                      '4096 candidate does not match the validated max_tokens-only proof')
-    candidate_config = source['arms'][gate.ARM] | {'max_tokens': 4096}
+        expected_input = source_proof['treatment_input_sha256'] if placement else source_proof['input_sha256']
+        expected_request = source_proof['treatment_request_sha256'] if placement else source_proof['candidate_request_sha256']
+        gate._require(request['input_sha256'] == expected_input and request['request_sha256'] == expected_request,
+                      'Candidate does not match the validated fixed experiment proof')
+        if placement:
+            request.update(dataset_sha256=proof['dataset_byte_sha256'], model_digest=digest,
+                           instructions_byte_sha256=proof['instructions_byte_sha256'],
+                           instructions_name=candidate_arm, instructions_version=gate.REVISION,
+                           instruction_placement=instruction_placement)
+    candidate_config = source['arms'][gate.ARM] | {'max_tokens': max_tokens}
+    if placement:
+        candidate_config['instruction_placement'] = instruction_placement
+    for snapshot in snapshots:
+        snapshot.verify()
     started_at, started = utc_now(), time.monotonic()
     root_manifest = {'schema_version': 1, 'status': 'prepared' if prepare_only else 'running',
-                     'started_at': started_at, 'experiment': 'cached medium2048 versus medium4096; development20 only',
-                     'source_preflight': proof, 'paired_arms': list(PAIRED_ARMS), 'selected_prompt_ids': ids,
-                     'execution_support': {'ready': True, 'runner': 'healthbench_budget_cycle'},
+                     'started_at': started_at, 'experiment': description,
+                     'source_preflight': proof, 'paired_arms': list(paired_arms), 'selected_prompt_ids': ids,
+                     'execution_support': {'ready': True, 'runner': runner},
                      'prepare_only': prepare_only, 'score': None, 'score_status': REVIEW_REQUIRED}
+    if placement:
+        root_manifest['cached_source_runtime_template'] = {
+            'byte_sha256': template_pin, 'metadata_source': 'cached source-time runtime snapshot; no new control query',
+            'bound_source_model_digest': digest,
+            'bound_source_manifest_byte_sha256': proof['source_byte_hashes']['source_manifest'],
+            'plain_api_system_mapping': 'supported by this fixed pinned runtime template',
+        }
     gate._publish_private(gate._path(out), root_manifest, snapshots)
     files = _Files(out, root_manifest)
     records, client, status, code, error, integrity_failures = [], None, root_manifest['status'], 0, None, []
@@ -286,15 +386,18 @@ def run_budget_cycle(data: Path, source_manifest: Path, source_comparison_manife
             return False
     candidate_manifest = {'schema_version': 1, 'status': status, 'started_at': started_at,
                           'dataset': deepcopy(source['dataset']), 'selected_prompt_ids': ids,
-                          'selected_arms': [CANDIDATE_ARM], 'split': deepcopy(source['split']),
-                          'arms': {CANDIDATE_ARM: candidate_config}, 'prepared_requests': requests,
+                          'selected_arms': [candidate_arm], 'split': deepcopy(source['split']),
+                          'arms': {candidate_arm: candidate_config}, 'prepared_requests': requests,
                           'model': {'name': DEFAULT_MODEL, 'digest': digest, 'metadata_status': 'not_requested'},
-                          'instructions': {'name': CANDIDATE_ARM, 'version': gate.REVISION,
+                          'instructions': {'name': candidate_arm, 'version': gate.REVISION,
                                            'byte_sha256': proof['instructions_byte_sha256']},
                           'config': {'model': DEFAULT_MODEL, 'base_url': DEFAULT_BASE_URL, 'timeout': timeout,
-                                     'reasoning_effort': 'medium', 'temperature': 0, 'max_tokens': 4096,
+                                     'reasoning_effort': 'medium', 'temperature': 0, 'max_tokens': max_tokens,
                                      'maximum_calls_per_case': 1, 'resume': False, 'prepare_only': prepare_only},
                           'source_byte_hashes': proof['source_byte_hashes'], 'score': None, 'score_status': REVIEW_REQUIRED}
+    if placement:
+        candidate_manifest['config']['instruction_placement'] = instruction_placement
+        candidate_manifest['cached_source_runtime_template'] = deepcopy(root_manifest['cached_source_runtime_template'])
     answers_snapshot = next(snapshot for snapshot in snapshots if snapshot.path == gate._path(source_manifest).parent / 'answers.jsonl')
     try:
         files.json('candidate/manifest.json', candidate_manifest)
@@ -302,37 +405,47 @@ def run_budget_cycle(data: Path, source_manifest: Path, source_comparison_manife
         files.write('comparison/control_answers.jsonl', answers_snapshot.raw)
         if not prepare_only:
             client = _SafeTransport(transport if transport is not None else
-                                    Transport(DEFAULT_BASE_URL, os.environ.get('HEALTHBENCH_API_KEY', ''), timeout))
+                                    Transport(DEFAULT_BASE_URL, os.environ.get('HEALTHBENCH_API_KEY', ''), timeout),
+                                    template_pin=template_pin)
             try:
                 for item, request in zip(items, requests):
                     _guard(snapshots, client, digest, files)
                     candidate_manifest['model']['metadata_status'] = 'available'
                     client.expected_request_sha256 = request['request_sha256']
-                    record = generate_candidate(item, GROUNDED_SUFFIX, CANDIDATE_ARM, DEFAULT_MODEL, client,
+                    record = generate_candidate(item, GROUNDED_SUFFIX, candidate_arm, DEFAULT_MODEL, client,
                                                 dataset_sha256=proof['dataset_byte_sha256'],
-                                                block_on_transport_failure=True, reasoning_effort='medium', max_tokens=4096)
+                                                block_on_transport_failure=True, reasoning_effort='medium', max_tokens=max_tokens,
+                                                instruction_placement=instruction_placement)
                     record.update(model_digest=digest, instructions_byte_sha256=proof['instructions_byte_sha256'],
-                                  instructions_name=CANDIDATE_ARM, instructions_version=gate.REVISION,
+                                  instructions_name=candidate_arm, instructions_version=gate.REVISION,
                                   model_digest_status='expected_source_pin', digest_before=client.last_digest,
                                   digest_after=None, model_identity_verified=False)
+                    if placement:
+                        record.update(template_before_sha256=client.last_template_sha256,
+                                      template_after_sha256=None, runtime_template_verified=False)
                     records.append(record)
                     files.write('candidate/answers.jsonl', (json.dumps(record, ensure_ascii=False) + '\n').encode('utf-8'), append=True)
-                    _verify_record(record, request)
+                    _verify_record(record, request, experiment=experiment)
                     if client.interrupted:
                         status, code, error = 'interrupted', 130, {'code': 'interrupted'}
                         break
                     before_metadata = client.metadata_calls
+                    before_template = client.template_queries
                     try:
                         _guard(snapshots, client, digest, files)
                     except _Blocked:
                         if client.metadata_calls > before_metadata:
                             record['digest_after'] = client.last_digest
+                        if placement and client.template_queries > before_template:
+                            record['template_after_sha256'] = client.last_template_sha256
                         try:
                             files.write('candidate/answers.jsonl', b''.join((json.dumps(row, ensure_ascii=False) + '\n').encode('utf-8') for row in records))
                         except _ArtifactChanged as exc:
                             integrity_failures.append(exc.evidence)
                         raise
                     record.update(digest_after=client.last_digest, model_identity_verified=True)
+                    if placement:
+                        record.update(template_after_sha256=client.last_template_sha256, runtime_template_verified=True)
                     files.write('candidate/answers.jsonl', b''.join((json.dumps(row, ensure_ascii=False) + '\n').encode('utf-8') for row in records))
                     if record['status'] == 'blocked':
                         status, code, error = 'blocked', 2, {'code': 'candidate_transport_failure'}
@@ -350,7 +463,7 @@ def run_budget_cycle(data: Path, source_manifest: Path, source_comparison_manife
         else:
             _guard(snapshots, files=files)
         summary = _row_summary(records, status, started_at, started, client, error)
-        summary.update(selected_prompt_ids=ids, selected_arms=[CANDIDATE_ARM],
+        summary.update(selected_prompt_ids=ids, selected_arms=[candidate_arm],
                        source_status_counts=proof['source_status_counts'], source_known_failure_count=3,
                        source_recorded_calls=20, source_usage=sum_usage([row['attempts'][0] for row in controls]))
         candidate_manifest.update(status=status, finished_at=summary['finished_at'], error=error)
@@ -376,8 +489,8 @@ def run_budget_cycle(data: Path, source_manifest: Path, source_comparison_manife
         comparison_status = 'partial' if status in {'completed', 'partial'} and len(records) == 20 else status
         comparison_manifest = {'schema_version': 1, 'status': comparison_status,
                                'finished_at': summary['finished_at'], 'dataset': deepcopy(source['dataset']),
-                               'selected_prompt_ids': ids, 'selected_arms': list(PAIRED_ARMS),
-                               'arms': {gate.ARM: deepcopy(source['arms'][gate.ARM]), CANDIDATE_ARM: candidate_config},
+                               'selected_prompt_ids': ids, 'selected_arms': list(paired_arms),
+                               'arms': {gate.ARM: deepcopy(source['arms'][gate.ARM]), candidate_arm: candidate_config},
                                'planned_answers': 40, 'written_answers': 20 + len(records),
                                'original_control_manifest_status': 'partial', 'control_status_counts': proof['source_status_counts'],
                                'control_recorded_calls': 20, 'control_usage': summary['source_usage'],
@@ -387,7 +500,10 @@ def run_budget_cycle(data: Path, source_manifest: Path, source_comparison_manife
         files.json('comparison/manifest.json', comparison_manifest)
         provenance_manifest = {'source_byte_hashes': proof['source_byte_hashes'],
                                'control_answers_byte_sha256': gate._sha(answers_snapshot.raw),
-                               'row_provenance': provenance, 'changed_fields': ['max_tokens']}
+                               'row_provenance': provenance, 'changed_fields': changed_fields}
+        if placement:
+            provenance_manifest['placement_request_provenance'] = deepcopy(proof['row_provenance'])
+            comparison_manifest['cached_source_runtime_template'] = deepcopy(root_manifest['cached_source_runtime_template'])
         files.json('comparison/provenance.json', provenance_manifest)
         def refresh_source_entries():
             notices = {entry['artifact']: entry for entry in integrity_failures}
@@ -428,7 +544,7 @@ def run_budget_cycle(data: Path, source_manifest: Path, source_comparison_manife
                 files.check()
                 review_status = review.create_review_packets(data, gate._path(out) / 'comparison/answers.jsonl',
                     gate._path(out) / 'comparison/manifest.json', gate._path(out) / 'comparison/review',
-                    paired_arms=PAIRED_ARMS, include_known_inference_failures=True)
+                    paired_arms=paired_arms, include_known_inference_failures=True)
                 review_status.update(prepared_packet_count=review_status['ready_packet_count'], review_eligible=True)
                 expected_answers_sha = gate._sha(files.expected[(('comparison',), 'answers.jsonl')])
                 if review_status.get('answers_snapshot_sha256') != expected_answers_sha:
@@ -463,6 +579,19 @@ def run_budget_cycle(data: Path, source_manifest: Path, source_comparison_manife
                            'metadata_status': client.metadata_status if client else 'not_requested',
                            'metadata_calls': client.metadata_calls if client else 0}
         summary['current_runtime_model'] = current_runtime
+        if placement:
+            current_template = {'expected_byte_sha256': template_pin,
+                                'observed_byte_sha256': client.last_template_sha256 if client else None,
+                                'metadata_status': client.template_status if client else 'not_requested',
+                                'template_queries': client.template_queries if client else 0,
+                                'verified': bool(client and client.metadata_status == 'available'
+                                                 and client.template_status == 'available'),
+                                'query': 'POST /api/show; exact template UTF-8 bytes; metadata only'}
+            summary.update(template_queries=current_template['template_queries'],
+                           current_runtime_template=current_template,
+                           cached_source_runtime_template=deepcopy(root_manifest['cached_source_runtime_template']))
+            for manifest in (candidate_manifest, comparison_manifest, root_manifest):
+                manifest['current_runtime_template'] = deepcopy(current_template)
         candidate_manifest.update(status=status, error=error, current_runtime_model=current_runtime,
                                   finished_at=summary['finished_at'])
         candidate_manifest['model']['metadata_status'] = current_runtime['metadata_status']
@@ -484,6 +613,8 @@ def run_budget_cycle(data: Path, source_manifest: Path, source_comparison_manife
         root_manifest.update(status=status, finished_at=summary['finished_at'], error=error,
                              calls=summary['calls'], model_metadata_calls=summary['model_metadata_calls'],
                              candidate_status=status, comparison_status=comparison_manifest['status'], review=review_status)
+        if placement:
+            root_manifest['template_queries'] = summary['template_queries']
         save_json('manifest.json', root_manifest)
         save_json('summary.json', summary)
         try:
@@ -516,6 +647,17 @@ def run_budget_cycle(data: Path, source_manifest: Path, source_comparison_manife
         return summary, code
     finally:
         files.close()
+
+
+def run_budget_cycle(data: Path, source_manifest: Path, source_comparison_manifest: Path,
+                     instructions_file: Path, out: Path, *, expected_comparison_sha256: str,
+                     expected_source_summary_sha256: str, transport=None, timeout=300,
+                     prepare_only: bool = False) -> tuple[dict, int]:
+    """Preserve the unchanged fixed medium4096 budget experiment."""
+    return _run_fixed_cycle(data, source_manifest, source_comparison_manifest, instructions_file, out,
+        expected_comparison_sha256=expected_comparison_sha256,
+        expected_source_summary_sha256=expected_source_summary_sha256,
+        transport=transport, timeout=timeout, prepare_only=prepare_only, experiment='max_tokens')
 
 
 def main(argv=None):

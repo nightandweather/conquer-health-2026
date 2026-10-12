@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from benchmarks.healthbench import (DEFAULT_BASE_URL, DEFAULT_MODEL, RequestFailure, arm_config,
+from benchmarks.healthbench import (DEFAULT_BASE_URL, DEFAULT_MODEL, GROUNDED_SUFFIX, RequestFailure, arm_config,
                                     build_payload, canonical_hash, generate, load_dataset)
 from benchmarks import healthbench_codex_cycle as cycle
 from benchmarks.healthbench_codex_cycle import REVIEW_REQUIRED, make_payload, run_cycle
@@ -64,6 +64,77 @@ class BudgetTokenPayloadTests(unittest.TestCase):
                                              dataset_sha256='synthetic', max_tokens=invalid)
                 self.assertEqual(transport.payloads, [])
                 self.assertEqual(transport.metadata_calls, 0)
+
+    def test_explicit_user_suffix_preserves_exact_2048_and_4096_requests_and_records(self):
+        item, instructions = self.item(), 'General\n[frozen instruction]\n'
+        for tokens in (2048, 4096):
+            with self.subTest(tokens=tokens):
+                implicit = make_payload(item, instructions, reasoning_effort='medium', max_tokens=tokens)
+                explicit = make_payload(item, instructions, reasoning_effort='medium', max_tokens=tokens,
+                                        instruction_placement='user_suffix')
+                self.assertEqual(json.dumps(implicit, ensure_ascii=False).encode(),
+                                 json.dumps(explicit, ensure_ascii=False).encode())
+                transport = FakeTransport([response()])
+                row = cycle.generate_candidate(item, instructions, 'legacy', DEFAULT_MODEL, transport,
+                    dataset_sha256='synthetic', reasoning_effort='medium', max_tokens=tokens)
+                self.assertEqual(transport.payloads, [implicit])
+                self.assertNotIn('instruction_placement', row)
+                self.assertNotIn('instruction_placement', row['attempts'][0])
+
+    def test_system_prefix_exact_block_raw_messages_and_actual_attempt(self):
+        item, instructions = self.item(), GROUNDED_SUFFIX
+        item['prompt'] = [{'role': 'user', 'content': '  raw fact\n'},
+                          {'role': 'assistant', 'content': 'Unconfirmed prior claim'},
+                          {'role': 'user', 'content': 'Question\n\n[' + instructions + ']'}]
+        original = deepcopy(item)
+        control = make_payload(item, instructions, reasoning_effort='medium', max_tokens=2048)
+        treatment = make_payload(item, instructions, reasoning_effort='medium', max_tokens=2048,
+                                 instruction_placement='system_prefix')
+        self.assertEqual(treatment['messages'],
+                         [{'role': 'system', 'content': '\n\n[' + instructions + ']'}, *original['prompt']])
+        self.assertEqual({key for key in control if control[key] != treatment[key]}, {'messages'})
+        self.assertEqual(item, original)
+        transport = FakeTransport([response()])
+        row = cycle.generate_candidate(item, instructions, 'grounded_medium_system2048_v1', DEFAULT_MODEL,
+            transport, dataset_sha256='synthetic', reasoning_effort='medium', max_tokens=2048,
+            instruction_placement='system_prefix')
+        self.assertEqual(transport.payloads, [treatment])
+        self.assertEqual(row['instruction_placement'], 'system_prefix')
+        self.assertEqual(row['attempts'][0]['instruction_placement'], 'system_prefix')
+        self.assertEqual(row['attempts'][0]['max_tokens'], 2048)
+        self.assertEqual(row['request_sha256'], canonical_hash(treatment))
+        self.assertEqual(row['input_sha256'], canonical_hash(treatment['messages']))
+
+    def test_invalid_placement_system_conflict_or_arm_rejects_before_transport(self):
+        for value in (None, True, '', 'system', 'SYSTEM_PREFIX', [], {}):
+            with self.subTest(value=value):
+                transport = FakeTransport([])
+                with self.assertRaises(ValueError):
+                    make_payload(self.item(), 'General', instruction_placement=value)
+                with self.assertRaises(ValueError):
+                    cycle.generate_candidate(self.item(), 'General', 'legacy', DEFAULT_MODEL, transport,
+                        dataset_sha256='synthetic', instruction_placement=value)
+                self.assertEqual(transport.payloads, [])
+        item = self.item()
+        item['prompt'].insert(0, {'role': 'system', 'content': 'Original system'})
+        with self.assertRaisesRegex(ValueError, 'preexisting system'):
+            make_payload(item, 'General', instruction_placement='system_prefix')
+        for name, effort, tokens, placement in (('legacy', 'medium', 2048, 'system_prefix'),
+                ('grounded_medium_system2048_v1', 'low', 2048, 'system_prefix'),
+                ('grounded_medium_system2048_v1', 'medium', 4096, 'system_prefix'),
+                ('grounded_medium_system2048_v1', 'medium', 2048, 'user_suffix')):
+            transport = FakeTransport([])
+            with self.assertRaises(ValueError):
+                cycle.generate_candidate(self.item(), 'General', name, DEFAULT_MODEL, transport,
+                    dataset_sha256='synthetic', reasoning_effort=effort, max_tokens=tokens,
+                    instruction_placement=placement)
+            self.assertEqual(transport.payloads, [])
+        transport = FakeTransport([])
+        with self.assertRaisesRegex(ValueError, 'frozen instructions'):
+            cycle.generate_candidate(self.item(), GROUNDED_SUFFIX + '\n', 'grounded_medium_system2048_v1',
+                DEFAULT_MODEL, transport, dataset_sha256='synthetic', reasoning_effort='medium', max_tokens=2048,
+                instruction_placement='system_prefix')
+        self.assertEqual(transport.payloads, [])
 
 
 class FakeTransport:

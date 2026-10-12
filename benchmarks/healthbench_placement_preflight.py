@@ -141,7 +141,7 @@ def prepare_instruction_placement(data: Path, source_manifest: Path,
               'medical_judgments': 'not_performed; source inference failures retain utility zero separately',
               'criteria_predicted': False, 'score': None, 'score_status': REVIEW_REQUIRED,
               'execution_support': {'ready': False, 'status': 'NOT_READY',
-                                    'reason': 'a role-aware instruction-placement execution runner is absent'},
+                                    'reason': 'this prepare-only tool does not generate; actual runner readiness is verified separately'},
               'fixed_low_control_gate': 'unchanged', 'default_payload_builder': 'unchanged'}
     # Revalidate every source after constructing the in-memory requests, before
     # publishing. The publisher revalidates them after its write and rolls back
