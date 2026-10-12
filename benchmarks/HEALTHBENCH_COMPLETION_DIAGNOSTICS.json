@@ -1,0 +1,75 @@
+{
+  "recorded_at_utc": "2026-10-12T14:09:21.711676+00:00",
+  "kind": "Offline HBT02/HBT03 completion contract diagnosis, not new clinical experiment",
+  "saved_receipts_inspected": 8,
+  "saved_status_counts": {
+    "completed": 6,
+    "failed": 2
+  },
+  "saved_empty_and_length_overlap_count": 2,
+  "diagnostic_findings": {
+    "captured_final_string_empty_in_both_failed_records": true,
+    "answer_equals_captured_string_all_eight": true,
+    "both_failed_completion_tokens_at_configured_cap": 2048,
+    "valid_final_string_loss_observed_in_code_or_synthetic_replay": false,
+    "root_cause_established": false,
+    "root_cause": null,
+    "raw_provider_envelope_retained": false,
+    "reasoning_presence_or_size_retained": false,
+    "separate_reasoning_token_usage_retained": false,
+    "choices_count_retained": false,
+    "total_tokens_direct_report_vs_derived_provenance_retained": false
+  },
+  "interpretation": "Evidence is consistent with an empty first-choice final string at the parsed transport boundary. It does not establish why the provider returned it or what other fields contained. No inference that all 2048 tokens were reasoning or that a prompt caused the failure.",
+  "synthetic_replay": {
+    "variants": 14,
+    "frozen_runners": 2,
+    "checks_passed": 28,
+    "fake_completion_calls": 28,
+    "real_model_calls": 0,
+    "real_metadata_queries": 0,
+    "real_template_queries": 0,
+    "network_calls": 0,
+    "clinical_content_used": false,
+    "production_state_changed": false
+  },
+  "usage_clarification": {
+    "input_output_fields": "Provider-reported integer input/output values are retained by normalization",
+    "total_tokens_field": "Direct provider value if present and valid; otherwise derived input+output. Provenance was not retained in HBT02/HBT03 receipts.",
+    "HBT02": {
+      "input": 2790,
+      "output": 5418,
+      "recorded_total": 8208,
+      "total_origin": "unknown_direct_or_derived"
+    },
+    "HBT03": {
+      "input": 1879,
+      "output": 4363,
+      "recorded_total": 6242,
+      "total_origin": "unknown_direct_or_derived"
+    },
+    "numeric_correction_required": false,
+    "historical_immutable_receipts_modified": false
+  },
+  "preservation": {
+    "files_checked": 109,
+    "all_match": true,
+    "whole_repository_backup": false
+  },
+  "new_generation_calls": 0,
+  "new_live_model_metadata_queries": 0,
+  "new_live_template_queries": 0,
+  "new_NOVA_submissions": 0,
+  "fresh_clinical_review": false,
+  "HBT02_HBT03_primary_result": null,
+  "HBT02_HBT03_adopted": false,
+  "future_diagnostic_contract_design_only": [
+    "Capture choice count and selected index",
+    "Capture content key presence, original type, UTF8 byte length and hash separately from normalized answer",
+    "Capture reasoning/reasoning_content key presence, type and length only; never promote reasoning to final answer",
+    "Capture original numeric usage values with per-field reported/derived/missing/invalid provenance and safe numeric detail fields",
+    "Capture finish reason and response model identity in private metadata",
+    "Preserve permanent reservations, one dispatch, all-complete review gate and no retry"
+  ],
+  "next_step": "Only a separate offline observability implementation/contract may be prepared from this gap; do not change pinned HBT02/HBT03, rerun old candidates, promote reasoning to an answer or start a new clinical prompt automatically."
+}
