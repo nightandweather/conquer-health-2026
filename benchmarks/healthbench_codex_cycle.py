@@ -221,19 +221,22 @@ def load_instructions(path: Path, name: str, version: str) -> tuple[str, dict]:
 
 
 def make_payload(item: dict, instructions: str, model: str = DEFAULT_MODEL, *,
-                 reasoning_effort: str = 'low') -> dict:
+                 reasoning_effort: str = 'low', max_tokens: int = 2048) -> dict:
     """Keep original roles/text, appending only the generic last-user suffix."""
     validate_reasoning_effort(reasoning_effort)
+    if type(max_tokens) is not int or max_tokens not in (2048, 4096):
+        raise ValueError('max_tokens must be the integer 2048 or 4096')
     body = build_payload(item, 'grounded_call', model)
     body['reasoning_effort'] = reasoning_effort
+    body['max_tokens'] = max_tokens
     body['messages'][-1]['content'] = item['prompt'][-1]['content'] + '\n\n[' + instructions + ']'
     return body
 
 
 def generate_candidate(item: dict, instructions: str, name: str, model: str, transport,
                        *, dataset_sha256: str, block_on_transport_failure: bool = False,
-                       reasoning_effort: str = 'low') -> dict:
-    body = make_payload(item, instructions, model, reasoning_effort=reasoning_effort)
+                       reasoning_effort: str = 'low', max_tokens: int = 2048) -> dict:
+    body = make_payload(item, instructions, model, reasoning_effort=reasoning_effort, max_tokens=max_tokens)
     started = time.monotonic()
     attempt = {'number': 1, 'max_tokens': body['max_tokens'], 'temperature': body['temperature'],
                'reasoning_effort': body['reasoning_effort'], 'request_sha256': canonical_hash(body),

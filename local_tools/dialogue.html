@@ -150,8 +150,11 @@ let state=null,selected=0,bottomPinned={},readMode=true,caseSignature='',filtere
 const el=id=>document.getElementById(id);
 const text=(tag,value,cls)=>{const node=document.createElement(tag);node.textContent=value;if(cls)node.className=cls;return node};
 function displayArms(){return Array.isArray(state.arms)&&state.arms.length?state.arms:defaultArms;}
-function reasoningComparison(){return state.read_only&&displayArms().includes('grounded_medium_v1');}
+function budgetComparison(){return state.read_only&&displayArms().includes('grounded_medium_budget4096_v1');}
+function reasoningComparison(){return state.read_only&&!budgetComparison()&&displayArms().includes('grounded_medium_v1');}
 function armLabel(arm){
+ if(budgetComparison()&&arm==='grounded_medium_v1')return '대조군 · medium · 2,048토큰';
+ if(budgetComparison()&&arm==='grounded_medium_budget4096_v1')return '후보 · medium · 4,096토큰';
  if(reasoningComparison()&&arm==='grounded_call')return '대조군 · low 추론';
  if(reasoningComparison()&&arm==='grounded_medium_v1')return '후보 · medium 추론';
  return state.read_only&&displayArms().some(name=>name.startsWith('codex_guided_'))&&arm==='grounded_call'?'대조군 · 기존 개선 설정':labels[arm]||(arm.startsWith('codex_guided_')?'Codex 개선 후보 · '+arm:arm);
@@ -191,9 +194,9 @@ function render(){
  el('connection').textContent=state.busy?'● 실행 중':'● 로컬 연결';el('connection').className='sub '+(state.busy?'busy':'');
  el('runAll').disabled=state.busy||state.read_only;el('runPair').disabled=state.busy||state.read_only;
  el('runAll').hidden=state.read_only||state.cases.length>3;el('runPair').hidden=Boolean(state.read_only);el('runPair').textContent=state.cases.length>3?`${state.cases.length}문항 기본·개선 비교 (${state.cases.length*2}답변)`:'기본·개선 다시 비교';
- el('pageTitle').textContent=state.read_only?(reasoningComparison()?'HealthBench 추론 설정 비교':displayArms().some(arm=>arm.startsWith('codex_guided_'))?'Codex 개선 전·후 답변 비교':'HealthBench 기본·지침 설정 비교'):'같은 질문, 세 가지 답변';
+ el('pageTitle').textContent=state.read_only?(budgetComparison()?'HealthBench 출력 한도 비교':reasoningComparison()?'HealthBench 추론 설정 비교':displayArms().some(arm=>arm.startsWith('codex_guided_'))?'Codex 개선 전·후 답변 비교':'HealthBench 기본·지침 설정 비교'):'같은 질문, 세 가지 답변';
  el('modelSettings').textContent=state.read_only?`${state.model} · 저장된 ${displayArms().length}개 설정 · 읽기 전용`:'gpt-oss-20b · 기본 / 루닛 호출 지침 / 사실 보존 지침';
- el('notice').textContent=`복구한 HealthBench 자료 ${state.cases.length}문항의 답변 생성·비교입니다. Codex 검토 점수는 공식 HealthBench 점수가 아닙니다. ${reasoningComparison()?'같은 지침·이력에서 추론 강도만 비교했습니다.':'각 답변의 호출 설정을 함께 표시합니다.'}`;
+ el('notice').textContent=`복구한 HealthBench 자료 ${state.cases.length}문항의 답변 생성·비교입니다. Codex 검토 점수는 공식 HealthBench 점수가 아닙니다. ${budgetComparison()?'같은 지침·이력·추론 강도에서 출력 한도만 비교했습니다.':reasoningComparison()?'같은 지침·이력에서 추론 강도만 비교했습니다.':'각 답변의 호출 설정을 함께 표시합니다.'}`;
  el('viewMode').textContent=readMode?'원문 보기':'읽기 모드';el('viewMode').setAttribute('aria-pressed',String(!readMode));el('modeLabel').textContent=readMode?'읽기 모드 · Markdown':'원문 모드';
  let status=state.error||((state.run?'최근 실행 '+state.run+' · ':'')+(runSummary()||(state.busy?`${state.completed}/${state.planned} 답변 기록`:'대화 기록을 비교할 수 있습니다.')));
  if(state.active){const a=state.active;status+=` · ${a.id} ${armLabel(a.arm)}${a.fallback?' 재호출':''} · ${Math.floor(Date.now()/1000-a.started)}초`;}

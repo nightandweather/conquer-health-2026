@@ -22,6 +22,50 @@ def response(answer='Synthetic candidate answer.', finish='stop'):
             'usage': {'prompt_tokens': 10, 'completion_tokens': 20, 'total_tokens': 30}}
 
 
+class BudgetTokenPayloadTests(unittest.TestCase):
+    """Budget-helper coverage without the cycle fixture's temporary Git calls."""
+
+    def item(self):
+        return {'prompt_id': 'synthetic-budget', 'prompt': [{'role': 'user', 'content': 'Synthetic question'}],
+                'rubrics': [{'criterion': 'RUBRIC_SECRET_SENTINEL', 'points': 1}],
+                'reference': 'REFERENCE_SECRET_SENTINEL', 'canary': 'CANARY_SECRET_SENTINEL'}
+
+    def test_default_and_explicit_2048_preserve_legacy_bytes(self):
+        item, instructions = self.item(), 'General frozen instruction'
+        legacy = build_payload(item, 'grounded_call')
+        legacy['messages'][-1]['content'] = item['prompt'][-1]['content'] + '\n\n[' + instructions + ']'
+        for payload in (make_payload(item, instructions), make_payload(item, instructions, max_tokens=2048)):
+            self.assertEqual(json.dumps(payload, ensure_ascii=False).encode(), json.dumps(legacy, ensure_ascii=False).encode())
+            self.assertEqual(canonical_hash(payload), canonical_hash(legacy))
+
+    def test_4096_changes_only_budget_and_reaches_the_real_attempt(self):
+        item, instructions = self.item(), 'General frozen instruction'
+        control = make_payload(item, instructions, reasoning_effort='medium')
+        expected = control | {'max_tokens': 4096}
+        transport = FakeTransport([response()])
+        row = cycle.generate_candidate(item, instructions, 'budget', DEFAULT_MODEL, transport,
+                                       dataset_sha256='synthetic', reasoning_effort='medium', max_tokens=4096)
+        self.assertEqual(transport.payloads, [expected])
+        self.assertEqual(row['attempts'][0]['max_tokens'], 4096)
+        self.assertEqual(row['request_sha256'], canonical_hash(expected))
+        self.assertEqual(row['input_sha256'], canonical_hash(control['messages']))
+        self.assertEqual(row['selected_attempt'], 1)
+        self.assertEqual(len(row['attempts']), 1)
+        self.assertFalse(row['fallback_used'])
+
+    def test_invalid_budget_is_rejected_before_transport(self):
+        for invalid in (None, True, False, 0, -1, 1024, 6144, 2048.0, 4096.0, '4096', [], {}):
+            with self.subTest(value=invalid):
+                transport = FakeTransport([])
+                with self.assertRaisesRegex(ValueError, 'max_tokens'):
+                    make_payload(self.item(), 'General', max_tokens=invalid)
+                with self.assertRaisesRegex(ValueError, 'max_tokens'):
+                    cycle.generate_candidate(self.item(), 'General', 'budget', DEFAULT_MODEL, transport,
+                                             dataset_sha256='synthetic', max_tokens=invalid)
+                self.assertEqual(transport.payloads, [])
+                self.assertEqual(transport.metadata_calls, 0)
+
+
 class FakeTransport:
     def __init__(self, responses, *, digest='synthetic-digest', on_complete=None):
         self.responses = iter(responses)

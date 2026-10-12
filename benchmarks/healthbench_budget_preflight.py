@@ -304,10 +304,10 @@ def _validate_low_provenance(source: dict, comparison: dict, items: list[dict],
     _equal(entries, expected, 'Frozen low control completed row provenance differs')
 
 
-def prepare_budget_preflight(data: Path, source_manifest: Path, source_comparison_manifest: Path,
+def _validate_budget_source(data: Path, source_manifest: Path, source_comparison_manifest: Path,
                              instructions_file: Path, out: Path, *,
                              expected_comparison_sha256: str,
-                             expected_source_summary_sha256: str) -> dict:
+                             expected_source_summary_sha256: str) -> tuple:
     """Validate the pinned 17+3 control and publish only prepare-only proof.
 
     There is intentionally no transport, model-metadata lookup, generation mode,
@@ -534,6 +534,19 @@ def prepare_budget_preflight(data: Path, source_manifest: Path, source_compariso
               'fixed_low_control_gate': 'unchanged'}
     for entry in snapshots:
         entry.verify()
+    return result, snapshots, items, rows, source, comparison
+
+
+def prepare_budget_preflight(data: Path, source_manifest: Path, source_comparison_manifest: Path,
+                             instructions_file: Path, out: Path, *,
+                             expected_comparison_sha256: str,
+                             expected_source_summary_sha256: str) -> dict:
+    """Keep the legacy hashes-only prepare API and fixed-runner NOT_READY proof."""
+    result, snapshots, _, _, _, _ = _validate_budget_source(
+        data, source_manifest, source_comparison_manifest, instructions_file, out,
+        expected_comparison_sha256=expected_comparison_sha256,
+        expected_source_summary_sha256=expected_source_summary_sha256)
+    output = _path(out)
     _publish_private(output, result, snapshots)
     return result
 
