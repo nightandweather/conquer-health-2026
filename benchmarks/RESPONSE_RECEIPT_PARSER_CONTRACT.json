@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-12T15:19:55.234505+00:00",
+  "status": "design_only_not_implemented",
+  "purpose": "Check structural-journal interaction with the unchanged _SourceTransport using only synthetic inner-client objects.",
+  "new_evidence": "The completed offline adapter uses a parser stub; old 28 response replays used frozen runners without the new persistence wrapper. Their combined return-boundary behavior has not been checked.",
+  "source_sha256": {
+    "benchmarks/healthbench.py": "411a9cf555986970214ed4a1074b4218522665603aa0411c7ecc956e5d3b963a",
+    "benchmarks/healthbench_budget_cycle.py": "e9d6396469f26f5917d09900b7361ef53a77767d93bb2ade7f88ae2b316218d6",
+    "benchmarks/healthbench_source_ledger_cycle.py": "95e03201429bc02d0a9c843e135fa628f2df15816d1112a2d3dd9134665808f5",
+    "benchmarks/response_receipt.py": "b4487c37f09a2e8c56ecc81676a72130f7fb5ee8a5ec46825778c92dfb622ceb",
+    "benchmarks/response_receipt_offline.py": "40a757be23b386b92006536b7a8c80debcac03e537689e6742608cee48faf91d",
+    "tests/test_response_receipt_offline.py": "6236dfda020711e0783bbebe86bc61eca9080affe18fb4eb4183ebdc27849d48"
+  },
+  "implementation_scope": {
+    "proposed_file": "tests/test_response_receipt_parser_contract.py",
+    "shape": "Test-only compatibility harness, no production entry point, no existing source changes. Reuse pinned helper and offline exclusive-write primitives without modifying either. Each synthetic branch has an independently named permanent owner/reservation in a disposable private test scope. The fixed scope registry is independent of out_name.",
+    "live_transport": "Install counted socket/socket.create_connection and urllib guards first. Under those guards import healthbench after static top-level inspection, then deny actual Transport class __init__/request/complete/model_metadata with patch.object. Only then import _SourceTransport and transitive dependencies. Existing aliases reference the same blocked class. Keep all guards through test and cleanup. No real Transport is constructed; only the unchanged _SourceTransport and registered fake inner are instantiated. Do not patch _SourceTransport code, read credentials, accept endpoints, call metadata/template or invoke production runner entrypoints.",
+    "pins": "Before fake dispatch verify fixed helper, wrapper, persistence and harness/fixture source hashes; verify after each case. Snapshot imported local dependency files in the future implementation manifest and preserve them. All model/template checks absent, not simulated as live identity evidence."
+  },
+  "boundary": {
+    "location": "_SourceTransport(fixture_observer).complete(payload); fixture_observer obtains a registered fake object, persists response_metadata, then returns that exact object.",
+    "legacy_behavior": "_SourceTransport increments calls before inner client, initializes provider_response_received=False, and sets True only after normal inner return. An inner storage error maps to transport_failure and leaves that legacy flag False.",
+    "separate_evidence": "A durable journal may independently prove parsed_object_observed=True before a storage error. Do not relabel legacy flags or infer provider absence from False. Actual provider is absent in these fixtures.",
+    "parser_scope": "_SourceTransport validates envelopes; empty/None content can return normally. Its normal return is not a complete-answer or clinical success result. No upper generation function, historical runner or blind export is invoked.",
+    "identity": "Within each accepted observed branch assert fake result, helper input and outer return are the same original object; the direct control branch asserts fake result and outer return identity. Direct and observed branches use independent fixture objects with identical fingerprint/payload and compare sanitized legacy fields. Exact canonical JSON before/after proves no mutation. Rejecting wrapper paths have no outer return object; record only fake/observer identity and pinned rejection behavior.",
+    "entry_observability": "Count outer_complete_entries, fake_invocations, helper_entries and observer_normal_returns separately. There is no standalone semantic-parser entry hook; do not fabricate parser-entered counts from wrapper entry.",
+    "coverage_limit": "Transport.request rejects oversized, invalid JSON, non-dict and truthy error envelopes before returning. This harness observes only synthetic inner-client objects and establishes no broader actual HTTP coverage."
+  },
+  "order": [
+    "Verify permanent synthetic owner and source/request/fixture pins",
+    "Exclusively create durable reservation; it consumes this synthetic branch even when later fake count is zero",
+    "Persist dispatch-possible marker; this is not a dispatch/response proof",
+    "Enter frozen outer wrapper, dispatch registered fake at most once",
+    "Observer records in-memory object seen and uses pinned helper; save structural-only receipt exclusively with the previously specified barriers",
+    "Only after structural persistence return identical object to frozen wrapper; collect its fixed sanitized outcome and legacy fields",
+    "Check source pins and save linked operational result; any saved result cannot certify its own durability, so follow the existing post-barrier commit pattern"
+  ],
+  "storage_contract": {
+    "reuse": "Reuse only pinned exclusive-write primitives (for example _Directory), flush/file-fsync/dir-fsync/snapshot semantics and post-terminal commit ordering. Do not reuse or modify offline _read_chain, fixture classifier or synthetic_eligibility; no full 42-fault rerun or new clinical gate.",
+    "failure": "Structural write failure prevents observer normal return and post-client semantic validation. A readable partial/full structure file alone never proves its durability. Save fixed stage/code and parsed observation in a separately committed failure receipt when possible. If that save also fails, recover parsed observation as unknown from prior committed disk evidence; later operational results must not reintroduce that in-memory observation as durable truth. In-memory counter/observation evidence remains separately labelled test-only.",
+    "interrupt": "Interrupt after durable structure but before observer return keeps structure readable; frozen wrapper maps KeyboardInterrupt to interrupted with its flag False. No fabricated normal return.",
+    "resumption": "Repeated same owner/case and alternate out_name produce zero extra fake calls. No removal of owner/reservation/marker/partial files or stale lock. Direct-control and observed branches are distinct preregistered synthetic branches, never retries.",
+    "receipt_fields": "Fixed labels/booleans/validated counts, source links and exact helper allowlist only. Never persist str/repr/traceback, arbitrary paths/class names, answer text or reasoning body/hash. Content hash is not anonymization.",
+    "completion": "No new clinical gate, synthetic four-reply gate or adoption decision is implemented. Existing four-complete prerequisite remains unchanged."
+  },
+  "planned_groups": [
+    {
+      "id": "C01",
+      "fixture": "normal_utf8_stop_missing_total",
+      "branches": [
+        "direct",
+        "observed"
+      ],
+      "expected": "Identical accepted object and sanitized legacy result. Journal raw total=missing, effective total=derived; legacy arithmetic total retained separately."
+    },
+    {
+      "id": "C02",
+      "fixture": "empty_final_length_with_reasoning_shape",
+      "branches": [
+        "direct",
+        "observed"
+      ],
+      "expected": "Envelope wrapper returns with blank first-choice final; never label complete. Preserve blank content/length and reasoning shape only; no reasoning substitution."
+    },
+    {
+      "id": "C03",
+      "fixture": "valid_final_string_invalid_finish",
+      "branches": [
+        "direct",
+        "observed"
+      ],
+      "expected": "Same invalid_provider_response code, provider flag True and literal received-string fingerprint on both paths; observed path has structural evidence before rejection. Do not publish/store literal final text."
+    },
+    {
+      "id": "C04",
+      "fixture": "fake_exception_before_return",
+      "branches": [
+        "observed"
+      ],
+      "expected": "Fake invocation 1, helper 0, no object observed by this fake; no response structure. A missing recovered observation is unknown, not invented False. Legacy flag False and fixed transport_failure."
+    },
+    {
+      "id": "C05",
+      "fixture": "object_returned_then_structural_save_failure",
+      "branches": [
+        "observed_failure_receipt_saved",
+        "observed_failure_receipt_also_failed"
+      ],
+      "expected": "Each branch fake 1 and observer normal return 0. Legacy flag False/transport_failure. Durable failure evidence permits object-seen True only in first branch; second recovery unknown. Retrying either owner/case or other out_name dispatches zero."
+    },
+    {
+      "id": "C06",
+      "fixture": "structure_saved_then_pre_return_keyboard_interrupt",
+      "branches": [
+        "observed"
+      ],
+      "expected": "Fake 1, durable structure retained, observer normal return 0, legacy interrupted/False. Retry blocked; no final answer eligibility."
+    }
+  ],
+  "budget": {
+    "planned_group_count": 6,
+    "planned_direct_control_fake_calls": 3,
+    "planned_observed_fake_calls": 7,
+    "planned_max_fake_calls_per_single_matrix_run": 10,
+    "per_branch_fake_max": 1,
+    "pre_dispatch_source_or_request_mismatch_extra_fake_calls": 0,
+    "new_actual_model_calls": 0,
+    "new_actual_provider_HTTP_calls": 0,
+    "new_actual_metadata_template_queries": 0,
+    "new_NOVA_submissions": 0,
+    "future_runtime_seconds": null,
+    "future_cost_money": null,
+    "note": "6 groups and 10 fake calls are plans, not tests passed or executions. Additional development reruns must be counted separately; no real API cost or whole-work duration is asserted."
+  },
+  "acceptance": [
+    "Direct and observed behavior match on the three paired fixtures apart from separate journal state; exact original object and payload bytes unchanged.",
+    "Failure and interruption preserve orthogonal observation/legacy states, prohibit retries and never promote empty or rejected final content.",
+    "Guarded network attempts zero, production Transport construction zero, actual model/metadata/template/submission zero.",
+    "Selected old source/evidence hashes match; independent bounded code and artifact audit before any later claim of compatibility."
+  ],
+  "non_goals": [
+    "Re-executing the completed 28 parser checks or 20 offline adapter tests as new work",
+    "Explaining historical HBT02/HBT03 empty upstream outputs",
+    "Calling any frozen model candidate, changing its budget/gate/out or revisiting clinical null reviews",
+    "Attributing NOVA E04/E05 scores",
+    "Connecting a live runtime or enabling automatic submission"
+  ],
+  "current_work": {
+    "new_code_files": 0,
+    "synthetic_execution": 0,
+    "fake_calls": 0,
+    "actual_model_calls": 0,
+    "clinical_reviews": 0,
+    "NOVA_submissions": 0
+  },
+  "clinical_comparison": null,
+  "upstream_root_cause": null,
+  "adoption_as_clinical_improvement": false,
+  "supersedes_draft": "plan-v1.json",
+  "revision_reason": "Clarify executable guard installation order, per-branch identity and storage-failure recovery evidence; scope and fake budget unchanged."
+}

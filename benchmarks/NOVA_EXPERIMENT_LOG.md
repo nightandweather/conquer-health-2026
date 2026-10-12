@@ -38,6 +38,7 @@ E03는 E00보다 +0.304점이지만 검토와 검색이 함께 달랐고 여러 
 | 응답 구조·사용량 출처 보조 함수 | [별도 순수 함수·34합성 검사, 런타임 미연결](RESPONSE_RECEIPT_HELPER.md) | `results/codex-response-receipt-helper-v1/` |
 | 응답 관측 연결 계약 | [저장 순서·중단 처리의 사전 설계 snapshot](RESPONSE_RECEIPT_INTEGRATION_DESIGN.md) | `results/codex-response-receipt-integration-design-v1/` |
 | 별도 오프라인 응답 어댑터 | [20고유 합성 검사·실제 모델 0·런타임 미연결](RESPONSE_RECEIPT_OFFLINE_ADAPTER.md) | `results/codex-response-receipt-offline-adapter-v1/` |
+| 응답 관측과 기존 파서의 결합 | [6계획군·fake 최대10회 계약, 현재 실행0](RESPONSE_RECEIPT_PARSER_CONTRACT.md) | `results/codex-response-receipt-parser-contract-v1/` |
 | 환자 대화 네 축 분포 | 기존 집계와 phase 기록 | `results/codex-dialogue-distribution-v1/` |
 | 공식 웹 조사 | [NOVA_WEB_RESEARCH_20261012.md](NOVA_WEB_RESEARCH_20261012.md) | `results/codex-web-research-20261012-v1/` |
 | 외래·응급/방문 목적별 흐름 | [미실행 설계](NOVA_ENCOUNTER_FLOW_PLAN.md) | `results/codex-experiment-record-index-v1/` |
