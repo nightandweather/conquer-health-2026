@@ -222,3 +222,5 @@ python3 -m unittest discover -s tests -p '*healthbench*.py' -v
 [루닛 제출 app.py](https://github.com/nightandweather/conquer-health-2026/blob/2fc54f136852026b7005218b4508469a832bfa88/submission/app.py),
 실험 흐름은 [ARCHITECTURE.md](https://github.com/nightandweather/conquer-health-2026/blob/2fc54f136852026b7005218b4508469a832bfa88/ARCHITECTURE.md)에 있습니다.
 이 저장소에 기록된 당시 L2 점수는 새로운 gpt-oss 실험 결과가 아닙니다.
+
+[같은 medium의 출력 한도 개발 비교](OUTPUT_BUDGET_DEV20.md)는 별도 경로로 20개를 한 번씩 생성했습니다. 2,048→4,096토큰에서 정상 17→18개·빈 답변 실패 3→2개이며 기존 정상 답변 17개는 원문이 같습니다. 요청 시간과 토큰이 늘었으며 독립 검토 40기록의 판정은 70개 확정·6개 보류입니다. 두 설정의 가능한 기준 범위는 같고 새 중대한 의학적 오류가 있어 채택하지 않았습니다. 공식 점수는 없습니다.

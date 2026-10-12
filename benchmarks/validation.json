@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "verified_date": "2026-10-12",
-  "state": "reasoning_candidate_not_adopted_adjudication_unchanged_budget_preflight_ready_generation_not_supported",
+  "state": "output_budget_generation_and_independent_review_completed_not_adopted_with_uncertainty",
   "tests": {
-    "scope": "Current private full regression and public budget/legacy-control targeted suite",
-    "total_tests": 229,
-    "executed_tests": 229,
-    "passed_tests": 229,
+    "scope": "Current private full regression and disjoint public budget/runner/queue/viewer/Markdown modules",
+    "total_tests": 254,
+    "executed_tests": 254,
+    "passed_tests": 254,
     "all_executed_passed": true,
     "blocked_tests": [],
-    "public_targeted_executed": 87,
-    "public_targeted_passed": 87,
-    "public_targeted_scope": "41 budget preflight plus 46 existing runner/queue tests; not the full public repository suite",
-    "verified_at_utc": "2026-10-12T03:39:58.574770+00:00"
+    "public_targeted_executed": 131,
+    "public_targeted_passed": 131,
+    "public_targeted_scope": "7 explicit budget/preflight/runner/queue/viewer/Markdown test modules; not full public repository suite",
+    "verified_at_utc": "2026-10-12T04:26:23.229776+00:00"
   },
   "data": {
     "dataset_kind": "legacy_consensus_val_200",
@@ -169,6 +169,24 @@
       "inference_failure_zero_count": 1,
       "pending_grade_count": 40,
       "visual_verification": "Browser checked Markdown readability, true source status counts and the separate failed-answer zero. Loaded store verified all 400 exact-answer assessments, 360 numeric displays and 40 pending scores."
+    },
+    "latest_budget_comparison": {
+      "url": "http://127.0.0.1:8772/",
+      "read_only": true,
+      "arms": [
+        "grounded_medium_v1",
+        "grounded_medium_budget4096_v1"
+      ],
+      "record_count": 40,
+      "source_status_display_verified": true,
+      "markdown_read_mode_verified": true,
+      "quality_review_status": "completed_with_uncertainty",
+      "assessment_count": 40,
+      "rubric_numeric_grade_count": 29,
+      "inference_failure_utility_zero_count": 5,
+      "pending_grade_count": 6,
+      "numeric_display_count": 34,
+      "safety_warning_visible_before_long_summary_note": true
     }
   },
   "latest_comparison": {
@@ -932,7 +950,7 @@
       "total_tokens": 506985
     }
   },
-  "verified_at_utc": "2026-10-12T02:05:29.325965+00:00",
+  "verified_at_utc": "2026-10-12T04:33:09.746232+00:00",
   "refinement": {
     "status": "superseded_by_codex_verifier_protocol",
     "plan": "REFINEMENT_PLAN.md",
@@ -1128,18 +1146,22 @@
     "reviewed_at_utc": "2026-10-11T05:47:14.369622+00:00"
   },
   "current_change_tests": {
-    "verified_at_utc": "2026-10-12T03:39:58.574770+00:00",
-    "budget_preflight_tests": 41,
-    "budget_preflight_passed": 41,
-    "full_private_executed": 229,
-    "full_private_passed": 229,
-    "public_targeted_tests": 87,
-    "public_targeted_passed": 87,
+    "verified_at_utc": "2026-10-12T04:26:23.229776+00:00",
+    "full_private_executed": 254,
+    "full_private_passed": 254,
+    "public_targeted_tests": 131,
+    "public_targeted_passed": 131,
     "public_full_suite_executed": false,
-    "original_fixed_low_gate_code_changed": false,
-    "independent_preflight_audit": "tested_race_cases_fixed_with_documented_same_uid_initial_inode_capture_limit",
-    "real_development_control_preflight_cases": 20,
-    "new_generation_calls": 0
+    "narrow_budget_synthetic_tests": 22,
+    "narrow_budget_synthetic_passed": 22,
+    "budget_payload_git_free_tests": 3,
+    "budget_payload_git_free_passed": 3,
+    "budget_preflight_tests": 41,
+    "independent_budget_code_audit": "passed",
+    "independent_public_safe_diff_audit": "passed",
+    "original_default_2048_request_bytes_preserved": true,
+    "original_low_control_gate_changed": false,
+    "known_same_uid_initial_inode_capture_race_limit": true
   },
   "historical_test_snapshot": {
     "healthbench_synthetic_tests": 112,
@@ -1165,7 +1187,7 @@
     "name": "NOVA 답변 품질 지속 개선",
     "interval_minutes": 5,
     "kind": "thread_heartbeat",
-    "verified_at_utc": "2026-10-12T04:17:14.884316+00:00",
+    "verified_at_utc": "2026-10-12T04:35:11.255235+00:00",
     "resume_pending_before_new_generation": true,
     "maximum_new_candidates_per_run": 1,
     "maximum_development_cases_per_candidate": 20,
@@ -1175,20 +1197,20 @@
     "unresolved_judgments_block_adoption": true,
     "stop_same_hypothesis_after_two_no_improvement_candidates": true,
     "completed_work_commit_and_push": true,
-    "next_hypothesis": "At fixed medium reasoning, compare only output max_tokens 2048 versus 4096 using the same cached medium dev20 source with failures preserved",
-    "next_experiment_status": "narrow_budget_runner_implementation_and_audit_in_progress",
+    "next_hypothesis": "No unchanged medium4096 recall; inspect new development evidence and prepare a distinct hypothesis with comparable pinned control before further calls",
+    "next_experiment_status": "requires_new_development_evidence_and_single_variable_plan",
     "previous_prompt_loop_result_preserved": "two_candidates_not_adopted",
-    "latest_run_started_at_utc": "2026-10-12T03:15:13.840838+00:00",
-    "latest_run_finished_at_utc": "2026-10-12T03:39:58.574770+00:00",
-    "latest_run_status": "adjudication_completed_and_budget_preflight_verified",
-    "new_generation_calls_in_latest_run": 0,
+    "latest_run_started_at_utc": "2026-10-12T04:19:41+00:00",
+    "latest_run_finished_at_utc": "2026-10-12T04:23:34+00:00",
+    "latest_run_status": "review_completed_with_uncertainty_not_adopted",
+    "new_generation_calls_in_latest_run": 20,
     "new_generation_calls_in_initial_scheduling_request": 0,
-    "latest_review_finished_at_utc": "2026-10-12T03:05:05.543051+00:00",
+    "latest_review_finished_at_utc": "2026-10-12T04:33:09.746232+00:00",
     "repeat_latest_candidate": false,
     "automation_status_after_update": "ACTIVE",
     "automation_prompt_updated_after_latest_review": true,
-    "automation_prompt_sha256": "236af350fffb253a98643a1d1de9bc6cf75e2e457a913bf6fc81d38f72ef4c87",
-    "automation_updated_at_utc": "2026-10-12T03:42:24.429604+00:00",
+    "automation_prompt_sha256": "9e0105d2e32494311681d26d401ba5800f818292b4b4735a4cb3d90329a24e62",
+    "automation_updated_at_utc": "2026-10-12T04:35:11.255235+00:00",
     "previous_generation_run": {
       "latest_run_started_at_utc": "2026-10-12T02:47:09+00:00",
       "latest_run_finished_at_utc": "2026-10-12T02:50:13+00:00",
@@ -1196,7 +1218,8 @@
       "new_generation_calls_in_latest_run": 20
     },
     "same_adjudication_repeat_requires_new_evidence": true,
-    "automation_prompt_updated_after_followup": true
+    "automation_prompt_updated_after_followup": true,
+    "automation_prompt_updated_after_budget_review": true
   },
   "reasoning_effort_cycle": {
     "phase": "reasoning_effort_low_vs_medium",
@@ -1418,5 +1441,127 @@
       "source_answers_and_original_reviews_unchanged": true,
       "official": false
     }
+  },
+  "tests_before_budget_generation": {
+    "scope": "Current private full regression and public budget/legacy-control targeted suite",
+    "total_tests": 229,
+    "executed_tests": 229,
+    "passed_tests": 229,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "public_targeted_executed": 87,
+    "public_targeted_passed": 87,
+    "public_targeted_scope": "41 budget preflight plus 46 existing runner/queue tests; not the full public repository suite",
+    "verified_at_utc": "2026-10-12T03:39:58.574770+00:00"
+  },
+  "change_tests_before_budget_generation": {
+    "verified_at_utc": "2026-10-12T03:39:58.574770+00:00",
+    "budget_preflight_tests": 41,
+    "budget_preflight_passed": 41,
+    "full_private_executed": 229,
+    "full_private_passed": 229,
+    "public_targeted_tests": 87,
+    "public_targeted_passed": 87,
+    "public_full_suite_executed": false,
+    "original_fixed_low_gate_code_changed": false,
+    "independent_preflight_audit": "tested_race_cases_fixed_with_documented_same_uid_initial_inode_capture_limit",
+    "real_development_control_preflight_cases": 20,
+    "new_generation_calls": 0
+  },
+  "output_budget_cycle": {
+    "status": "review_completed_with_uncertainty_not_adopted",
+    "scope": "HB-V0000..0019 only; cached medium2048 vs new medium4096",
+    "changed_fields": [
+      "max_tokens"
+    ],
+    "instructions_revision": "grounded-v2",
+    "same_original_instructions_inputs_and_model_digest": true,
+    "reasoning_effort": "medium",
+    "temperature": 0,
+    "source_control_original_status": "partial",
+    "control": {
+      "max_tokens": 2048,
+      "generation_calls": 20,
+      "status_counts": {
+        "completed": 17,
+        "failed": 3
+      },
+      "empty_final_answers": 3,
+      "request_seconds": 183.814,
+      "whole_seconds": 184.209,
+      "usage": {
+        "prompt_tokens": 7464,
+        "completion_tokens": 18184,
+        "total_tokens": 25648
+      }
+    },
+    "candidate": {
+      "max_tokens": 4096,
+      "generation_calls": 20,
+      "model_metadata_queries": 43,
+      "status": "partial",
+      "status_counts": {
+        "completed": 18,
+        "failed": 2
+      },
+      "empty_final_answers": 2,
+      "truncated_answers": 0,
+      "blocked_answers": 0,
+      "unattempted_answers": 0,
+      "retries": 0,
+      "request_seconds": 232.219,
+      "whole_seconds": 232.566,
+      "usage": {
+        "prompt_tokens": 7464,
+        "completion_tokens": 23794,
+        "total_tokens": 31258
+      }
+    },
+    "byte_identical_nonempty_pairs": 17,
+    "failed_to_completed_pairs": 1,
+    "all_20_actual_payload_and_attempt_budgets_verified": true,
+    "all_40_full_row_hashes_verified": true,
+    "original_source_pins_and_control_bytes_unchanged": true,
+    "holdout_generation_calls": 0,
+    "holdout_feedback_used_for_tuning": false,
+    "fresh_independent_reviewers": 2,
+    "review_packet_count": 20,
+    "review_record_count": 40,
+    "adopted": false,
+    "quality_improvement": false,
+    "official": false,
+    "nova_runtime_applied": false,
+    "review_finished_at_utc": "2026-10-12T04:33:09.746232+00:00",
+    "boolean_judgment_count": 70,
+    "unresolved_judgment_count": 6,
+    "skipped_failure_rubric_count": 10,
+    "rubric_numeric_record_count": 29,
+    "separate_failure_utility_zero_count": 5,
+    "pending_grade_record_count": 6,
+    "new_major_error_answer_count": 1,
+    "identical_answer_judgment_mismatches": 0,
+    "possible_criterion_score_ranges": {
+      "control_medium2048": [
+        56.666666666666664,
+        63.33333333333333
+      ],
+      "candidate_medium4096": [
+        56.666666666666664,
+        63.33333333333333
+      ]
+    },
+    "possible_ranges_are_measured_scores": false,
+    "possible_ranges_are_confidence_intervals": false,
+    "fresh_control_review_is_distinct_from_previous_phase_review": true,
+    "recovered_answer_criterion_score": 0,
+    "adoption_reasons": [
+      "criterion quality improvement not confirmed",
+      "new major clinical safety/factual concerns",
+      "two remaining empty answers",
+      "six unresolved gradable criteria"
+    ],
+    "same_candidate_reinvoke": false,
+    "hypothesis_tested_candidate_count": 1,
+    "completion_tokens_reasoning_and_final_not_separated": true
   }
 }
