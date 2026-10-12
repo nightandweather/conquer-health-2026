@@ -35,6 +35,7 @@ E03는 E00보다 +0.304점이지만 검토와 검색이 함께 달랐고 여러 
 | HBT02 진료 시점 일관성 | [실행 4회: 완전 3·빈 답변 한도 종료 1, 비교 전제 실패·미채택](HEALTHBENCH_CARE_TIMING_PROBE.md), [사전 설계](HEALTHBENCH_CARE_TIMING_DESIGN.md) | `results/codex-healthbench-care-timing-probe-v1/`, `results/codex-healthbench-care-timing-design-v1/` |
 | HBT03 이미 제공한 답 재사용 | [실행 4회: 완전 3·빈 답변 한도 종료 1, 비교 전제 실패·미채택](HEALTHBENCH_QUESTION_REUSE_PROBE.md), [사전 설계](HEALTHBENCH_QUESTION_REUSE_DESIGN.md) | `results/codex-healthbench-question-reuse-probe-v1/`, `results/codex-healthbench-question-reuse-design-v1/` |
 | HBT02/HBT03 빈 응답 오프라인 진단 | [기존 8기록 구조 확인·28합성 응답 검사·원인 미확정](HEALTHBENCH_COMPLETION_DIAGNOSTICS.md) | `results/codex-healthbench-completion-diagnostics-v1/` |
+| 응답 구조·사용량 출처 보조 함수 | [별도 순수 함수·34합성 검사, 런타임 미연결](RESPONSE_RECEIPT_HELPER.md) | `results/codex-response-receipt-helper-v1/` |
 | 환자 대화 네 축 분포 | 기존 집계와 phase 기록 | `results/codex-dialogue-distribution-v1/` |
 | 공식 웹 조사 | [NOVA_WEB_RESEARCH_20261012.md](NOVA_WEB_RESEARCH_20261012.md) | `results/codex-web-research-20261012-v1/` |
 | 외래·응급/방문 목적별 흐름 | [미실행 설계](NOVA_ENCOUNTER_FLOW_PLAN.md) | `results/codex-experiment-record-index-v1/` |
