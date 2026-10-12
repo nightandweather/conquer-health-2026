@@ -137,5 +137,61 @@ class MarkdownReaderTests(unittest.TestCase):
         self.assertIn('&lt;br onmouseover=', output)
 
 
+@unittest.skipUnless(NODE, 'Node.js is needed for the local comparison page checks')
+class ComparisonPageTests(unittest.TestCase):
+    def test_saved_candidate_renders_real_arms_and_partial_source_without_run_buttons(self):
+        html = PAGE.read_text(encoding='utf-8')
+        renderer = re.search(r'<script id="markdown-renderer">(.*?)</script>', html, re.S).group(1)
+        ui = re.search(r'<script id="comparison-ui">(.*?)</script>', html, re.S).group(1)
+        # Run the shipped render function against a small offline DOM. No server,
+        # model connection, benchmark content or external browser dependency.
+        dom = r'''
+class Element {
+ constructor(tag='div') {this.tagName=tag;this.children=[];this.dataset={};this.className='';this.value='';this.scrollTop=0;this.scrollHeight=0;this.clientHeight=0;this.hidden=false;this.textContent='';this.innerHTML='';
+  this.classList={toggle:(name,on)=>{const all=new Set(this.className.split(/\s+/).filter(Boolean));if(on)all.add(name);else all.delete(name);this.className=[...all].join(' ')}};}
+ append(...nodes){this.children.push(...nodes)}
+ replaceChildren(...nodes){this.children=[...nodes]}
+ setAttribute(key,value){this[key]=value}
+ descendants(){return this.children.flatMap(node=>[node,...node.descendants()])}
+ querySelector(selector){return this.descendants().find(node=>selector==='h2'?node.tagName==='h2':selector==='.card-head > .meta:not(.settings)'?node.className.split(' ').includes('meta')&&!node.className.split(' ').includes('settings'):node.className.split(' ').includes(selector.slice(1)))}
+}
+const elements={};const document={createElement:tag=>new Element(tag),getElementById:id=>elements[id]||(elements[id]=new Element())};
+'''
+        candidate = {'answer': '# Synthetic candidate\n\n- Preserved fact.', 'status': 'truncated',
+                     'seconds': 3.5, 'calls': 1, 'usage': {'completion_tokens': 12}, 'run': 'synthetic/comparison',
+                     'assessment': {'status': 'uncertain', 'score': None, 'note': 'Synthetic pending review.'}}
+        control = {'answer': 'Synthetic control.', 'status': 'completed', 'seconds': 2, 'calls': 1,
+                   'run': 'synthetic/comparison', 'assessment': {'status': 'reviewed', 'score': 50, 'note': ''}}
+        state = {'model': 'gpt-oss:20b', 'busy': False, 'read_only': True, 'run': 'synthetic/comparison',
+                 'completed': 2, 'planned': 2, 'arms': ['grounded_call', 'codex_guided_v3'],
+                 'arm_config': {'codex_guided_v3': {'temperature': 0, 'max_tokens': 2048, 'reasoning_effort': 'low'}},
+                 'run_summary': {'answer_status_counts': {'completed': 1, 'truncated': 1},
+                                 'source_statuses': {'baseline': 'partial', 'candidate': 'completed'}},
+                 'cases': [{'id': 'SYNTHETIC-001', 'messages': [{'role': 'user', 'content': 'Synthetic question.'}],
+                            'answers': {'grounded_call': control, 'codex_guided_v3': candidate}}]}
+        inspect = r'''
+render();
+const columns=el('columns').children.map(card=>({arm:card.dataset.arm,title:card.querySelector('h2').textContent,
+ settings:card.querySelector('.settings').textContent,status:card.querySelector('.record-status').textContent,
+ assessment:card.querySelector('.assessment').textContent,answer:card.querySelector('.answer').innerHTML}));
+process.stdout.write(JSON.stringify({columns,status:el('status').textContent,runAll:el('runAll').hidden,
+ runPair:el('runPair').hidden,title:el('pageTitle').textContent}));
+'''
+        script = renderer + dom + ui.split('async function poll()')[0] + '\nstate=' + json.dumps(state) + ';\n' + inspect
+        result = subprocess.run([NODE, '-e', script], capture_output=True, text=True, check=True, timeout=10)
+        output = json.loads(result.stdout)
+        self.assertEqual([card['arm'] for card in output['columns']], ['grounded_call', 'codex_guided_v3'])
+        self.assertIn('codex_guided_v3', output['columns'][1]['title'])
+        self.assertIn('한도 2,048토큰', output['columns'][1]['settings'])
+        self.assertEqual(output['columns'][1]['status'], '출력 한도로 잘림')
+        self.assertIn('점수 미정', output['columns'][1]['assessment'])
+        self.assertIn('50 / 100', output['columns'][0]['assessment'])
+        self.assertIn('<h1>Synthetic candidate</h1>', output['columns'][1]['answer'])
+        self.assertIn('원본 대조군 실행 부분 완료', output['status'])
+        self.assertIn('잘림 1', output['status'])
+        self.assertTrue(output['runAll'])
+        self.assertTrue(output['runPair'])
+
+
 if __name__ == '__main__':
     unittest.main()

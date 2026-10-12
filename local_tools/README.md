@@ -55,3 +55,29 @@ Codex 검토 결과는 실행 폴더의 `assessments.json`에서 읽습니다. �
 `reviewed`는 기준별 채점이 끝났다는 뜻이며 임상적으로 안전하다는 판정이 아닙니다.
 오류·누락 또는 채점 기준 문제가 있으면 점수와 함께 `추가 검토 필요` 메모를 표시합니다.
 판정 보류가 있는 답변은 `uncertain`이며 숫자 점수를 표시하지 않습니다.
+
+## Codex 개선 루프의 저장된 비교
+
+후보 생성이 끝나 `comparison/manifest.json`과 `comparison/answers.jsonl`이 만들어지면,
+중첩된 비교 폴더를 지정해 대조군과 새 후보를 읽기 모드로 표시할 수 있습니다.
+
+```sh
+python3 -m local_tools.dialogue_server \
+  --data private_data/healthbench/legacy_consensus_val_roles.json \
+  --limit 20 --port 8768 \
+  --comparison-dir results/codex-loop-dev20-v1/round-01/execution-approved-20261012/comparison
+```
+
+`--comparison-dir`에는 이 저장소의 `results/` 안에 있는 실제 비교 폴더를 지정합니다.
+표시 문항 범위인 `--limit`은 비교 manifest의 문항을 모두 포함해야 합니다.
+화면은 manifest의 실제 설정 이름(`grounded_call`, `codex_guided_v3` 등), 추론 강도,
+temperature, 출력 한도와 답변별 시간·호출 수·토큰을 표시합니다. 다른 실행의 최신 답변을
+섞지 않으며, 기존 기본·루닛 비교 화면과 별도 포트에서 열 수 있습니다.
+
+저장된 비교에서는 생성 버튼을 숨깁니다. 다음 후보 생성은 개선 루프 실행기로 진행하며,
+`--start-arms`와 `--comparison-dir`를 함께 사용할 수 없습니다. 원본 대조군 실행이
+`partial`이면 화면에도 부분 완료로 표시합니다. 선택한 개발 문항의 대조군 답변이 완료된
+경우에도 원본 전체 실행이 완료됐다고 표시하지 않습니다. 후보 답변의 잘림·실패도 유지합니다.
+
+이 비교 폴더의 `assessments.json`이 생기거나 갱신되면 일치하는 답변 해시의 Codex 검토가
+자동으로 표시됩니다. 검토가 없거나 판단 보류이면 숫자 점수 대신 검토 대기 상태를 표시합니다.

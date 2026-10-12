@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 from copy import deepcopy
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -10,6 +11,7 @@ import importlib
 import json
 import math
 from pathlib import Path
+import re
 import secrets
 import sys
 import threading
@@ -91,23 +93,85 @@ def visible_assessment(value, row):
 
 
 class ComparisonStore:
-    def __init__(self, data: Path, limit: int = 3):
+    def __init__(self, data: Path, limit: int = 3, comparison_dir: Path | None = None):
         hb = importlib.import_module('benchmarks.healthbench')
         self.items, metadata = hb.load_dataset(data, limit)
         self.data, self.limit, self.dataset_hash = data, limit, metadata['sha256']
         self.prompt_hashes = metadata['selected_prompt_sha256']
+        self.comparison_dir, self.comparison_manifest = None, None
+        self.variants = VARIANTS
+        self.configs = hb.arm_config(VARIANTS)
+        if comparison_dir is not None:
+            path = comparison_dir.resolve()
+            if not path.is_relative_to((ROOT / 'results').resolve()):
+                raise ValueError('Comparison directory must be inside this repository results directory')
+            manifest = json.loads((path / 'manifest.json').read_text(encoding='utf-8'))
+            if not isinstance(manifest, dict):
+                raise ValueError('Comparison manifest requires an object')
+            variants, ids = manifest.get('selected_arms'), manifest.get('selected_prompt_ids')
+            dataset = manifest.get('dataset', {})
+            configs = manifest.get('arms', {})
+            if (not isinstance(variants, list) or not 2 <= len(variants) <= 6
+                    or any(not isinstance(arm, str) or re.fullmatch(r'[A-Za-z0-9_-]{1,80}', arm) is None
+                           for arm in variants) or len(set(variants)) != len(variants)
+                    or not isinstance(ids, list) or not ids or any(not isinstance(key, str) for key in ids)
+                    or len(set(ids)) != len(ids) or not set(ids).issubset(self.prompt_hashes)
+                    or not isinstance(dataset, dict) or dataset.get('sha256') != self.dataset_hash
+                    or not isinstance(dataset.get('selected_prompt_sha256'), dict)
+                    or any(dataset['selected_prompt_sha256'].get(key) != self.prompt_hashes[key] for key in ids)
+                    or not isinstance(configs, dict) or any(not isinstance(configs.get(arm), dict) for arm in variants)):
+                raise ValueError('Comparison manifest arms or prompt identities do not match this dataset selection')
+            self.items = [item for key in ids for item in self.items if item['prompt_id'] == key]
+            self.comparison_dir, self.comparison_manifest = path, manifest
+            self.variants, self.configs = tuple(variants), configs
         self.lock = threading.RLock()
         self.busy, self.active, self.run_name, self.error = False, None, None, None
         self.live = {}
         self.completed, self.planned = 0, 0
         self.worker = None
+        if self.comparison_dir is not None:
+            self.run_name = self.comparison_dir.relative_to((ROOT / 'results').resolve()).as_posix()
+            self.planned = len(self.items) * len(self.variants)
+
+    def display_configs(self):
+        """Expose inference settings, never instruction text or private paths."""
+        result = {}
+        for arm in self.variants:
+            result[arm] = {}
+            for key in ('max_tokens', 'temperature', 'reasoning_effort', 'max_attempts', 'prompt_revision'):
+                value = self.configs[arm].get(key)
+                if isinstance(value, str):
+                    result[arm][key] = value[:120]
+                elif isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value):
+                    result[arm][key] = value
+        return result
+
+    def source_run(self, key):
+        """Return a repository-relative source name without disclosing file paths."""
+        if self.comparison_manifest is None:
+            return None
+        sources = self.comparison_manifest.get('sources', {})
+        for value in self.comparison_manifest.get('row_provenance', []):
+            if isinstance(value, dict) and (value.get('prompt_id'), value.get('arm')) == key:
+                source = sources.get(value.get('source'), {})
+                path = source.get('answers_path') if isinstance(source, dict) else None
+                if isinstance(path, str):
+                    parent = Path(path).parent.resolve()
+                    try:
+                        return parent.relative_to((ROOT / 'results').resolve()).as_posix()
+                    except ValueError:
+                        return None
+        return None
 
     def saved_records(self):
         records = {}
         allowed = {item['prompt_id'] for item in self.items}
-        candidates = sorted((ROOT / 'results').glob('healthbench-*/answers.jsonl'),
-                            key=lambda p: p.stat().st_mtime)
+        candidates = ([self.comparison_dir / 'answers.jsonl'] if self.comparison_dir is not None
+                      else sorted((ROOT / 'results').glob('healthbench-*/answers.jsonl'),
+                                  key=lambda p: p.stat().st_mtime))
         for path in candidates:
+            if not path.exists():
+                continue
             review_path = path.parent / 'assessments.json'
             reviews = {}
             if review_path.exists() and review_path.stat().st_size <= 1_000_000:
@@ -123,11 +187,19 @@ class ComparisonStore:
                     row = json.loads(line)
                 except ValueError:
                     continue  # A writer may currently be flushing its last line.
-                if ((row.get('dataset_sha256') == self.dataset_hash
-                     or row.get('prompt_sha256') == self.prompt_hashes.get(row.get('prompt_id')))
-                        and row.get('prompt_id') in allowed and row.get('arm') in VARIANTS):
+                if not isinstance(row, dict):
+                    continue
+                dataset_match = row.get('dataset_sha256') == self.dataset_hash
+                prompt_match = row.get('prompt_sha256') == self.prompt_hashes.get(row.get('prompt_id'))
+                identity_match = (dataset_match and prompt_match if self.comparison_dir is not None
+                                  else dataset_match or prompt_match)
+                if (identity_match and row.get('prompt_id') in allowed and row.get('arm') in self.variants):
                     key = (row['prompt_id'], row['arm'])
-                    records[key] = visible_record(row, path.parent.name)
+                    run = self.run_name if self.comparison_dir is not None else path.parent.name
+                    records[key] = visible_record(row, run)
+                    source = self.source_run(key)
+                    if source:
+                        records[key]['source_run'] = source
                     assessment = visible_assessment(reviews.get(key), row)
                     if assessment is not None:
                         records[key]['assessment'] = assessment
@@ -140,7 +212,7 @@ class ComparisonStore:
             cases = []
             for item in self.items:
                 answers = {}
-                for arm in VARIANTS:
+                for arm in self.variants:
                     key = (item['prompt_id'], arm)
                     value = deepcopy(saved.get(key, {'answer': '', 'status': 'not_run'}))
                     live = self.live.get(key)
@@ -149,12 +221,24 @@ class ComparisonStore:
                     answers[arm] = value
                 cases.append({'id': item['prompt_id'], 'messages': deepcopy(item['prompt']),
                               'answers': answers})
-            return {'model': 'gpt-oss:20b', 'cases': cases, 'busy': self.busy,
+            result = {'model': 'gpt-oss:20b', 'cases': cases, 'busy': self.busy,
                     'active': deepcopy(self.active), 'run': self.run_name,
-                    'error': self.error, 'completed': written if self.busy else self.completed,
-                    'planned': self.planned}
+                    'error': self.error, 'completed': written if self.busy or self.comparison_dir is not None else self.completed,
+                    'planned': self.planned, 'arms': list(self.variants),
+                    'arm_config': self.display_configs(), 'read_only': self.comparison_dir is not None}
+            if self.comparison_manifest is not None:
+                sources = self.comparison_manifest.get('sources', {})
+                result['run_summary'] = {
+                    'status': self.comparison_manifest.get('status'),
+                    'answer_status_counts': dict(Counter(row.get('status', 'unknown') for row in saved.values())),
+                    'source_statuses': {label: value.get('original_manifest_status')
+                                        for label, value in sources.items()
+                                        if label in {'baseline', 'candidate'} and isinstance(value, dict)}}
+            return result
 
     def start(self, arms):
+        if self.comparison_dir is not None:
+            raise RuntimeError('이 화면은 저장된 개선 실험의 읽기 전용 비교입니다.')
         if not isinstance(arms, list) or not arms or len(set(arms)) != len(arms):
             raise ValueError('설정을 하나 이상 선택하세요.')
         if any(arm not in VARIANTS for arm in arms):
@@ -320,10 +404,13 @@ def main():
     parser.add_argument('--port', type=int, default=8766)
     parser.add_argument('--limit', type=int, default=3)
     parser.add_argument('--start-arms', help='Optional explicit comparison to start after serving')
+    parser.add_argument('--comparison-dir', type=Path, help='Read-only saved comparison inside results; retain its actual arm names')
     args = parser.parse_args()
     if not 1 <= args.limit <= 200 or not 1024 <= args.port <= 65535:
         parser.error('Use 1–200 prompts and a port between 1024 and 65535')
-    store = ComparisonStore(args.data, args.limit)
+    if args.comparison_dir is not None and args.start_arms:
+        parser.error('--comparison-dir is read-only and cannot be combined with --start-arms')
+    store = ComparisonStore(args.data, args.limit, args.comparison_dir)
     host = f'127.0.0.1:{args.port}'
     server = ThreadingHTTPServer(('127.0.0.1', args.port), make_handler(store, secrets.token_urlsafe(32), host))
     if args.start_arms:
