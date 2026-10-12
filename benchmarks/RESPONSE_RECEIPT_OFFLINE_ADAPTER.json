@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-12T15:03:46.626310+00:00",
+  "status": "offline_fixture_prototype_verified",
+  "offline_implementation": true,
+  "live_runtime_integration": false,
+  "historical_response_replay": false,
+  "code_sha256": {
+    "benchmarks/response_receipt_offline.py": "40a757be23b386b92006536b7a8c80debcac03e537689e6742608cee48faf91d",
+    "tests/test_response_receipt_offline.py": "6236dfda020711e0783bbebe86bc61eca9080affe18fb4eb4183ebdc27849d48",
+    "benchmarks/response_receipt.py": "b4487c37f09a2e8c56ecc81676a72130f7fb5ee8a5ec46825778c92dfb622ceb"
+  },
+  "synthetic_validation": {
+    "design_groups": 14,
+    "unique_committed_test_methods": 20,
+    "selected_modules_per_repo": 1,
+    "full_suite": false,
+    "private_final": {
+      "tests_run": 20,
+      "passed": true,
+      "elapsed_suite_seconds": 0.837175,
+      "summary": {
+        "run_in_process": 1,
+        "test_methods_executed": 20,
+        "fault_subcases": 42,
+        "network_attempts": 0,
+        "fake_invocations": 103,
+        "helper_calls": 98,
+        "parser_calls": 90,
+        "fault_injections": 42,
+        "blocked_reentries": 104,
+        "unique_test_methods": 20,
+        "real_model_calls": 0,
+        "live_metadata_queries": 0,
+        "live_template_queries": 0
+      }
+    },
+    "public_final": {
+      "tests_run": 20,
+      "passed": true,
+      "elapsed_suite_seconds": 0.844241,
+      "summary": {
+        "run_in_process": 1,
+        "test_methods_executed": 20,
+        "fault_subcases": 42,
+        "network_attempts": 0,
+        "fake_invocations": 103,
+        "helper_calls": 98,
+        "parser_calls": 90,
+        "fault_injections": 42,
+        "blocked_reentries": 104,
+        "unique_test_methods": 20,
+        "real_model_calls": 0,
+        "live_metadata_queries": 0,
+        "live_template_queries": 0
+      }
+    },
+    "fault_subcases_definition": "42 explicit Fault injection calls/events per final suite; excludes other tamper/concurrency/privacy and monkeypatched compound-save subcases",
+    "pipeline_counter_definition": "helper/parser counters count generated-fixture pipeline entries; pure recovery consistency checks are separate and not counted as pipeline calls",
+    "runs": [
+      {
+        "kind": "author_development",
+        "run": 1,
+        "test_methods": 18,
+        "fake_invocations": 75,
+        "evidence_source": "author reported"
+      },
+      {
+        "kind": "author_development",
+        "run": 2,
+        "test_methods": 19,
+        "fake_invocations": 79,
+        "evidence_source": "author reported"
+      },
+      {
+        "kind": "author_development",
+        "run": 3,
+        "test_methods": 20,
+        "fake_invocations": 103,
+        "evidence_source": "author reported"
+      },
+      {
+        "kind": "root_private_final",
+        "test_methods": 20,
+        "fake_invocations": 103,
+        "elapsed_suite_seconds": 0.837175,
+        "evidence_source": "saved root verification"
+      },
+      {
+        "kind": "root_public_final",
+        "test_methods": 20,
+        "fake_invocations": 103,
+        "elapsed_suite_seconds": 0.844241,
+        "evidence_source": "saved root verification"
+      },
+      {
+        "kind": "independent_intermediate",
+        "checks": 4,
+        "fake_invocations": 10,
+        "result": "3 passed, 1 reproduced gate issue subsequently fixed",
+        "evidence_source": "independent audit"
+      },
+      {
+        "kind": "independent_final",
+        "checks": 2,
+        "fake_invocations": 8,
+        "result": "passed",
+        "evidence_source": "independent audit"
+      }
+    ],
+    "accounted_fake_invocations_all_recorded_runs": 481,
+    "unique_count_warning": "Reruns and independent checks do not increase the 20 unique committed test methods",
+    "network_control": "Tests deny socket.socket, socket.create_connection and urllib.request.OpenerDirector.open; observed attempts zero. New adapter has no endpoint/key/live transport path. Not an OS-wide network sandbox claim.",
+    "timing_scope": "Suite elapsed only; not total development, review or publication time"
+  },
+  "observation_contract": {
+    "pipeline": [
+      "owner and fixture/source pins",
+      "exclusive reservation",
+      "dispatch-possible marker",
+      "registered fake invocation at most once",
+      "structural receipt persisted",
+      "same original object to parser stub",
+      "post-pin simulation and terminal",
+      "post-terminal commit link"
+    ],
+    "dispatch_marker_is_proof_of_actual_send": false,
+    "storage_failure_is_provider_or_clinical_failure": false,
+    "missing_durable_evidence": "unknown/null",
+    "reserved_reentry": "blocked without extra fake call, including other out_name under same permanent scope",
+    "terminal_barrier_evidence": "Require commit link written after terminal file/directory fsync and snapshot check",
+    "reasoning_body_or_hash_saved": false,
+    "answer_body_saved": false,
+    "exception_detail_saved": false,
+    "synthetic_gate": "four complete nonblank stop outcomes with valid links/post-pins; fixed fixture semantic consistency; eligibility flag only"
+  },
+  "review_fixes": [
+    "Post-terminal commit prevents readable-but-uncommitted terminal from self-proving persistence",
+    "False post-pin result blocks progression even when separate block save fails",
+    "Exact canonical JSON/type validation distinguishes booleans, integers and floats",
+    "Fixed synthetic fixture semantics prevent contradictory complete terminal from opening eligibility"
+  ],
+  "preservation": {
+    "selected_files": 116,
+    "before_after_sha256_equal": true,
+    "whole_backup": false
+  },
+  "new_real_model_calls": 0,
+  "new_provider_HTTP_calls": 0,
+  "new_live_metadata_queries": 0,
+  "new_live_template_queries": 0,
+  "new_clinical_reviews": 0,
+  "new_NOVA_submissions": 0,
+  "actual_blind_exports": 0,
+  "upstream_empty_answer_cause": null,
+  "clinical_comparison": null,
+  "adopted_as_clinical_improvement": false,
+  "limitations": [
+    "Only fixed synthetic fixtures and parser stub; no full production parser equivalence",
+    "Existing Transport pre-return rejection boundary remains; malformed fixture injection does not expand real HTTP observation",
+    "Injected failures and Python interruption do not establish universal power-loss or SIGKILL durability",
+    "Local hashes/order checks are not authenticated logs against arbitrary hostile rewrite of code and all evidence",
+    "Any future actual content fingerprints/per-response receipts remain private; hash is not anonymization",
+    "HBT02/HBT03 consumed candidates, original all-four gate and null clinical outcomes remain unchanged"
+  ],
+  "next_step": "Offline prototype complete. Actual runtime integration and any model experiment require a separately justified, bounded plan; no automatic candidate retries or NOVA submission."
+}
