@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_utc": "2026-10-12T12:00:06.863691+00:00",
+  "updated_at_utc": "2026-10-12T12:09:52.488139+00:00",
   "sample_scores_are_not_official": true,
   "clinical_improvement_verified": false,
   "experiments": [
@@ -226,7 +226,7 @@
       "id": "E05",
       "recipe": "Frozen E03 with closing explanation hint threshold2to6 only; E04 RECORD prompt not inherited",
       "control": "E03",
-      "status": "sample_queued",
+      "status": "sample_in_progress",
       "score": null,
       "areas": null,
       "server_model_calls": null,
@@ -258,7 +258,11 @@
       "submitted_at_kst": "2026-10-12 20:59",
       "server_zip_sha256": "a92020b5889fe550c3dfeb9a5ecd9b48ae396079571c43002778d93923c61a2d",
       "server_zip_hash_matches": true,
-      "observed_at_utc": "2026-10-12T12:00:06.863691+00:00"
+      "observed_at_utc": "2026-10-12T12:05:54.367365+00:00",
+      "server_file_status": "building_validating",
+      "completed_cases": null,
+      "whole_evaluation_complete": false,
+      "case_results_visibility": "No case results shown; empty list does not establish zero completed cases"
     }
   ],
   "comparison_limit": "E01 has no score. E03 versus E00 changes review and retrieval together; E03 versus E02 repairs storage only but E02 never reached dialogue. Reused public samples and unconfirmed server digest do not establish independent clinical improvement.",

@@ -13,7 +13,7 @@
 | E02 | 검토 + 오프라인 지침 검색 | 디스크 부족으로 준비 실패, 점수 없음 | `results/codex-guideline-agent-v1/` |
 | E03 | 지침 색인을 RAM 전용으로 수정 | 완료 42.483; 전체 품질 개선 미확인 | `results/codex-memory-guideline-agent-v1/` |
 | E04 | E03의 최종 기록 지시 묶음만 변경 | 완료41.079; 3건 정상, E03 대비-1.404점·미채택 | `results/codex-record-contract-agent-v1/` |
-| E05 | E03의 종료 설명 힌트 2→6 | 20:59KST 한 번 접수·평가 대기·점수 없음 | `results/codex-closing-six-agent-v1/` |
+| E05 | E03의 종료 설명 힌트 2→6 | 20:59KST 한 번 접수; 21:05KST 평가 중·점수/증례 미확인 | `results/codex-closing-six-agent-v1/` |
 
 각 회차에서 계획, 코드·ZIP 해시, 검사 결과, 독립 감사, 제출 링크·서버 해시, 관측 시각, 점수·6영역·증례별 턴·시간·오류, 비교와 채택 여부, 게시 검증을 남긴다. 해당 자료가 아직 없으면 미확인/미완료로 유지한다. 첫 접수와 후속 관측의 원래 파일을 덮어쓰지 않는다. `phase.json`과 공개 집계는 최신 상태를 가리키는 변경 가능한 색인이다.
 
@@ -40,3 +40,5 @@ HealthBench 원래200문항은 partial이고 400기록 검토에도 보류 기�
 private 전체 `results/`의 파일 경로·크기·수정시각 색인은 `results/codex-experiment-record-index-v1/record-inventory-v1.json`에 저장했다. 이 색인은 기존 파일의 존재 목록이며 모든 파일 내용의 검증이나 별도 백업 완료 증명은 아니다. 원래 원문·DB는 복제하거나 공개하지 않았다. 코드·합성 검사·일반 문서·집계만 명시적으로 선택해 Git에 보존한다.
 
 E04 완료 후 실제 E03/E04 서버 원문 제공 경로를 확인했지만 조사한 화면·가이드·결과 폴더에서는 찾지 못했다. 없는 대화를 추정하지 않고 [E05 종료 힌트 실험](NOVA_CLOSING_SIX_PROTOTYPE.md)을 별도 한 변수 후보로 검사·독립 감사 후20:59KST에 한 번 접수했다. 원래 10월10일 로컬 대화 검토는 이 서버 실행의 증거로 사용하지 않는다.
+
+21:05KST E05 진행 관측은 `results/codex-closing-six-agent-v1/sample-in-progress-v1.json`에 별도 보존했다. 지침 검색과 실제 계획 제시의 차이는 [E05 문서](NOVA_CLOSING_SIX_PROTOTYPE.md)에 기록했다. E04 검사·추적 0점의 원인은 실제 대화·기록 미확보로 미확인이다. 이번 후속 확인에서 새 코드·모델·샘플은 없다.
