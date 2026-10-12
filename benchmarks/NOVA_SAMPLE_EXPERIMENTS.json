@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_utc": "2026-10-12T10:12:42.432017+00:00",
+  "updated_at_utc": "2026-10-12T10:20:12.839238+00:00",
   "sample_scores_are_not_official": true,
   "clinical_improvement_verified": false,
   "experiments": [
@@ -93,7 +93,7 @@
         "generic_query_matches_e02": 15
       },
       "submitted_at_kst": "2026-10-12 18:50",
-      "completed_cases": 1,
+      "completed_cases": 2,
       "expected_cases": 3,
       "case_results": [
         {
@@ -101,6 +101,12 @@
           "status": "normal",
           "turns": 30,
           "seconds": 974
+        },
+        {
+          "case_id": "C10",
+          "status": "normal",
+          "turns": 27,
+          "seconds": 593
         }
       ],
       "whole_evaluation_complete": false
