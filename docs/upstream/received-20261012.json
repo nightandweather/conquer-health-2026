@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "received_at_utc": "2026-10-12T07:06:56.051309+00:00",
+  "official_documentation_url": "https://nova.snubhai.org/docs/",
+  "all6_normal_get_http200": true,
+  "downloads": [
+    {
+      "name": "starter.zip",
+      "requested_url": "https://nova.snubhai.org/docs/starter.zip",
+      "http_status": 200,
+      "bytes": 13051,
+      "sha256": "29d62dd2b0509cf02ed0bbb83191bb1ec3f57da72a0eb58cc6cbadcca8513aaf",
+      "published_sha256": null
+    },
+    {
+      "name": "devkit.zip",
+      "requested_url": "https://nova.snubhai.org/docs/devkit.zip",
+      "http_status": 200,
+      "bytes": 67021,
+      "sha256": "160b49d17fb06fc9a1e946adf87ac17d3586639fcd9836b1702fa2497ac11cfb",
+      "published_sha256": null
+    },
+    {
+      "name": "nova-samples-2026.zip",
+      "requested_url": "https://nova.snubhai.org/downloads/nova-samples-2026.zip",
+      "http_status": 200,
+      "bytes": 44267,
+      "sha256": "2ffd8caea1e07b8616de67b5e15de72c08c1cc92b66da115fe40738658c581c4",
+      "published_sha256": null
+    },
+    {
+      "name": "nova-benchmarks-2026.zip",
+      "requested_url": "https://nova.snubhai.org/downloads/nova-benchmarks-2026.zip",
+      "http_status": 200,
+      "bytes": 180120875,
+      "sha256": "a2b4dbc6a2bc177a54cf7c7f1a4e15f94625bfd335738737b575c6832a1060a7",
+      "published_sha256": "a2b4dbc6a2bc177a54cf7c7f1a4e15f94625bfd335738737b575c6832a1060a7"
+    },
+    {
+      "name": "nova-guidelines-2026.zip",
+      "requested_url": "https://nova.snubhai.org/downloads/nova-guidelines-2026.zip",
+      "http_status": 200,
+      "bytes": 192558854,
+      "sha256": "ef58c2f4369750af382f2706dcc1c9c7a85e3a93c261d880f7470d695eaf30d5",
+      "published_sha256": "ef58c2f4369750af382f2706dcc1c9c7a85e3a93c261d880f7470d695eaf30d5"
+    },
+    {
+      "name": "nova-guidelines-catalog.xlsx",
+      "requested_url": "https://nova.snubhai.org/downloads/nova-guidelines-catalog.xlsx",
+      "http_status": 200,
+      "bytes": 1145673,
+      "sha256": "14f417d73224329186be779a919029f704622b0b838b3cc8063831d9b2d32955",
+      "published_sha256": null
+    }
+  ],
+  "only_benchmark_and_guideline_archives_have_published_expected_sha": true,
+  "published_expected_sha_both_match": true,
+  "extracted_files": 16003,
+  "outer_uncompressed_bytes": 786444719,
+  "nested_ddx_csv_archives_preserved_and_crc_checked": true,
+  "guideline_document_count": 15904,
+  "guideline_language_counts": {
+    "en": 14398,
+    "ko": 1506
+  },
+  "guidelines_format": "UTF8 Markdown plus catalog CSV/XLSX; mounted local files, not a remote API",
+  "benchmark_packages": [
+    "AgentClinic-MedQA",
+    "DDXPlus",
+    "ACI-Bench"
+  ],
+  "latest_received_sdk_version": "1.0.1",
+  "existing_checkout_sdk_version": "1.0.0",
+  "existing_sdk_and_official_starter_not_replaced": true,
+  "receipt_sha256": "b11bb91e51a7f32f74e02736b0ccdf5ebce5d9a7f01648d2f5a1619f3f200860",
+  "receipt_is_point_in_time_before_indexing": true,
+  "raw_corpus_and_search_index_are_not_public_git_files": true,
+  "model_calls_during_asset_receipt": 0
+}
