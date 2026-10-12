@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_utc": "2026-10-12T09:51:07.002976+00:00",
+  "updated_at_utc": "2026-10-12T09:52:39.583048+00:00",
   "sample_scores_are_not_official": true,
   "clinical_improvement_verified": false,
   "experiments": [
@@ -70,7 +70,7 @@
     {
       "id": "E03",
       "recipe": "E02 storage repair: in-memory contentless FTS5, same corpus/query/references/review",
-      "status": "evaluation_pending",
+      "status": "evaluating",
       "score": null,
       "areas": null,
       "server_model_calls": null,
