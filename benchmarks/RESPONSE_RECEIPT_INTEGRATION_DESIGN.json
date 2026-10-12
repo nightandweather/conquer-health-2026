@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-12T14:37:29.634397+00:00",
+  "status": "design_only_not_implemented",
+  "purpose": "Preserve structural observations before semantic rejection without retrying consumed candidates",
+  "new_runtime_code": false,
+  "runtime_integration": false,
+  "synthetic_execution": false,
+  "new_model_calls": 0,
+  "new_live_metadata_queries": 0,
+  "new_live_template_queries": 0,
+  "new_NOVA_submissions": 0,
+  "new_clinical_reviews": 0,
+  "source_sha256": {
+    "benchmarks/healthbench.py": "411a9cf555986970214ed4a1074b4218522665603aa0411c7ecc956e5d3b963a",
+    "benchmarks/healthbench_source_ledger_cycle.py": "95e03201429bc02d0a9c843e135fa628f2df15816d1112a2d3dd9134665808f5",
+    "benchmarks/healthbench_question_reuse_probe.py": "91d15cdba68b140add13daf465022d210fef5e0250aa75535ce544e28707e130",
+    "benchmarks/response_receipt.py": "b4487c37f09a2e8c56ecc81676a72130f7fb5ee8a5ec46825778c92dfb622ceb",
+    "tests/test_response_receipt.py": "03cec66913cf58660ca265981600ed298930399fe0786808793f417a13a8a76d"
+  },
+  "source_boundary": {
+    "prospective_location": "Between client.complete parsed-object return and _SourceTransport semantic validation, in a separate future adapter; frozen classes unchanged",
+    "actual_transport_limit": "Current Transport.request rejects non-dict/error envelopes before returning. Observing its return is not observing every decoded JSON or raw HTTP bytes. Malformed offline fixtures do not prove expanded live coverage.",
+    "response_identity": "Same original object reaches parser only after successful structural persistence; no fallback or answer replacement"
+  },
+  "scope": {
+    "next_prototype": "Separate offline-only fixture adapter in new files and disposable test directories; no real endpoint/key/model transport imports or arguments",
+    "historical_experiments": "HBT01/HBT02/HBT03 sources, owner/reservation/evidence, completed outcomes and E05 code/ZIP remain frozen",
+    "live_enablement": "Not included; requires a separate justified experiment and applicable existing authorization/pins before any real call",
+    "baseline_gate": "Existing durable reservation, once-only dispatch, no retry, four-complete response clinical gate remain unchanged"
+  },
+  "proposed_order": [
+    "Verify permanent owner, fixed fixture scope, request/fixture/helper/parser pins and simulated identity checks",
+    "Exclusive durable reservation consumes fixture slot",
+    "Exclusive durable dispatch-possible marker links reservation; marker is not dispatch proof",
+    "Invoke registered fake dispatch at most once",
+    "Record in-memory parsed_object_observed; immediately call pinned helper before semantic parser",
+    "Persist structural-only receipt exclusively, flush/fsync file and directory, verify snapshot",
+    "Pass identical object to semantic parser stub; collect sanitized operational result separately",
+    "Simulate post-pin check, persist terminal linking reservation/marker/structure/pin-result hashes and sanitized outcome"
+  ],
+  "orthogonal_state_axes": [
+    "dispatch_possible",
+    "parsed_object_observed",
+    "structural_receipt_persisted",
+    "parser_entered",
+    "terminal_receipt_persisted",
+    "semantic_outcome",
+    "post_pin_check"
+  ],
+  "recovery_contract": {
+    "missing_evidence": "Unknown is distinct from false; persist only supported observations",
+    "unfinished_reservation": "Always consumed, no resend even if fixture observer knew invocation count 0",
+    "storage_failure": "Stop before parser if structure was not durable. If possible write a separate sanitized local failure receipt including parsed observation; failure to save that too leaves only earlier durable evidence. No disk-error detail strings.",
+    "incomplete_chain": "Unknown/incomplete and no retry/export; terminal existence alone is not semantic success",
+    "immutable_files": "Exclusive creation, nofollow handles, directory identity checks and fsync barriers proposed; preserve partial files; never delete owner/reservation/marker or overwrite evidence",
+    "locks": "No automatic stale-lock cleanup",
+    "power_loss_limit": "Fsync ordering must be tested with fault injection; this design is not proof of power-loss durability on all storage devices"
+  },
+  "privacy": {
+    "structural_fields": "Exactly pinned helper allowlist",
+    "exceptions": "Fixed stage/code enums only; no str/repr/traceback, arbitrary class names, response keys, paths, identifiers or bodies",
+    "reasoning": "No body/hash; never substitute as final answer",
+    "content_hash": "Not anonymization; any future actual per-response receipts remain private",
+    "synthetic_adapter_receipts": "No actual patient data; do not copy body values even from fixtures"
+  },
+  "planned_test_groups": [
+    {
+      "id": "G01",
+      "name": "before_reservation",
+      "requirement": "Stop before reservation; fake dispatch 0; no completion evidence; detected pin mismatch blocks the scope."
+    },
+    {
+      "id": "G02",
+      "name": "after_reservation",
+      "requirement": "Stop after reservation durability; fixture invocation may be known 0 inside the test, but recovered unfinished reservation consumes the slot and remains unknown/no retry."
+    },
+    {
+      "id": "G03",
+      "name": "around_dispatch_marker",
+      "requirement": "Stop after dispatch-possible durability immediately before or after fake invocation; marker proves possibility, not a sent request or response."
+    },
+    {
+      "id": "G04",
+      "name": "after_parsed_return",
+      "requirement": "Interrupt after fake returns but before structural persistence; in-memory observed=true is not durable evidence; no invented recovery receipt."
+    },
+    {
+      "id": "G05",
+      "name": "structural_write_failure",
+      "requirement": "Short write, flush/fsync failure or interruption leaves partial evidence and parser count 0; preserve files and prohibit overwrite/recreation."
+    },
+    {
+      "id": "G06",
+      "name": "after_structure_before_terminal",
+      "requirement": "Parser failure or terminal write interruption preserves committed structural metadata; terminal absence is incomplete evidence, never success."
+    },
+    {
+      "id": "G07",
+      "name": "duplicate_and_other_output",
+      "requirement": "Repeated fixture request or new output directory under same permanent owner produces 0 additional dispatches."
+    },
+    {
+      "id": "G08",
+      "name": "concurrent_writers",
+      "requirement": "Only one writer may reserve/dispatch; second writer is blocked; stale lock is not auto-deleted."
+    },
+    {
+      "id": "G09",
+      "name": "evidence_integrity",
+      "requirement": "Orphan, existing/partial file, changed hash, symlink or observed pin failure blocks; restoring bytes does not silently clear permanent block."
+    },
+    {
+      "id": "G10",
+      "name": "same_object_no_mutation",
+      "requirement": "Helper sees original parsed object, parser receives identical object after persistence; no mutation, rewriting, alternate choice or fallback."
+    },
+    {
+      "id": "G11",
+      "name": "structure_vs_semantics",
+      "requirement": "Normal/null/empty/whitespace/length/malformed synthetic objects retain structural observations separately from fixed semantic-stub outcome."
+    },
+    {
+      "id": "G12",
+      "name": "usage_and_reasoning_provenance",
+      "requirement": "Persist helper output without normalizing unknown to 0 or removing original total state; no reasoning text/hash or token estimation."
+    },
+    {
+      "id": "G13",
+      "name": "exception_privacy",
+      "requirement": "Transport/helper/parser/storage exceptions containing secret sentinels must not leak via files/stdout/stderr/tracebacks; allow fixed stage/code and validated numbers only."
+    },
+    {
+      "id": "G14",
+      "name": "all_four_review_gate",
+      "requirement": "Four complete nonblank stop outcomes plus post-pin simulation and valid terminal links permit only a synthetic eligibility flag; any failed/unknown/partial result keeps the set closed; no actual export."
+    }
+  ],
+  "planned_test_group_count": 14,
+  "completed_synthetic_tests_in_this_design": 0,
+  "cost_scope": {
+    "planned_real_generation_calls": 0,
+    "planned_live_metadata_template_queries": 0,
+    "planned_submission_calls": 0,
+    "future_fake_invocations": "At most one per fixture reservation; each independent test uses a fresh synthetic scope. Final total to be counted by implementation, not assumed from 14 groups.",
+    "duration_seconds": null,
+    "cost_money": null,
+    "duration_cost_note": "No live API cost requested; implementation/reviewer work and elapsed duration are not estimated or asserted free."
+  },
+  "acceptance_for_future_offline_prototype": [
+    "All declared interruption and integrity groups verified with network denied and a deterministic fake invocation counter",
+    "No old production import or entrypoint changed and selected historical pins preserved",
+    "Structural persistence failure prevents parser entry; every reserved restart produces no dispatch",
+    "Private/public synthetic source copies and aggregate claims independently audited"
+  ],
+  "clinical_comparison": null,
+  "upstream_root_cause": null,
+  "adoption_as_clinical_improvement": false
+}
