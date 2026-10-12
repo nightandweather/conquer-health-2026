@@ -237,7 +237,20 @@
       "official_submissions": 0,
       "local_model_calls": 0,
       "clinical_improvement_verified": false,
-      "case_results": [],
+      "case_results": [
+        {
+          "case_id": "C01",
+          "status": "normal",
+          "turns": 30,
+          "seconds": 1021
+        },
+        {
+          "case_id": "C10",
+          "status": "normal",
+          "turns": 30,
+          "seconds": 1096
+        }
+      ],
       "limitations": [
         "Actual E03/E04 server dialogue/final records not found in inspected UI/docs and local result folders",
         "Threshold6 replaces prior EXAM hint for remaining6..3; may reduce information/exam opportunities",
@@ -258,11 +271,12 @@
       "submitted_at_kst": "2026-10-12 20:59",
       "server_zip_sha256": "a92020b5889fe550c3dfeb9a5ecd9b48ae396079571c43002778d93923c61a2d",
       "server_zip_hash_matches": true,
-      "observed_at_utc": "2026-10-12T12:05:54.367365+00:00",
+      "observed_at_utc": "2026-10-12T12:39:13.278994+00:00",
       "server_file_status": "building_validating",
-      "completed_cases": null,
+      "completed_cases": 2,
       "whole_evaluation_complete": false,
-      "case_results_visibility": "No case results shown; empty list does not establish zero completed cases"
+      "case_results_visibility": "Two normal case results shown; last case unobserved; total and area scores not shown",
+      "observation_window_kst": "2026-10-12 21:38-21:39"
     }
   ],
   "comparison_limit": "E01 has no score. E03 versus E00 changes review and retrieval together; E03 versus E02 repairs storage only but E02 never reached dialogue. Reused public samples and unconfirmed server digest do not establish independent clinical improvement.",

@@ -13,7 +13,7 @@
 | E02 | 검토 + 오프라인 지침 검색 | 디스크 부족으로 준비 실패, 점수 없음 | `results/codex-guideline-agent-v1/` |
 | E03 | 지침 색인을 RAM 전용으로 수정 | 완료 42.483; 전체 품질 개선 미확인 | `results/codex-memory-guideline-agent-v1/` |
 | E04 | E03의 최종 기록 지시 묶음만 변경 | 완료41.079; 3건 정상, E03 대비-1.404점·미채택 | `results/codex-record-contract-agent-v1/` |
-| E05 | E03의 종료 설명 힌트 2→6 | 20:59KST 한 번 접수; 21:05KST 평가 중·점수/증례 미확인 | `results/codex-closing-six-agent-v1/` |
+| E05 | E03의 종료 설명 힌트 2→6 | 20:59KST 한 번 접수; 21:38–21:39KST 2/3건 정상·전체 평가 중·점수 미확인 | `results/codex-closing-six-agent-v1/` |
 
 각 회차에서 계획, 코드·ZIP 해시, 검사 결과, 독립 감사, 제출 링크·서버 해시, 관측 시각, 점수·6영역·증례별 턴·시간·오류, 비교와 채택 여부, 게시 검증을 남긴다. 해당 자료가 아직 없으면 미확인/미완료로 유지한다. 첫 접수와 후속 관측의 원래 파일을 덮어쓰지 않는다. `phase.json`과 공개 집계는 최신 상태를 가리키는 변경 가능한 색인이다.
 
@@ -31,6 +31,7 @@ E03는 E00보다 +0.304점이지만 검토와 검색이 함께 달랐고 여러 
 | 사용자 원문 출처 색인 | [SOURCE_LEDGER_DEV20.md](SOURCE_LEDGER_DEV20.md) | `results/codex-source-ledger-dev20-v1/` |
 | 제공 지침 검색·준비 | [NOVA_OFFLINE_KNOWLEDGE.md](NOVA_OFFLINE_KNOWLEDGE.md), [프로토타입](NOVA_GUIDELINE_PROTOTYPE.md) | `results/codex-guidelines-build-v1/`, `results/codex-provided-integration-v1/` |
 | 제공 벤치 구조·노출 감사 | [NOVA_BENCHMARK_QUALITY.md](NOVA_BENCHMARK_QUALITY.md) | `results/codex-provided-benchmark-quality-v1/` |
+| HealthBench 파생 여러 턴 HBT01 | [12회 실행·독립 검토 결과](HEALTHBENCH_TURN_PROBE.md) | `results/codex-healthbench-turn-probe-v1/` |
 | 환자 대화 네 축 분포 | 기존 집계와 phase 기록 | `results/codex-dialogue-distribution-v1/` |
 | 공식 웹 조사 | [NOVA_WEB_RESEARCH_20261012.md](NOVA_WEB_RESEARCH_20261012.md) | `results/codex-web-research-20261012-v1/` |
 | 외래·응급/방문 목적별 흐름 | [미실행 설계](NOVA_ENCOUNTER_FLOW_PLAN.md) | `results/codex-experiment-record-index-v1/` |
