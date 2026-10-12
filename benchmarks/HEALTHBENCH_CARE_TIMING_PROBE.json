@@ -1,0 +1,84 @@
+{
+  "experiment_id": "HBT02",
+  "kind": "Selected historical-prefix development regression; not a full new multi-turn run",
+  "recorded_at_utc": "2026-10-12T13:29:26.244523+00:00",
+  "execution_status": "four_requests_consumed_review_prerequisite_failed",
+  "planned_source_cases": 4,
+  "attempted_source_cases": 4,
+  "unattempted_source_cases": 0,
+  "new_generation_requests": 4,
+  "response_status_counts": {
+    "completed": 3,
+    "failed": 1
+  },
+  "finish_reason_counts": {
+    "stop": 3,
+    "length": 1
+  },
+  "empty_answer_count": 1,
+  "length_termination_count": 1,
+  "overlap_note": "One record is both an empty-answer failure and length-terminated; these are not two failures. No nonempty truncated answer observed.",
+  "retries": 0,
+  "sum_generation_request_seconds": 66.619,
+  "timing_scope": "Generation request durations only, excluding metadata/preparation/review; not whole task runtime",
+  "reported_usage": {
+    "prompt_tokens": 2790,
+    "completion_tokens": 5418,
+    "total_tokens": 8208
+  },
+  "missing_usage_responses": 0,
+  "usage_scope": "Provider-reported output may include reasoning; not separately measured visible-answer tokens. Do not infer the exact cause of the empty answer.",
+  "model_metadata_queries": 8,
+  "template_queries": 8,
+  "source_model_template_pins_verified_before_after_all_four": true,
+  "settings": {
+    "model": "gpt-oss:20b",
+    "base_url": "http://127.0.0.1:11434/v1",
+    "reasoning_effort": "medium",
+    "max_tokens": 2048,
+    "temperature": 0,
+    "timeout": 90
+  },
+  "model_digest": "f38aa0c53da5f8c49d08c43a99df24ff53167fe68e24664a7777288e7656fdfe",
+  "template_sha256": "fa6710a93d78da62641e192361344be7a8c0a1c3737f139cf89f20ce1626b99c",
+  "intervention": "Append one fixed general care-timing consistency instruction bundle; all other request fields and historical contexts unchanged",
+  "synthetic_validation": {
+    "new_tests_passed": 20,
+    "full_suite": false,
+    "independent_code_audit_passed": true,
+    "public_selected_modules": 2,
+    "public_tests_passed": 41,
+    "public_full_suite": false
+  },
+  "review": {
+    "fresh_blinded_clinical_review_performed": false,
+    "reason": "One empty final answer with length termination; unchanged four-complete-response export condition failed",
+    "blinded_packets_exported": 0,
+    "primary_timing_regression_resolution": null,
+    "clinical_accuracy_comparison": null,
+    "prior_HBT01_unresolved_propositions_changed": false
+  },
+  "decision": {
+    "adopted": false,
+    "reason": "Incomplete usable response set; clinical comparison prerequisite failed",
+    "same_hypothesis_executions": 1,
+    "same_candidate_repeat_allowed": false,
+    "same_hypothesis_two_failure_stop_rule_retained": true
+  },
+  "patient_generation_model_calls": 0,
+  "automatic_grader_API_calls": 0,
+  "new_NOVA_submissions": 0,
+  "official_HealthBench_score": null,
+  "NOVA_score": null,
+  "limitations": [
+    "Known-failure post-hoc selection and reused dev cases; not independent or representative",
+    "Historical controls; one response per source case; no causal comparison",
+    "Candidate inherited historical assistant context; no candidate-generated end-to-end consultation",
+    "The primary timing question remains unreviewed; no verified quality effect",
+    "One length-terminated empty response does not establish instruction causality or a medical-error diagnosis",
+    "No inference about actual NOVA E04/E05 score causes"
+  ],
+  "runner_sha256": "95ee15cbe18596517163b41dca5a77195425dd4cdbcda99ff2dff866084918cf",
+  "test_sha256": "e17f18257531ed8c415742109e0fdb87b962155754a25357676c79e0cf1dbe88",
+  "independent_execution_audit_passed": true
+}
