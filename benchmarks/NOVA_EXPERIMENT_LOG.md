@@ -33,6 +33,7 @@ E03는 E00보다 +0.304점이지만 검토와 검색이 함께 달랐고 여러 
 | 제공 벤치 구조·노출 감사 | [NOVA_BENCHMARK_QUALITY.md](NOVA_BENCHMARK_QUALITY.md) | `results/codex-provided-benchmark-quality-v1/` |
 | HealthBench 파생 여러 턴 HBT01 | [12회 실행·독립 검토 결과](HEALTHBENCH_TURN_PROBE.md) | `results/codex-healthbench-turn-probe-v1/` |
 | HBT02 진료 시점 일관성 | [실행 4회: 완전 3·빈 답변 한도 종료 1, 비교 전제 실패·미채택](HEALTHBENCH_CARE_TIMING_PROBE.md), [사전 설계](HEALTHBENCH_CARE_TIMING_DESIGN.md) | `results/codex-healthbench-care-timing-probe-v1/`, `results/codex-healthbench-care-timing-design-v1/` |
+| HBT03 이미 제공한 답 재사용 | [미실행 설계: 재질문 두 관찰·보존 두 맥락](HEALTHBENCH_QUESTION_REUSE_DESIGN.md) | `results/codex-healthbench-question-reuse-design-v1/` |
 | 환자 대화 네 축 분포 | 기존 집계와 phase 기록 | `results/codex-dialogue-distribution-v1/` |
 | 공식 웹 조사 | [NOVA_WEB_RESEARCH_20261012.md](NOVA_WEB_RESEARCH_20261012.md) | `results/codex-web-research-20261012-v1/` |
 | 외래·응급/방문 목적별 흐름 | [미실행 설계](NOVA_ENCOUNTER_FLOW_PLAN.md) | `results/codex-experiment-record-index-v1/` |
