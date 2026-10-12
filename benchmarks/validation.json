@@ -3,15 +3,15 @@
   "verified_date": "2026-10-12",
   "state": "source_index_generation_and_independent_review_completed_not_adopted",
   "tests": {
-    "scope": "Private full regression and15 explicitly selected public modules after provided-guideline/QC/context/day0 changes",
-    "total_tests": 440,
-    "executed_tests": 440,
-    "passed_tests": 440,
+    "scope": "Private full regression and16 explicitly selected public modules after offline prepare adapter",
+    "total_tests": 457,
+    "executed_tests": 457,
+    "passed_tests": 457,
     "all_executed_passed": true,
     "blocked_tests": [],
-    "public_targeted_executed": 317,
-    "public_targeted_passed": 317,
-    "public_targeted_scope": "15 explicit source-index/placement/budget/runner/queue/viewer/Markdown plus guideline/context/benchmark-QC/day0 modules; not full public suite",
+    "public_targeted_executed": 334,
+    "public_targeted_passed": 334,
+    "public_targeted_scope": "16 explicit source-index/placement/budget/runner/queue/viewer/Markdown plus guideline/context/benchmark-QC/day0/prepare modules; not full public suite",
     "verified_at_utc": "2026-10-12T07:49:55.041657+00:00"
   },
   "data": {
@@ -2080,7 +2080,38 @@
     "server_prepare_verified": false,
     "current_root_agent_applied": false,
     "today_candidate_applied": false,
-    "index_public_or_in_submission_zip": false
+    "index_public_or_in_submission_zip": false,
+    "local_linux_prepare_verified": true,
+    "prepare_synthetic_tests": 17,
+    "local_prepare": {
+      "python": "3.12.15",
+      "sqlite": "3.46.1",
+      "architecture": "x86_64",
+      "uid": 65532,
+      "cpus": 2,
+      "memory_limit_bytes": 8589934592,
+      "swap_limit_bytes": 0,
+      "tmpfs_limit_bytes": 6442450944,
+      "network": "none",
+      "root_readonly": true,
+      "source_readonly": true,
+      "deadline_seconds": 600,
+      "prepare_seconds": 34.813163,
+      "host_container_command_seconds": 65.34921054099686,
+      "cgroup_memory_peak_bytes": 2033729536,
+      "peak_process_rss_bytes": 123772928,
+      "oom_events": 0,
+      "documents": 15904,
+      "chunks": 389730,
+      "index_bytes": 1266126848,
+      "source_bytes": 597185304,
+      "source_manifest_matches_mac_build": true,
+      "source_module_sha256": "4e039d55b65d08737bf8a1a45e5eae53b031c97435f5bf3053b4297a2c18d8b9",
+      "prepare_module_sha256": "f2e9d9cd8ccc5be00412dc9af9aaa76b1062926a1ad48b24a83e1fb5f3606093",
+      "official_server_verified": false,
+      "limits_enforced_by_container_not_adapter": true,
+      "local_single_observation": true
+    }
   },
   "provided_benchmark_quality": {
     "status": "all3_structural_quality_audit_and_independent_recomputation_completed",
@@ -2110,7 +2141,7 @@
     "counts_are_not_clinical_score": true
   },
   "today_submission": {
-    "status": "sample_validation_evaluation_in_progress",
+    "status": "sample_validation_completed",
     "registered_at_kst": "2026-10-12 16:45 KST",
     "candidate_sdk": "1.0.1",
     "candidate_is_official_baseline": true,
@@ -2120,20 +2151,89 @@
     "sample_requests": 1,
     "official_requests": 0,
     "server_model_calls": null,
-    "reference_score": null,
-    "server_validation_passed": null,
+    "reference_score": 42.179,
+    "server_validation_passed": true,
     "leaderboard_current_option_disabled": true,
     "leaderboard_disabled_reason": "not_currently_accepting_submissions",
     "root_agent_sdk_old_zip_preserved": true,
     "synthetic_tests": 15,
     "independent_fake_consult_paths": 5,
     "new_guideline_and_prompt_not_applied": true,
-    "latest_observed_at_kst": "2026-10-12 16:57 KST",
+    "latest_observed_at_kst": "2026-10-12 17:19 KST",
     "first_observed_status": "evaluation_queued",
-    "observed_case_results": 1,
+    "observed_case_results": 3,
     "observed_first_case_termination": "normal",
     "observed_first_case_turns": 30,
     "observed_first_case_seconds": 517,
-    "aggregate_result_complete": false
+    "aggregate_result_complete": true,
+    "observed_case_metrics": [
+      {
+        "termination": "normal",
+        "turns": 30,
+        "seconds": 517
+      },
+      {
+        "termination": "normal",
+        "turns": 30,
+        "seconds": 536
+      },
+      {
+        "termination": "normal",
+        "turns": 30,
+        "seconds": 567
+      }
+    ],
+    "sample_cases_total": 3,
+    "sample_remaining_today_observed": 9,
+    "domain_scores_ui_rounded": {
+      "information_gathering": {
+        "score": 5.21,
+        "max": 25
+      },
+      "diagnostic_reasoning": {
+        "score": 7.22,
+        "max": 15
+      },
+      "investigation_followup": {
+        "score": 0.94,
+        "max": 10
+      },
+      "safety": {
+        "score": 6.25,
+        "max": 15
+      },
+      "communication": {
+        "score": 2.56,
+        "max": 15
+      },
+      "efficiency": {
+        "score": 20.0,
+        "max": 20
+      }
+    },
+    "official_score": null,
+    "quality_improvement_comparison_exists": false,
+    "leaderboard_checked_after_sample_completion": true
+  },
+  "tests_before_prepare_adapter": {
+    "scope": "Private full regression and15 explicitly selected public modules after provided-guideline/QC/context/day0 changes",
+    "total_tests": 440,
+    "executed_tests": 440,
+    "passed_tests": 440,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "public_targeted_executed": 317,
+    "public_targeted_passed": 317,
+    "public_targeted_scope": "15 explicit source-index/placement/budget/runner/queue/viewer/Markdown plus guideline/context/benchmark-QC/day0 modules; not full public suite",
+    "verified_at_utc": "2026-10-12T07:49:55.041657+00:00"
+  },
+  "test_harness_notes": {
+    "cause": "test command set process umask077 for private logs, changing existing0755 fixture to0700",
+    "resolution": "restore normal test umask022; create log fd0600 independently; no existing source/test gate modified",
+    "final_private_full": 457,
+    "final_public_selected16": 334,
+    "earlier_failed_logs_preserved": true,
+    "initial_followup_failed_runs": 2,
+    "initial_failures_per_run": 2
   }
 }
