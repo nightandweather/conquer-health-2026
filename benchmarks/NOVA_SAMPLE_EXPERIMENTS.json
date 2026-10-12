@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_utc": "2026-10-12T10:20:12.839238+00:00",
+  "updated_at_utc": "2026-10-12T10:44:45.696287+00:00",
   "sample_scores_are_not_official": true,
   "clinical_improvement_verified": false,
   "experiments": [
@@ -70,9 +70,16 @@
     {
       "id": "E03",
       "recipe": "E02 storage repair: in-memory contentless FTS5, same corpus/query/references/review",
-      "status": "evaluating",
-      "score": null,
-      "areas": null,
+      "status": "completed",
+      "score": 42.483,
+      "areas": {
+        "information": 5.75,
+        "reasoning": 9.17,
+        "tests_followup": 0.69,
+        "safety": 6.25,
+        "communication": 2.0,
+        "efficiency": 18.62
+      },
       "server_model_calls": null,
       "server_tokens": null,
       "zip_sha256": "fcad1c128bb9a3b790220f0c556a1782a0aa039003ae151ba6a2725a7ff46ac4",
@@ -93,7 +100,7 @@
         "generic_query_matches_e02": 15
       },
       "submitted_at_kst": "2026-10-12 18:50",
-      "completed_cases": 2,
+      "completed_cases": 3,
       "expected_cases": 3,
       "case_results": [
         {
@@ -107,10 +114,58 @@
           "status": "normal",
           "turns": 27,
           "seconds": 593
+        },
+        {
+          "case_id": "C03",
+          "status": "normal",
+          "turns": 30,
+          "seconds": 1190
         }
       ],
-      "whole_evaluation_complete": false
+      "whole_evaluation_complete": true,
+      "normal_cases": 3,
+      "case_count": 3,
+      "case_turns": [
+        30,
+        27,
+        30
+      ],
+      "case_seconds": [
+        974,
+        593,
+        1190
+      ],
+      "completion_observed_at_utc": "2026-10-12T10:43:05.342789+00:00",
+      "server_file_status": "validated"
     }
   ],
-  "comparison_limit": "E01 has no score. E03 versus E00 changes review and retrieval together; E03 versus E02 repairs storage only but E02 never reached dialogue. Reused public samples and unconfirmed server digest do not establish independent clinical improvement."
+  "comparison_limit": "E01 has no score. E03 versus E00 changes review and retrieval together; E03 versus E02 repairs storage only but E02 never reached dialogue. Reused public samples and unconfirmed server digest do not establish independent clinical improvement.",
+  "latest_comparison": {
+    "control": "E00",
+    "candidate": "E03",
+    "total_score_delta": 0.304,
+    "displayed_area_deltas": {
+      "information": 0.54,
+      "reasoning": 1.95,
+      "tests_followup": -0.25,
+      "safety": 0.0,
+      "communication": -0.56,
+      "efficiency": -1.38
+    },
+    "displayed_case_seconds_sum_control": 1620,
+    "displayed_case_seconds_sum_candidate": 2757,
+    "displayed_case_seconds_increase": 1137,
+    "displayed_case_seconds_change_percent": 70.18518518518519,
+    "case_seconds_are_not_whole_job_elapsed": true,
+    "quality_conclusion": "mixed_sample_result_overall_clinical_improvement_unverified",
+    "adopted_as_verified_improvement": false,
+    "limits": [
+      "Same three reused public samples",
+      "E01 score unavailable so review and retrieval effects not isolated",
+      "Server model digest not disclosed; matched uploaded ZIP SHA is a separate fact",
+      "Actual dialogue and final note not independently reviewed",
+      "Calls and tokens not disclosed; no attribution of efficiency loss to a specific cost component",
+      "Displayed area scores rounded to 2 decimals; total rounded to 3"
+    ]
+  }
 }
