@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_utc": "2026-10-12T09:41:07.196015+00:00",
+  "updated_at_utc": "2026-10-12T09:51:07.002976+00:00",
   "sample_scores_are_not_official": true,
   "clinical_improvement_verified": false,
   "experiments": [
@@ -47,14 +47,53 @@
     {
       "id": "E02",
       "recipe": "E01 plus offline provided-guideline retrieval for draft and review",
-      "status": "evaluating",
+      "status": "preparation_failed",
       "score": null,
       "areas": null,
       "server_model_calls": null,
       "server_tokens": null,
       "zip_sha256": "7f8bcf85a799e2aa5317cac68538452a345b4a599589df7d40947d1924db6afa",
-      "url": "https://nova.snubhai.org/submissions/eda955f4-87b6-42c2-8727-661fb9e5b153/"
+      "url": "https://nova.snubhai.org/submissions/eda955f4-87b6-42c2-8727-661fb9e5b153/",
+      "error_code": "SAMPLE_VALIDATION_FAILED",
+      "failure_reason": "SQLite database or disk is full in /output while preparing index",
+      "case_turns": [
+        0,
+        0,
+        0
+      ],
+      "case_seconds": [
+        8,
+        7,
+        7
+      ]
+    },
+    {
+      "id": "E03",
+      "recipe": "E02 storage repair: in-memory contentless FTS5, same corpus/query/references/review",
+      "status": "evaluation_pending",
+      "score": null,
+      "areas": null,
+      "server_model_calls": null,
+      "server_tokens": null,
+      "zip_sha256": "fcad1c128bb9a3b790220f0c556a1782a0aa039003ae151ba6a2725a7ff46ac4",
+      "url": "https://nova.snubhai.org/submissions/dc162598-4b4f-42a9-b35c-5c0747f43d8a/",
+      "local_validation": {
+        "private_full_tests": 530,
+        "new_synthetic_tests": 24,
+        "cpu_cores": 2,
+        "ram_limit_gib": 8,
+        "swap_bytes": 0,
+        "network": "none",
+        "output_tmpfs_mib": 16,
+        "tmp_tmpfs_mib": 16,
+        "prepare_seconds": 38.297871,
+        "cgroup_peak_bytes": 1222184960,
+        "rss_peak_bytes": 576446464,
+        "created_index_files": 0,
+        "generic_query_matches_e02": 15
+      },
+      "submitted_at_kst": "2026-10-12 18:50"
     }
   ],
-  "comparison_limit": "Without an E01 score, E02 versus E00 changes both review and retrieval. Reused public samples and unconfirmed server digest do not establish independent clinical improvement."
+  "comparison_limit": "E01 has no score. E03 versus E00 changes review and retrieval together; E03 versus E02 repairs storage only but E02 never reached dialogue. Reused public samples and unconfirmed server digest do not establish independent clinical improvement."
 }
