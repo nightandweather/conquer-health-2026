@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "verified_date": "2026-10-12",
-  "state": "source_index_prepare_only_verified_actual_runner_not_ready",
+  "state": "source_index_generation_and_independent_review_completed_not_adopted",
   "tests": {
-    "scope": "Private full regression and 10 explicitly selected public source-index/placement/budget/runner/queue/viewer modules",
-    "total_tests": 347,
-    "executed_tests": 347,
-    "passed_tests": 347,
+    "scope": "Private full regression and 11 explicitly selected public source-index/placement/budget/runner/queue/viewer modules",
+    "total_tests": 372,
+    "executed_tests": 372,
+    "passed_tests": 372,
     "all_executed_passed": true,
     "blocked_tests": [],
-    "public_targeted_executed": 224,
-    "public_targeted_passed": 224,
-    "public_targeted_scope": "10 explicit source-index/placement/budget/preflight/runner/queue/viewer/Markdown modules; not full public suite",
-    "verified_at_utc": "2026-10-12T05:52:24.638576+00:00"
+    "public_targeted_executed": 249,
+    "public_targeted_passed": 249,
+    "public_targeted_scope": "11 explicit source-index/placement/budget/preflight/runner/queue/viewer/Markdown modules; not full public suite",
+    "verified_at_utc": "2026-10-12T06:15:44.782496+00:00"
   },
   "data": {
     "dataset_kind": "legacy_consensus_val_200",
@@ -203,6 +203,18 @@
       "failure_utility_zero_count": 4,
       "pending_grade_count": 2,
       "numeric_display_count": 38
+    },
+    "latest_source_index_comparison": {
+      "url": "http://127.0.0.1:8774/",
+      "read_only": true,
+      "record_count": 40,
+      "assessment_count": 40,
+      "rubric_numeric_records": 34,
+      "separate_failure_zero_records": 1,
+      "numeric_display_count": 35,
+      "pending_grade_count": 5,
+      "markdown_labels_settings_partial_and_completed_states_verified": true,
+      "candidate_factual_error_warning_visible": true
     }
   },
   "latest_comparison": {
@@ -966,7 +978,7 @@
       "total_tokens": 506985
     }
   },
-  "verified_at_utc": "2026-10-12T05:25:43.021692+00:00",
+  "verified_at_utc": "2026-10-12T06:42:57.529185+00:00",
   "refinement": {
     "status": "superseded_by_codex_verifier_protocol",
     "plan": "REFINEMENT_PLAN.md",
@@ -1162,9 +1174,9 @@
     "reviewed_at_utc": "2026-10-11T05:47:14.369622+00:00"
   },
   "current_change_tests": {
-    "verified_at_utc": "2026-10-12T05:52:24.638576+00:00",
-    "full_private_executed": 347,
-    "full_private_passed": 347,
+    "verified_at_utc": "2026-10-12T06:15:44.782496+00:00",
+    "full_private_executed": 372,
+    "full_private_passed": 372,
     "placement_prepare_tests": 51,
     "placement_prepare_passed": 51,
     "existing_gate_scenarios_through_placement_api": 41,
@@ -1173,8 +1185,8 @@
     "existing_default_payload_builder_changed": false,
     "existing_low_control_gate_changed": false,
     "public_full_suite_executed": false,
-    "public_targeted_executed": 224,
-    "public_targeted_passed": 224,
+    "public_targeted_executed": 249,
+    "public_targeted_passed": 249,
     "placement_cycle_synthetic_tests": 23,
     "placement_cycle_synthetic_passed": 23,
     "independent_placement_runner_audit": "passed",
@@ -1182,7 +1194,10 @@
     "old_low_gate_and_default_general_cli_unchanged": true,
     "source_index_prepare_tests": 16,
     "source_index_prepare_passed": 16,
-    "independent_source_index_audit": "SCOPE SAFE for prepare-only"
+    "independent_source_index_audit": "SCOPE SAFE for prepare-only",
+    "source_index_cycle_synthetic_tests": 25,
+    "source_index_cycle_synthetic_passed": 25,
+    "independent_source_index_executor_audit": "passed"
   },
   "historical_test_snapshot": {
     "healthbench_synthetic_tests": 112,
@@ -1208,7 +1223,7 @@
     "name": "NOVA 답변 품질 지속 개선",
     "interval_minutes": 5,
     "kind": "thread_heartbeat",
-    "verified_at_utc": "2026-10-12T05:52:24.638576+00:00",
+    "verified_at_utc": "2026-10-12T06:45:40.497115+00:00",
     "resume_pending_before_new_generation": true,
     "maximum_new_candidates_per_run": 1,
     "maximum_development_cases_per_candidate": 20,
@@ -1218,20 +1233,20 @@
     "unresolved_judgments_block_adoption": true,
     "stop_same_hypothesis_after_two_no_improvement_candidates": true,
     "completed_work_commit_and_push": true,
-    "next_hypothesis": "Fixed literal user-source-index context with unchanged frozen system instructions and medium2048",
-    "next_experiment_status": "preflight_verified_actual_executor_and_paired_review_path_NOT_READY",
+    "next_hypothesis": "Requires new development evidence and a distinct one-variable comparable plan; unchanged source-index candidate prohibited",
+    "next_experiment_status": "requires_distinct_hypothesis_and_source_control_proof",
     "previous_prompt_loop_result_preserved": "two_candidates_not_adopted",
-    "latest_run_started_at_utc": "2026-10-12T05:41:41.707061+00:00",
-    "latest_run_finished_at_utc": "2026-10-12T05:52:24.638576+00:00",
-    "latest_run_status": "prepare_only_verified_actual_runner_not_ready",
-    "new_generation_calls_in_latest_run": 0,
+    "latest_run_started_at_utc": "2026-10-12T06:16:42.530998+00:00",
+    "latest_run_finished_at_utc": "2026-10-12T06:19:38+00:00",
+    "latest_run_status": "review_completed_with_uncertainty_not_adopted",
+    "new_generation_calls_in_latest_run": 20,
     "new_generation_calls_in_initial_scheduling_request": 0,
-    "latest_review_finished_at_utc": "2026-10-12T05:25:43.021692+00:00",
+    "latest_review_finished_at_utc": "2026-10-12T06:39:08.640131+00:00",
     "repeat_latest_candidate": false,
     "automation_status_after_update": "ACTIVE",
     "automation_prompt_updated_after_latest_review": true,
-    "automation_prompt_sha256": "b14183bbbddbe2c516796a9c9e70f1edf86d42c975d743ebc17cf92339f22981",
-    "automation_updated_at_utc": "2026-10-12T05:52:24.638576+00:00",
+    "automation_prompt_sha256": "387aa89682c5f653d27d17fc1bdbcd60d924e1af038cc00511bf51d151787a32",
+    "automation_updated_at_utc": "2026-10-12T06:45:40.497115+00:00",
     "previous_generation_run": {
       "latest_run_started_at_utc": "2026-10-12T02:47:09+00:00",
       "latest_run_finished_at_utc": "2026-10-12T02:50:13+00:00",
@@ -1241,18 +1256,31 @@
     "same_adjudication_repeat_requires_new_evidence": true,
     "automation_prompt_updated_after_followup": true,
     "automation_prompt_updated_after_budget_review": true,
-    "latest_followup_status": "source_index_preparation_verified_no_generation",
-    "new_generation_calls_in_latest_followup": 0,
-    "new_model_metadata_calls_in_latest_followup": 0,
-    "new_template_queries_in_latest_followup": 0,
+    "latest_followup_status": "source_index_generation_review_completed_not_adopted",
+    "new_generation_calls_in_latest_followup": 20,
+    "new_model_metadata_calls_in_latest_followup": 43,
+    "new_template_queries_in_latest_followup": 43,
     "automation_prompt_updated_after_placement_review": true,
     "latest_completed_generation_run": {
+      "latest_run_started_at_utc": "2026-10-12T06:16:42.530998+00:00",
+      "latest_run_finished_at_utc": "2026-10-12T06:19:38+00:00",
+      "latest_run_status": "review_completed_with_uncertainty_not_adopted",
+      "new_generation_calls_in_latest_run": 20
+    },
+    "automation_prompt_updated_after_source_index_preflight": true,
+    "previous_preparation_run": {
+      "latest_run_started_at_utc": "2026-10-12T05:41:41.707061+00:00",
+      "latest_run_finished_at_utc": "2026-10-12T05:52:24.638576+00:00",
+      "latest_run_status": "prepare_only_verified_actual_runner_not_ready",
+      "new_generation_calls_in_latest_run": 0
+    },
+    "automation_prompt_updated_after_source_index_review": true,
+    "previous_completed_generation_run": {
       "latest_run_started_at_utc": "2026-10-12T05:10:06+00:00",
       "latest_run_finished_at_utc": "2026-10-12T05:12:55+00:00",
       "latest_run_status": "review_completed_with_uncertainty_not_adopted",
       "new_generation_calls_in_latest_run": 20
-    },
-    "automation_prompt_updated_after_source_index_preflight": true
+    }
   },
   "reasoning_effort_cycle": {
     "phase": "reasoning_effort_low_vs_medium",
@@ -1866,6 +1894,141 @@
     "new_holdout_calls": 0,
     "old_judgments_and_answers_unchanged": true,
     "current_model_runtime_reverified": false,
+    "nova_submission_agent_applied": false,
+    "official": false,
+    "historical_prepare_only_record": true
+  },
+  "tests_before_source_index_executor": {
+    "scope": "Private full regression and 10 explicitly selected public source-index/placement/budget/runner/queue/viewer modules",
+    "total_tests": 347,
+    "executed_tests": 347,
+    "passed_tests": 347,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "public_targeted_executed": 224,
+    "public_targeted_passed": 224,
+    "public_targeted_scope": "10 explicit source-index/placement/budget/preflight/runner/queue/viewer/Markdown modules; not full public suite",
+    "verified_at_utc": "2026-10-12T05:52:24.638576+00:00"
+  },
+  "current_change_tests_before_source_index_executor": {
+    "verified_at_utc": "2026-10-12T05:52:24.638576+00:00",
+    "full_private_executed": 347,
+    "full_private_passed": 347,
+    "placement_prepare_tests": 51,
+    "placement_prepare_passed": 51,
+    "existing_gate_scenarios_through_placement_api": 41,
+    "placement_specific_new_scenarios": 10,
+    "independent_placement_code_audit": "passed",
+    "existing_default_payload_builder_changed": false,
+    "existing_low_control_gate_changed": false,
+    "public_full_suite_executed": false,
+    "public_targeted_executed": 224,
+    "public_targeted_passed": 224,
+    "placement_cycle_synthetic_tests": 23,
+    "placement_cycle_synthetic_passed": 23,
+    "independent_placement_runner_audit": "passed",
+    "default_request_bytes_preserved": true,
+    "old_low_gate_and_default_general_cli_unchanged": true,
+    "source_index_prepare_tests": 16,
+    "source_index_prepare_passed": 16,
+    "independent_source_index_audit": "SCOPE SAFE for prepare-only"
+  },
+  "source_index_cycle": {
+    "status": "independent_review_completed_not_adopted",
+    "generation_started_at": "2026-10-12T06:16:42.530998+00:00",
+    "generation_finished_at": "2026-10-12T06:19:38+00:00",
+    "new_generation_calls": 20,
+    "candidate_status_counts": {
+      "completed": 20
+    },
+    "source_original_status": "partial",
+    "source_status_counts": {
+      "completed": 18,
+      "failed": 1,
+      "truncated": 1
+    },
+    "unattempted_answers": 0,
+    "retries": 0,
+    "blocked_answers": 0,
+    "empty_answers": 0,
+    "truncated_answers": 0,
+    "new_model_tag_queries": 43,
+    "new_template_queries": 43,
+    "current_runtime_model_and_template_pins_verified": true,
+    "all20_actual_request_attempt_source_index_hashes_verified": true,
+    "all40_source_row_hashes_verified": true,
+    "all20_blinded_packets_rederived": true,
+    "source_request_seconds": 168.513,
+    "candidate_request_seconds": 175.137,
+    "source_whole_seconds": 168.918,
+    "candidate_whole_seconds": 175.685,
+    "source_usage": {
+      "prompt_tokens": 7613,
+      "completion_tokens": 17338,
+      "total_tokens": 24951
+    },
+    "candidate_usage": {
+      "prompt_tokens": 9637,
+      "completion_tokens": 16406,
+      "total_tokens": 26043
+    },
+    "observed_request_seconds_change_percent": 3.93,
+    "observed_total_tokens_change_percent": 4.38,
+    "single_run_observations_not_causal_effects": true,
+    "completion_not_split_into_reasoning_and_final": true,
+    "review_records": 40,
+    "boolean_judgment_count": 78,
+    "unresolved_judgment_count": 6,
+    "skipped_failure_rubric_count": 2,
+    "rubric_numeric_records": 34,
+    "failure_utility_zero_records": 1,
+    "pending_grade_records": 5,
+    "numeric_display_records": 35,
+    "possible_score_bounds": {
+      "grounded_medium_system2048_v1": {
+        "lower_score_percent": 49.16666666666667,
+        "unresolved_criterion_count": 4,
+        "upper_score_percent": 57.49999999999999
+      },
+      "grounded_medium_user_index2048_v1": {
+        "lower_score_percent": 50.83333333333333,
+        "unresolved_criterion_count": 2,
+        "upper_score_percent": 55.00000000000001
+      }
+    },
+    "confirmed_full_score": null,
+    "new_confirmed_major_error_answer_count": 1,
+    "adoption_reasons": [
+      "new important medication-identity factual error",
+      "six unresolved rubric judgments across five records",
+      "overlapping possible criterion-score ranges and no confirmed overall quality improvement"
+    ],
+    "adopted": false,
+    "quality_improvement_confirmed": false,
+    "same_candidate_reinvoke": false,
+    "hypothesis_tested_candidates": 1,
+    "old_answers_criteria_judgments_unchanged": true,
+    "fresh_control_score_not_combined_with_previous_ranges": true,
+    "general_primary_grading_definitions_checked": true,
+    "specific_positive_weight_direction_conflict_official_correction_found": false,
+    "previous_targeted_null_adjudication_repeated": false,
+    "private_full_tests_passed": 372,
+    "public_targeted_11_modules_tests_passed": 249,
+    "public_full_suite_executed": false,
+    "code_sha256": {
+      "benchmarks/healthbench_source_ledger_cycle.py": "95e03201429bc02d0a9c843e135fa628f2df15816d1112a2d3dd9134665808f5",
+      "benchmarks/healthbench_source_ledger_preflight.py": "86c71383d3ad6e5a3862420a3a76f5c77f594b6d9e1971aeb64914e9da950ec2",
+      "benchmarks/healthbench_budget_preflight.py": "eb27b1e05af2a37054a87d032d352c895c2a0f4bbe97ab53ccb2294cf60bddc8",
+      "benchmarks/healthbench.py": "411a9cf555986970214ed4a1074b4218522665603aa0411c7ecc956e5d3b963a",
+      "benchmarks/healthbench_review.py": "35bdad080fe70db8beba299ddbbcad7161b708a4aa2690ccc2899170760cb0af",
+      "benchmarks/healthbench_score.py": "e3f89ce5b5127456df1c10d74c7bf6f933c36150cb3294267a8570cdc01a90b8",
+      "benchmarks/healthbench_placement_cycle.py": "40c8527ed4fd05b226f3d235498a76e14acad3d5389eb62c5c291b11a8471682",
+      "benchmarks/healthbench_budget_cycle.py": "e9d6396469f26f5917d09900b7361ef53a77767d93bb2ade7f88ae2b316218d6",
+      "benchmarks/healthbench_codex_cycle.py": "716ef7ea42bcac3c1ee53d3a94b2d0167ea5fbd1c35c73fbfe26d01978ef9b84"
+    },
+    "fixed_low_and_original_source_gates_unchanged": true,
+    "heldout_feedback_used_for_tuning": false,
+    "new_holdout_generation_calls": 0,
     "nova_submission_agent_applied": false,
     "official": false
   }
