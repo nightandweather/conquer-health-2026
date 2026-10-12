@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "updated_at_utc": "2026-10-12T09:41:07.196015+00:00",
+  "sample_scores_are_not_official": true,
+  "clinical_improvement_verified": false,
+  "experiments": [
+    {
+      "id": "E00",
+      "recipe": "official SDK1.0.1 baseline",
+      "status": "completed",
+      "score": 42.179,
+      "areas": {
+        "information": 5.21,
+        "reasoning": 7.22,
+        "tests_followup": 0.94,
+        "safety": 6.25,
+        "communication": 2.56,
+        "efficiency": 20.0
+      },
+      "case_count": 3,
+      "normal_cases": 3,
+      "case_turns": [
+        30,
+        30,
+        30
+      ],
+      "case_seconds": [
+        517,
+        536,
+        567
+      ],
+      "server_model_calls": null,
+      "server_tokens": null,
+      "url": "https://nova.snubhai.org/submissions/fcc91095-fd1f-4e90-9fc5-361c130ae8cf/"
+    },
+    {
+      "id": "E01",
+      "recipe": "draft plus one Doctor review",
+      "status": "service_recovery_pending",
+      "score": null,
+      "error_code": "EXECUTION_INFRASTRUCTURE",
+      "areas": null,
+      "server_model_calls": null,
+      "server_tokens": null,
+      "url": "https://nova.snubhai.org/submissions/c6e44a7d-ecfe-4a75-8d70-b3239b106de5/"
+    },
+    {
+      "id": "E02",
+      "recipe": "E01 plus offline provided-guideline retrieval for draft and review",
+      "status": "evaluating",
+      "score": null,
+      "areas": null,
+      "server_model_calls": null,
+      "server_tokens": null,
+      "zip_sha256": "7f8bcf85a799e2aa5317cac68538452a345b4a599589df7d40947d1924db6afa",
+      "url": "https://nova.snubhai.org/submissions/eda955f4-87b6-42c2-8727-661fb9e5b153/"
+    }
+  ],
+  "comparison_limit": "Without an E01 score, E02 versus E00 changes both review and retrieval. Reused public samples and unconfirmed server digest do not establish independent clinical improvement."
+}
