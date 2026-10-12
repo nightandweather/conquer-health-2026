@@ -1565,16 +1565,16 @@
     "completion_tokens_reasoning_and_final_not_separated": true
   },
   "tests_before_placement_preflight": {
-    "scope": "Current private full regression and public disjoint placement/budget/runner/queue/viewer modules",
-    "total_tests": 305,
-    "executed_tests": 305,
-    "passed_tests": 305,
+    "scope": "Current private full regression and disjoint public budget/runner/queue/viewer/Markdown modules",
+    "total_tests": 254,
+    "executed_tests": 254,
+    "passed_tests": 254,
     "all_executed_passed": true,
     "blocked_tests": [],
-    "public_targeted_executed": null,
-    "public_targeted_passed": null,
-    "public_targeted_scope": "new placement module to be verified in public checkout",
-    "verified_at_utc": "2026-10-12T04:53:46.700416+00:00"
+    "public_targeted_executed": 131,
+    "public_targeted_passed": 131,
+    "public_targeted_scope": "7 explicit budget/preflight/runner/queue/viewer/Markdown test modules; not full public repository suite",
+    "verified_at_utc": "2026-10-12T04:26:23.229776+00:00"
   },
   "change_tests_before_placement_preflight": {
     "verified_at_utc": "2026-10-12T04:26:23.229776+00:00",
