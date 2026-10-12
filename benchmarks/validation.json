@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "verified_date": "2026-10-12",
-  "state": "output_budget_generation_and_independent_review_completed_not_adopted_with_uncertainty",
+  "state": "instruction_placement_preflight_verified_generation_not_ready",
   "tests": {
-    "scope": "Current private full regression and disjoint public budget/runner/queue/viewer/Markdown modules",
-    "total_tests": 254,
-    "executed_tests": 254,
-    "passed_tests": 254,
+    "scope": "Current private full regression and public disjoint placement/budget/runner/queue/viewer modules",
+    "total_tests": 305,
+    "executed_tests": 305,
+    "passed_tests": 305,
     "all_executed_passed": true,
     "blocked_tests": [],
-    "public_targeted_executed": 131,
-    "public_targeted_passed": 131,
-    "public_targeted_scope": "7 explicit budget/preflight/runner/queue/viewer/Markdown test modules; not full public repository suite",
-    "verified_at_utc": "2026-10-12T04:26:23.229776+00:00"
+    "public_targeted_executed": 182,
+    "public_targeted_passed": 182,
+    "public_targeted_scope": "8 explicit placement/budget/preflight/runner/queue/viewer/Markdown modules; not full public suite",
+    "verified_at_utc": "2026-10-12T04:53:46.700416+00:00"
   },
   "data": {
     "dataset_kind": "legacy_consensus_val_200",
@@ -950,7 +950,7 @@
       "total_tokens": 506985
     }
   },
-  "verified_at_utc": "2026-10-12T04:33:09.746232+00:00",
+  "verified_at_utc": "2026-10-12T04:53:46.700416+00:00",
   "refinement": {
     "status": "superseded_by_codex_verifier_protocol",
     "plan": "REFINEMENT_PLAN.md",
@@ -1146,22 +1146,19 @@
     "reviewed_at_utc": "2026-10-11T05:47:14.369622+00:00"
   },
   "current_change_tests": {
-    "verified_at_utc": "2026-10-12T04:26:23.229776+00:00",
-    "full_private_executed": 254,
-    "full_private_passed": 254,
-    "public_targeted_tests": 131,
-    "public_targeted_passed": 131,
+    "verified_at_utc": "2026-10-12T04:53:46.700416+00:00",
+    "full_private_executed": 305,
+    "full_private_passed": 305,
+    "placement_prepare_tests": 51,
+    "placement_prepare_passed": 51,
+    "existing_gate_scenarios_through_placement_api": 41,
+    "placement_specific_new_scenarios": 10,
+    "independent_placement_code_audit": "passed",
+    "existing_default_payload_builder_changed": false,
+    "existing_low_control_gate_changed": false,
     "public_full_suite_executed": false,
-    "narrow_budget_synthetic_tests": 22,
-    "narrow_budget_synthetic_passed": 22,
-    "budget_payload_git_free_tests": 3,
-    "budget_payload_git_free_passed": 3,
-    "budget_preflight_tests": 41,
-    "independent_budget_code_audit": "passed",
-    "independent_public_safe_diff_audit": "passed",
-    "original_default_2048_request_bytes_preserved": true,
-    "original_low_control_gate_changed": false,
-    "known_same_uid_initial_inode_capture_race_limit": true
+    "public_targeted_executed": 182,
+    "public_targeted_passed": 182
   },
   "historical_test_snapshot": {
     "healthbench_synthetic_tests": 112,
@@ -1197,8 +1194,8 @@
     "unresolved_judgments_block_adoption": true,
     "stop_same_hypothesis_after_two_no_improvement_candidates": true,
     "completed_work_commit_and_push": true,
-    "next_hypothesis": "No unchanged medium4096 recall; inspect new development evidence and prepare a distinct hypothesis with comparable pinned control before further calls",
-    "next_experiment_status": "requires_new_development_evidence_and_single_variable_plan",
+    "next_hypothesis": "At medium2048, relocate unchanged frozen instruction block from last user suffix to leading system message; preserve original history and cached17+3control",
+    "next_experiment_status": "placement_preflight_verified_generation_support_required",
     "previous_prompt_loop_result_preserved": "two_candidates_not_adopted",
     "latest_run_started_at_utc": "2026-10-12T04:19:41+00:00",
     "latest_run_finished_at_utc": "2026-10-12T04:23:34+00:00",
@@ -1219,7 +1216,10 @@
     },
     "same_adjudication_repeat_requires_new_evidence": true,
     "automation_prompt_updated_after_followup": true,
-    "automation_prompt_updated_after_budget_review": true
+    "automation_prompt_updated_after_budget_review": true,
+    "latest_followup_status": "prepared_not_generated",
+    "new_generation_calls_in_latest_followup": 0,
+    "new_model_metadata_calls_in_latest_followup": 0
   },
   "reasoning_effort_cycle": {
     "phase": "reasoning_effort_low_vs_medium",
@@ -1563,5 +1563,80 @@
     "same_candidate_reinvoke": false,
     "hypothesis_tested_candidate_count": 1,
     "completion_tokens_reasoning_and_final_not_separated": true
+  },
+  "tests_before_placement_preflight": {
+    "scope": "Current private full regression and public disjoint placement/budget/runner/queue/viewer modules",
+    "total_tests": 305,
+    "executed_tests": 305,
+    "passed_tests": 305,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "public_targeted_executed": null,
+    "public_targeted_passed": null,
+    "public_targeted_scope": "new placement module to be verified in public checkout",
+    "verified_at_utc": "2026-10-12T04:53:46.700416+00:00"
+  },
+  "change_tests_before_placement_preflight": {
+    "verified_at_utc": "2026-10-12T04:26:23.229776+00:00",
+    "full_private_executed": 254,
+    "full_private_passed": 254,
+    "public_targeted_tests": 131,
+    "public_targeted_passed": 131,
+    "public_full_suite_executed": false,
+    "narrow_budget_synthetic_tests": 22,
+    "narrow_budget_synthetic_passed": 22,
+    "budget_payload_git_free_tests": 3,
+    "budget_payload_git_free_passed": 3,
+    "budget_preflight_tests": 41,
+    "independent_budget_code_audit": "passed",
+    "independent_public_safe_diff_audit": "passed",
+    "original_default_2048_request_bytes_preserved": true,
+    "original_low_control_gate_changed": false,
+    "known_same_uid_initial_inode_capture_race_limit": true
+  },
+  "instruction_placement_preflight": {
+    "status": "prepared_not_generated",
+    "scope": "development20 only",
+    "factor": "instruction placement package",
+    "components_changed_together": [
+      "role",
+      "message_boundary",
+      "position"
+    ],
+    "instruction_wording_and_exact_block_bytes_identical": true,
+    "original_message_roles_contents_order_preserved": true,
+    "control_request_and_inverse_hashes_match": true,
+    "changed_top_level_request_fields": [
+      "messages"
+    ],
+    "reasoning_effort": "medium",
+    "temperature": 0,
+    "control_max_tokens": 2048,
+    "treatment_max_tokens": 2048,
+    "model_metadata_source": "pinned source only; current runtime not queried",
+    "control_original_status": "partial",
+    "control_status_counts": {
+      "completed": 17,
+      "failed": 3
+    },
+    "source_arm_name_preserved": true,
+    "development_cases": 20,
+    "generation_calls": 0,
+    "model_metadata_calls": 0,
+    "holdout_generation_calls": 0,
+    "holdout_feedback_used_for_tuning": false,
+    "source_pins_unchanged": true,
+    "prepared_output_has_no_questions_answers_or_rubrics": true,
+    "priority_only_effect_isolated": false,
+    "mechanism_proven": false,
+    "quality_improvement": null,
+    "adopted": false,
+    "execution_support": {
+      "ready": false,
+      "status": "NOT_READY",
+      "reason": "role-aware actual generation runner is absent"
+    },
+    "earlier_budget_review_and_scores_unchanged": true,
+    "official": false
   }
 }
