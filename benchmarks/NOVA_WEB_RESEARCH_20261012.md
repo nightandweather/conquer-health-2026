@@ -38,3 +38,7 @@ Sequential Diagnosis with Language Models v2의 §3.2·§4는 감별 가설 유�
 정답·샘플 대본·숨은 평가 피드백으로 환자 사실을 보충하지 않는다. 이 문서는 연구 결과이며 변경 구현, 새 제출 또는 임상 개선 판정이 아니다.
 
 검토한 소스: `submission_candidates/20261012-review-memory-guidelines-sdk101/run.py`의 RECORD_PROMPT(51–63), 종료 힌트(397–403), transcript 저장(455–473), 기록 작성(498–516). SHA-256: `6bb27da593be842f993ab819bf1519af28d226f02eb102b1990d72f4de0d1b1e`.
+
+## 조사 이후 실행 기록
+
+연구 시점의 위 가설·무실행 기록은 보존한다. 이후 E04에서 최종 기록 지시 묶음을 구현·검증·독립 감사하고 20:05KST에 샘플 한 번으로 접수했다. 치료·처치 계획의 근거와 미확인 복약·알레르기 보존을 추가로 명시했다. 첫 상태는 평가 대기이며 개선 판정은 없다. [E04 변경·검증](NOVA_RECORD_CONTRACT_PROTOTYPE.md) · [실험표](NOVA_SAMPLE_EXPERIMENTS.json)
