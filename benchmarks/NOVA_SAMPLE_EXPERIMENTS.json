@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_utc": "2026-10-12T09:52:39.583048+00:00",
+  "updated_at_utc": "2026-10-12T10:12:42.432017+00:00",
   "sample_scores_are_not_official": true,
   "clinical_improvement_verified": false,
   "experiments": [
@@ -92,7 +92,18 @@
         "created_index_files": 0,
         "generic_query_matches_e02": 15
       },
-      "submitted_at_kst": "2026-10-12 18:50"
+      "submitted_at_kst": "2026-10-12 18:50",
+      "completed_cases": 1,
+      "expected_cases": 3,
+      "case_results": [
+        {
+          "case_id": "C01",
+          "status": "normal",
+          "turns": 30,
+          "seconds": 974
+        }
+      ],
+      "whole_evaluation_complete": false
     }
   ],
   "comparison_limit": "E01 has no score. E03 versus E00 changes review and retrieval together; E03 versus E02 repairs storage only but E02 never reached dialogue. Reused public samples and unconfirmed server digest do not establish independent clinical improvement."
