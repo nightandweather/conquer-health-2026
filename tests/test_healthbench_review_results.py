@@ -79,7 +79,7 @@ class ReviewResultTests(unittest.TestCase):
         return export_reviews(self.data, self.answers, self.manifest, self.review, shards or [self.shard])
 
     def outputs(self):
-        paths = [self.review / 'judgments.jsonl', self.review / 'score_summary.json',
+        paths = [self.review / 'judgments.jsonl', self.review / 'score_summary.json', self.review / 'score_bounds.json',
                  self.review / 'review_export.json', self.run / 'assessments.json']
         return {str(path): (path.read_bytes(), path.stat().st_mtime_ns) for path in paths if path.exists()}
 
@@ -192,6 +192,43 @@ class ReviewResultTests(unittest.TestCase):
         for path in self.outputs():
             self.assertEqual(stat.S_IMODE(Path(path).stat().st_mode), 0o600)
         self.assertEqual(stat.S_IMODE(self.review.stat().st_mode), 0o700)
+
+    def test_known_failure_keeps_zero_utility_separate_from_rubric_labels(self):
+        self.rows[0].update(status='failed', answer='', selected_attempt=1,
+                            error={'code': 'empty_answer'},
+                            attempts=[{'number': 1, 'status': 'failed', 'answer': '',
+                                       'error': {'code': 'empty_answer'}}])
+        self.write_answers(self.rows)
+        self.manifest_value.update(status='partial', finished_at='2026-01-01T00:00:00Z')
+        self.manifest.write_text(json.dumps(self.manifest_value))
+        self.review = self.run / 'failure-review'
+        self.shard = self.review / 'supplied.json'
+        create_review_packets(self.data, self.answers, self.manifest, self.review,
+                              include_known_inference_failures=True)
+        self.shard_value = self.make_shard()
+        private = json.loads((self.review / 'private_manifest.json').read_text())
+        for packet in self.shard_value['packets']:
+            entry = private['packets'][packet['packet_id']]
+            if entry['prompt_id'] == 'p0':
+                label = next(label for label, arm in entry['candidate_map'].items() if arm == 'raw_default')
+                for judgment in packet['candidates'][label]['judgments']:
+                    judgment['criteria_met'] = None
+        self.write_shard()
+        report = self.export()
+        self.assertEqual(report['boolean_judgment_count'], 6)
+        self.assertEqual(report['unresolved_judgment_count'], 0)
+        self.assertEqual(report['skipped_failure_rubric_count'], 2)
+        self.assertEqual(report['known_inference_failure_count'], 1)
+        summary = json.loads((self.review / 'score_summary.json').read_text())
+        self.assertEqual(summary['arms']['raw_default']['score_percent'], 30)
+        assessment = next(row for row in json.loads((self.run / 'assessments.json').read_text())['answers']
+                          if row['arm'] == 'raw_default' and row['prompt_id'] == 'p0')
+        self.assertEqual(assessment['score'], 0)
+        self.assertEqual(assessment['quality_status'], 'inference_failure')
+        visible = visible_assessment(assessment, self.rows[0])
+        self.assertEqual(visible['status'], 'reviewed')
+        self.assertEqual(visible['score'], 0)
+        self.assertIn('생성 실패', visible['note'])
 
     def test_null_is_omitted_not_false_and_blocks_aggregate(self):
         self.shard_value['packets'][0]['candidates']['A']['judgments'][0]['criteria_met'] = None

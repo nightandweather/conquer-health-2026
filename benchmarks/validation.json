@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "verified_date": "2026-10-11",
-  "state": "codex_cycle2_generated_independent_review_in_progress",
+  "verified_date": "2026-10-12",
+  "state": "stopped_no_confirmed_quality_improvement",
   "tests": {
     "healthbench_synthetic_tests": 112,
     "local_viewer_tests": 13,
@@ -135,7 +135,7 @@
     "zip_bytes": 7275,
     "sha256": "f8c95613f13572d3ff1fb7142aec4550829053ef5f4f85260aafb60f98c5505e"
   },
-  "notice": "Frozen 200-case generation finalized partial: 343 completed, 56 truncated, 1 failed. Codex reviewed 80 answers; the full quality score remains incomplete. Candidate improvement remains unmeasured.",
+  "notice": "Original 200-case generation remains partial (343 completed, 56 truncated, 1 failed). Remaining original-answer review in progress. Two dev20 candidates generated and independently reviewed; neither adopted; accuracy gain unconfirmed.",
   "viewer": {
     "status": "implemented_and_browser_opened",
     "host": "127.0.0.1",
@@ -151,7 +151,20 @@
     "markdown_read_mode": true,
     "maximum_cases": 200,
     "grade_display": "Only reviews matching exact answer hash; pending answers have no score",
-    "visual_verification": "Previous plaintext UI opened; current Markdown renderer checked offline; browser refresh pending"
+    "visual_verification": "Previous plaintext UI opened; current Markdown renderer checked offline; browser refresh pending",
+    "latest_development_comparison": {
+      "url": "http://127.0.0.1:8769/",
+      "read_only": true,
+      "arms": [
+        "grounded_call",
+        "codex_guided_v4"
+      ],
+      "record_count": 40,
+      "assessment_count": 40,
+      "numeric_score_count": 33,
+      "pending_score_count": 7,
+      "visual_verification": "Browser inspected: real arm names, source statuses, Markdown content and exact-answer-hash assessments."
+    }
   },
   "latest_comparison": {
     "status": "completed",
@@ -283,7 +296,12 @@
       "holdout_feedback_not_used_for_prompt_changes": true,
       "packets_ready": 199,
       "packets_pending": 1,
-      "review_snapshot_refreshed_at_utc": "2026-10-11T20:58:27.566231+00:00"
+      "review_snapshot_refreshed_at_utc": "2026-10-11T20:58:27.566231+00:00",
+      "remaining_review_status": "in_progress_three_independent_blinded_reviewers",
+      "final_review_packets_ready": 200,
+      "existing_packets_byte_identical": 199,
+      "known_failure_policy": "Explicit finalized-run option; recorded failure utility zero; no fabricated medical rubric judgments",
+      "uncertainty_reporting": "Possible weighted score bounds, distinct from measured score and confidence interval"
     },
     "finished_at": "2026-10-11T06:12:48+00:00",
     "seconds": 4389.593,
@@ -293,7 +311,7 @@
       "total_tokens": 506985
     }
   },
-  "verified_at_utc": "2026-10-12T01:22:30+00:00",
+  "verified_at_utc": "2026-10-12T01:47:59.745613+00:00",
   "refinement": {
     "status": "superseded_by_codex_verifier_protocol",
     "plan": "REFINEMENT_PLAN.md",
@@ -317,7 +335,7 @@
     "role": "optional auxiliary experiment; never the independent quality judge"
   },
   "codex_verifier_cycle": {
-    "status": "round_02_awaiting_independent_codex_review",
+    "status": "stopped_no_confirmed_quality_improvement",
     "plan": "CODEX_VERIFIER.md",
     "instructions_path": "prompts/codex_guided_v3.txt",
     "instructions_byte_sha256": "3472f102e2e6fa2fa980d9714cb5af48a9682054017a6ad090770eedbaad4470",
@@ -332,7 +350,7 @@
     "development_only": true,
     "holdout_used_for_instruction_changes": false,
     "score": null,
-    "score_status": "independent_codex_review_required",
+    "score_status": "independent_review_completed_no_candidate_adopted",
     "judge": "Codex checks original context, rubric coverage and primary evidence; gpt-oss only generates candidates",
     "codex_judge_api_implemented": false,
     "previous_queue_status": "blocked",
@@ -441,8 +459,30 @@
         }
       },
       "score": null,
-      "score_status": "independent_codex_review_required"
-    }
+      "score_status": "incomplete",
+      "reviewed_answers": 40,
+      "boolean_judgments": 78,
+      "unresolved_judgments": 8,
+      "adopted": false,
+      "complete_pair_diagnostic": {
+        "count": 15,
+        "candidate_wins": 2,
+        "candidate_losses": 1,
+        "ties": 12,
+        "score_percent": {
+          "grounded_call": 43.333333333333336,
+          "codex_guided_v4": 46.666666666666664
+        },
+        "excluded_due_to_unresolved_review": 5,
+        "notice": "Incomplete paired diagnostic; not a full-20 quality conclusion."
+      },
+      "control_review_variation_case_count": 3
+    },
+    "adopted_candidate": null,
+    "candidate_versions_tested": 2,
+    "blinded_assessment_instances": 80,
+    "consecutive_no_confirmed_quality_improvement": 2,
+    "holdout_new_candidate_calls": 0
   },
   "nova_dialogue_codex_review": {
     "status": "qualitative_review_completed",
@@ -467,16 +507,16 @@
     "reviewed_at_utc": "2026-10-11T05:47:14.369622+00:00"
   },
   "current_change_tests": {
-    "verified_at_utc": "2026-10-11T21:00:49+00:00",
-    "targeted_tests": 33,
-    "targeted_passed": 33,
-    "full_private_executed": 163,
-    "full_private_passed": 163,
+    "verified_at_utc": "2026-10-12T01:47:59.745613+00:00",
+    "targeted_tests": 42,
+    "targeted_passed": 42,
+    "full_private_executed": 172,
+    "full_private_passed": 172,
     "full_private_permission_blocked": 0,
     "blocked_test": null,
     "all_network_checks_passed": false,
-    "public_targeted_tests": 33,
-    "public_targeted_passed": 33,
+    "public_targeted_tests": 42,
+    "public_targeted_passed": 42,
     "independent_source_pinning_review": "passed",
     "viewer_final_targeted_tests": 19,
     "viewer_final_targeted_passed": 19,

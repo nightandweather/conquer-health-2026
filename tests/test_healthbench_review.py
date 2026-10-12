@@ -108,6 +108,58 @@ class HealthBenchReviewTests(unittest.TestCase):
                               paired_arms=("raw_default", "grounded_call"))
         self.assertEqual(self.snapshot(), before)
 
+    def test_recorded_failure_requires_finalized_explicit_policy(self):
+        failed = dict(self.rows[0], status='failed', answer='', selected_attempt=1,
+                      error={'code': 'empty_answer'},
+                      attempts=[{'number': 1, 'status': 'failed', 'answer': '',
+                                 'error': {'code': 'empty_answer'}}])
+        self.rows[0] = failed
+        self.write_answers(self.rows)
+        self.run_packets()
+        self.assertEqual(len(self.private()['packets']), 4)
+        original = self.snapshot()
+        self.out = self.root / 'results' / 'finalized-review'
+        with self.assertRaisesRegex(ValueError, 'finalized'):
+            create_review_packets(self.data, self.answers, self.manifest, self.out,
+                                  include_known_inference_failures=True)
+        self.manifest_value.update(status='partial', finished_at='2026-01-01T00:00:00Z')
+        self.manifest.write_text(json.dumps(self.manifest_value))
+        create_review_packets(self.data, self.answers, self.manifest, self.out,
+                              include_known_inference_failures=True)
+        self.assertEqual(len(self.private()['packets']), 5)
+        self.assertIs(self.private()['include_known_inference_failures'], True)
+        for name, raw in original.items():
+            if name.startswith('packets/'):
+                self.assertEqual(self.snapshot()[name], raw)
+
+    def test_failure_policy_rejects_unrecorded_or_mismatched_attempt(self):
+        self.manifest_value.update(status='partial', finished_at='2026-01-01T00:00:00Z')
+        self.manifest.write_text(json.dumps(self.manifest_value))
+        base = dict(self.rows[0], status='failed', answer='', selected_attempt=1,
+                    error={'code': 'empty_answer'},
+                    attempts=[{'number': 1, 'status': 'failed', 'answer': '',
+                               'error': {'code': 'empty_answer'}}])
+        variants = [dict(base, attempts=[]), dict(base, selected_attempt=0),
+                    dict(base, selected_attempt=True), dict(base, error=None),
+                    dict(base, attempts=[dict(base['attempts'][0], number=True)]),
+                    dict(base, attempts=[dict(base['attempts'][0], answer='different')]),
+                    dict(base, attempts=[dict(base['attempts'][0], status='completed')])]
+        for index, row in enumerate(variants):
+            with self.subTest(index=index):
+                self.write_answers([row, *self.rows[1:]])
+                out = self.root / 'results' / f'invalid-{index}'
+                with self.assertRaisesRegex(ValueError, 'failure'):
+                    create_review_packets(self.data, self.answers, self.manifest, out,
+                                          include_known_inference_failures=True)
+
+    def test_failure_policy_does_not_package_missing_or_blocked_answers(self):
+        self.manifest_value.update(status='partial', finished_at='2026-01-01T00:00:00Z')
+        self.manifest.write_text(json.dumps(self.manifest_value))
+        self.write_answers([dict(self.rows[0], status='blocked', answer=''), *self.rows[2:]])
+        create_review_packets(self.data, self.answers, self.manifest, self.out,
+                              include_known_inference_failures=True)
+        self.assertEqual(len(self.private()['packets']), 4)
+
     def test_custom_pair_preserves_original_names_and_requested_order(self):
         pair = self.custom_pair()
         create_review_packets(self.data, self.answers, self.manifest, self.out, paired_arms=pair)

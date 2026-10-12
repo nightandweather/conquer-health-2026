@@ -6,8 +6,10 @@ Run from the repository root::
         --answers results/run/answers.jsonl --manifest results/run/manifest.json \
         --out results/run/review
 
-Only nonempty completed/truncated raw_default and grounded_call pairs become
-packets. The original prompt and rubric criteria belong in private packets;
+By default only nonempty completed/truncated pairs become packets. An explicit
+finalized-run option also includes recorded inference failures for coverage,
+without treating their empty answers as rubric judgments. The original prompt
+and rubric criteria belong in private packets;
 arm identities and inference metrics do not. Keep the private_manifest.json
 mapping away from reviewers. Repeating the command adds newly completed pairs
 and refuses changes to previously packaged content. No score is produced.
@@ -35,6 +37,33 @@ ROOT = Path(__file__).resolve().parents[1]
 PAIRED_ARMS = ("raw_default", "grounded_call")
 REVIEWABLE = {"completed", "truncated"}
 REVIEWER_COUNT = 4
+
+
+def _reviewable_row(row: dict | None, include_known_inference_failures: bool = False) -> bool:
+    if row is None or not isinstance(row.get("answer"), str):
+        return False
+    if row.get("status") in REVIEWABLE:
+        return bool(row["answer"].strip())
+    if not include_known_inference_failures or row.get("status") != "failed":
+        return False
+    attempts, selected, error = row.get("attempts"), row.get("selected_attempt"), row.get("error")
+    if (not isinstance(attempts, list) or not attempts or type(selected) is not int or selected < 1
+            or not isinstance(error, dict) or not isinstance(error.get("code"), str) or not error["code"]):
+        raise ValueError("Known inference failure requires recorded final-attempt evidence")
+    matches = [attempt for attempt in attempts if isinstance(attempt, dict)
+               and type(attempt.get("number")) is int and attempt["number"] == selected]
+    if (len(matches) != 1 or matches[0].get("status") != "failed"
+            or matches[0].get("answer") != row["answer"] or matches[0].get("error") != error):
+        raise ValueError("Known inference failure disagrees with its selected attempt")
+    return True
+
+
+def _failure_review_policy(manifest: dict, enabled: bool) -> None:
+    if type(enabled) is not bool:
+        raise ValueError("include_known_inference_failures must be a boolean")
+    if enabled and (manifest.get("status") not in {"completed", "partial"}
+                    or not isinstance(manifest.get("finished_at"), str) or not manifest["finished_at"]):
+        raise ValueError("Known failure review requires a finalized generation manifest")
 
 
 def _json_object(raw: bytes, label: str) -> dict:
@@ -178,7 +207,8 @@ def _packet(item: dict, rows: dict, dataset_sha256: str, reviewer_index: int,
 
 
 def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path,
-                          *, paired_arms: tuple[str, str] = PAIRED_ARMS) -> dict:
+                          *, paired_arms: tuple[str, str] = PAIRED_ARMS,
+                          include_known_inference_failures: bool = False) -> dict:
     """Validate a generation snapshot, then append immutable blinded packets.
 
     Validation of every input and existing packet completes before any output
@@ -192,6 +222,7 @@ def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path,
     _data_index(items)  # Validate finite signed points and positive denominators.
     data_rows = {item["prompt_id"]: item for item in items}
     manifest_value = _json_object(Path(manifest).read_bytes(), "manifest")
+    _failure_review_policy(manifest_value, include_known_inference_failures)
     snapshot = Path(answers).read_bytes()
     snapshot_sha = hashlib.sha256(snapshot).hexdigest()
     rows = _answer_rows(snapshot)
@@ -232,6 +263,8 @@ def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path,
                          "reviewer_assignment": "sorted original manifest index modulo 4", "packets": {}}
     if paired_arms != PAIRED_ARMS:
         expected_manifest["paired_arms"] = list(paired_arms)
+    if include_known_inference_failures:
+        expected_manifest["include_known_inference_failures"] = True
     previous = _read_existing(out / "private_manifest.json")
     if previous is not None:
         if _paired_arms(previous.get("paired_arms", PAIRED_ARMS)) != paired_arms:
@@ -257,7 +290,7 @@ def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path,
             else:
                 text = row.get("answer")
                 nonempty = isinstance(text, str) and bool(text.strip())
-                if row["status"] not in REVIEWABLE or not nonempty:
+                if not _reviewable_row(row, include_known_inference_failures):
                     unavailable.append({"arm": arm, "reason": "empty_answer" if not nonempty
                                         else "status_not_reviewable", "status": row["status"]})
         if unavailable:
@@ -322,12 +355,15 @@ def main(argv=None) -> int:
     for option in ("data", "answers", "manifest", "out"):
         parser.add_argument("--" + option, type=Path, required=True)
     parser.add_argument("--paired-arms", help="Explicit ordered comma-separated pair of original arm names")
+    parser.add_argument("--include-known-inference-failures", action="store_true",
+                        help="Finalized runs only: preserve failed answers with matching recorded attempt evidence")
     args = parser.parse_args(argv)
     try:
         paired_arms = PAIRED_ARMS if args.paired_arms is None else tuple(
             name.strip() for name in args.paired_arms.split(","))
         progress = create_review_packets(args.data, args.answers, args.manifest, args.out,
-                                         paired_arms=paired_arms)
+                                         paired_arms=paired_arms,
+                                         include_known_inference_failures=args.include_known_inference_failures)
     except (ValueError, OSError) as exc:
         parser.error(str(exc))
     print(f"Review packets: {progress['ready_packet_count']}/{progress['selected_count']} ready; "

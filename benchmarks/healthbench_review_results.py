@@ -19,6 +19,7 @@ import tempfile
 from .healthbench import canonical_hash, load_dataset
 from . import healthbench_review as packets
 from .healthbench_score import _answer_index, _data_index, _manifest_selection, build_summary
+from .healthbench_score_bounds import build_score_bounds
 
 
 def _json(raw: bytes, label: str) -> dict:
@@ -135,6 +136,8 @@ def export_reviews(data: Path, answers: Path, manifest: Path, review_dir: Path,
     manifest_value = _json(manifest_raw, 'generation manifest')
     private_raw = _read(review_dir / 'private_manifest.json')
     private = _json(private_raw, 'private manifest')
+    include_failures = private.get('include_known_inference_failures', False)
+    packets._failure_review_policy(manifest_value, include_failures)
     paired_arms = packets._paired_arms(private.get('paired_arms', packets.PAIRED_ARMS))
     snapshot = _read(Path(answers))  # One immutable snapshot; never reread during export.
     rows = [_json(line.encode('utf-8'), f'answer line {number}')
@@ -166,6 +169,8 @@ def export_reviews(data: Path, answers: Path, manifest: Path, review_dir: Path,
                         'dataset_sha256': dataset['sha256'], 'generation_scope_sha256': canonical_hash(scope),
                         'selected_prompt_ids': selected, 'reviewer_count': packets.REVIEWER_COUNT,
                         'reviewer_assignment': 'sorted original manifest index modulo 4'}
+    if include_failures:
+        expected_private['include_known_inference_failures'] = True
     if any(private.get(key) != value for key, value in expected_private.items()):
         raise ValueError('Private manifest generation identity changed')
     entries = private.get('packets')
@@ -183,8 +188,7 @@ def export_reviews(data: Path, answers: Path, manifest: Path, review_dir: Path,
             raise ValueError('Private packet selects an unknown prompt')
         for arm in paired_arms:
             row = row_index.get((arm, prompt_id))
-            if (row is None or row['status'] not in packets.REVIEWABLE
-                    or not isinstance(row.get('answer'), str) or not row['answer'].strip()):
+            if not packets._reviewable_row(row, include_failures):
                 raise ValueError('Previously packaged answer is missing or no longer reviewable')
         expected_packet, expected_entry = packets._packet(
             data_rows[prompt_id], row_index, dataset['sha256'], selected.index(prompt_id) % packets.REVIEWER_COUNT,
@@ -233,6 +237,7 @@ def export_reviews(data: Path, answers: Path, manifest: Path, review_dir: Path,
             reviewed[packet_id] = deepcopy(review)
 
     judgments, assessments, unresolved = [], [], 0
+    failure_count, skipped_failure_rubrics = 0, 0
     for packet_id, review in sorted(reviewed.items()):
         entry = entries[packet_id]
         prompt_id = entry['prompt_id']
@@ -241,7 +246,16 @@ def export_reviews(data: Path, answers: Path, manifest: Path, review_dir: Path,
             arm = entry['candidate_map'][label]  # Unblind only after shard validation.
             row = row_index[(arm, prompt_id)]
             answer_sha = canonical_hash(row['answer'])
+            known_failure = answer_kinds[(arm, prompt_id)]['kind'] == 'known_inference_failure'
+            if known_failure:
+                failure_count += 1
+                skipped_failure_rubrics += len(candidate['judgments'])
             for judgment in sorted(candidate['judgments'], key=lambda item: item['rubric_index']):
+                # Failure utility is already zero under the declared scorer.
+                # Retain labels in the supplied shard, never fabricate clinical
+                # criterion judgments for an absent/failed completion.
+                if known_failure:
+                    continue
                 if judgment['criteria_met'] is None:
                     unresolved += 1
                     continue
@@ -254,16 +268,20 @@ def export_reviews(data: Path, answers: Path, manifest: Path, review_dir: Path,
             uncertain = any(item['criteria_met'] is None for item in candidate['judgments'])
             # The running viewer permits a numeric score only for reviewed.
             # This status means complete rubric grading, never clinical approval.
-            status = 'uncertain' if uncertain else 'reviewed'
-            quality_status = 'uncertain' if uncertain else 'needs_review' if candidate['flags'] else 'no_flags_recorded'
+            status = 'reviewed' if known_failure else 'uncertain' if uncertain else 'reviewed'
+            quality_status = ('inference_failure' if known_failure else 'uncertain' if uncertain
+                              else 'needs_review' if candidate['flags'] else 'no_flags_recorded')
             note = candidate['note'] or '; '.join(flag['category'] + ': ' + flag['explanation']
                                                  for flag in candidate['flags'])
             if candidate['flags']:
                 note = '추가 검토 필요: ' + note
+            if known_failure:
+                note = '생성 실패: 사전 정의한 실패 점수 0 적용. 의학적 기준 판정은 생략. ' + note
             assessments.append({'prompt_id': prompt_id, 'arm': arm, 'answer_sha256': answer_sha,
                                 'status': status, 'quality_status': quality_status,
                                 'score': None, 'note': note[:500]})
     summary = build_summary(items, rows, judgments, manifest_value)
+    bounds = build_score_bounds(items, rows, judgments, manifest_value)
     for assessment in assessments:
         case = next(case for case in summary['arms'][assessment['arm']]['cases']
                     if case['prompt_id'] == assessment['prompt_id'])
@@ -273,16 +291,20 @@ def export_reviews(data: Path, answers: Path, manifest: Path, review_dir: Path,
                   'answers_snapshot_sha256': _sha(snapshot), 'generation_manifest_byte_sha256': _sha(manifest_raw),
                   'private_manifest_byte_sha256': _sha(private_raw), 'shards': shard_sources}
     summary['review_provenance'] = provenance
+    bounds['review_provenance'] = provenance
     assessment_output = {'schema_version': 1, 'answers': assessments, 'review_provenance': provenance}
     report = {'schema_version': 1, 'status': summary['status'], 'reviewed_packet_count': len(reviewed),
               'assessment_count': len(assessments), 'boolean_judgment_count': len(judgments),
               'unresolved_judgment_count': unresolved, 'selected_count': len(selected),
+              'known_inference_failure_count': failure_count,
+              'skipped_failure_rubric_count': skipped_failure_rubrics,
               'review_provenance': provenance}
     def encoded(value):
         return (json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False) + '\n').encode('utf-8')
     outputs = {review_dir / 'judgments.jsonl': ''.join(json.dumps(row, ensure_ascii=False, sort_keys=True,
                                                                allow_nan=False) + '\n' for row in judgments).encode('utf-8'),
                review_dir / 'score_summary.json': encoded(summary),
+               review_dir / 'score_bounds.json': encoded(bounds),
                review_dir / 'review_export.json': encoded(report),
                run_dir / 'assessments.json': encoded(assessment_output)}
     for path in outputs:
