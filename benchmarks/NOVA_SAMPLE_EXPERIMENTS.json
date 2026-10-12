@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_utc": "2026-10-12T11:33:44.321589+00:00",
+  "updated_at_utc": "2026-10-12T11:44:56.495989+00:00",
   "sample_scores_are_not_official": true,
   "clinical_improvement_verified": false,
   "experiments": [
@@ -142,11 +142,18 @@
       "id": "E04",
       "recipe": "E03 final RECORD_PROMPT instruction bundle: grounded tests/treatment/follow-up/disposition and performed-versus-planned education",
       "control": "E03",
-      "status": "evaluating",
-      "score": null,
-      "areas": null,
+      "status": "completed",
+      "score": 41.079,
+      "areas": {
+        "information": 6.55,
+        "reasoning": 6.39,
+        "tests_followup": 0.0,
+        "safety": 7.5,
+        "communication": 1.83,
+        "efficiency": 18.8
+      },
       "expected_cases": 3,
-      "completed_cases": 2,
+      "completed_cases": 3,
       "case_results": [
         {
           "case_id": "C01",
@@ -159,6 +166,12 @@
           "status": "normal",
           "turns": 30,
           "seconds": 710
+        },
+        {
+          "case_id": "C03",
+          "status": "normal",
+          "turns": 30,
+          "seconds": 682
         }
       ],
       "server_model_calls": null,
@@ -169,8 +182,8 @@
       "url": "https://nova.snubhai.org/submissions/b08031cc-2785-42a6-929f-64859b0e0ca5/",
       "submitted_at_kst": "2026-10-12 20:05",
       "server_file_sha_matches_local": true,
-      "server_file_status": "building_validating",
-      "whole_evaluation_complete": false,
+      "server_file_status": "validated",
+      "whole_evaluation_complete": true,
       "local_validation": {
         "new_synthetic_tests": 17,
         "private_full_tests": 547,
@@ -188,38 +201,88 @@
       "official_submission_count": 0,
       "last_observed_at_utc": null,
       "last_observation_window_utc": [
-        "2026-10-12T11:32:33Z",
-        "2026-10-12T11:33:00Z"
-      ]
+        "2026-10-12T11:42:40Z",
+        "2026-10-12T11:43:19Z"
+      ],
+      "normal_cases": 3,
+      "case_count": 3,
+      "case_turns": [
+        23,
+        30,
+        30
+      ],
+      "case_seconds": [
+        583,
+        710,
+        682
+      ],
+      "completion_observation_window_utc": [
+        "2026-10-12T11:42:40Z",
+        "2026-10-12T11:43:19Z"
+      ],
+      "adopted_as_verified_improvement": false
     }
   ],
   "comparison_limit": "E01 has no score. E03 versus E00 changes review and retrieval together; E03 versus E02 repairs storage only but E02 never reached dialogue. Reused public samples and unconfirmed server digest do not establish independent clinical improvement.",
   "latest_comparison": {
-    "control": "E00",
-    "candidate": "E03",
-    "total_score_delta": 0.304,
+    "control": "E03",
+    "candidate": "E04",
+    "total_score_delta": -1.404,
     "displayed_area_deltas": {
-      "information": 0.54,
-      "reasoning": 1.95,
-      "tests_followup": -0.25,
-      "safety": 0.0,
-      "communication": -0.56,
-      "efficiency": -1.38
+      "information": 0.8,
+      "reasoning": -2.78,
+      "tests_followup": -0.69,
+      "safety": 1.25,
+      "communication": -0.17,
+      "efficiency": 0.18
     },
-    "displayed_case_seconds_sum_control": 1620,
-    "displayed_case_seconds_sum_candidate": 2757,
-    "displayed_case_seconds_increase": 1137,
-    "displayed_case_seconds_change_percent": 70.18518518518519,
+    "displayed_case_seconds_sum_control": 2757,
+    "displayed_case_seconds_sum_candidate": 1975,
+    "displayed_case_seconds_change": -782,
+    "displayed_case_seconds_change_percent": -28.36416394631846,
     "case_seconds_are_not_whole_job_elapsed": true,
-    "quality_conclusion": "mixed_sample_result_overall_clinical_improvement_unverified",
+    "quality_conclusion": "lower_total_mixed_sample_result_no_verified_quality_improvement",
     "adopted_as_verified_improvement": false,
+    "baseline_E00_total_score_delta": -1.1,
     "limits": [
-      "Same three reused public samples",
-      "E01 score unavailable so review and retrieval effects not isolated",
-      "Server model digest not disclosed; matched uploaded ZIP SHA is a separate fact",
-      "Actual dialogue and final note not independently reviewed",
-      "Calls and tokens not disclosed; no attribution of efficiency loss to a specific cost component",
-      "Displayed area scores rounded to 2 decimals; total rounded to 3"
+      "Same three reused public samples, one run per candidate",
+      "E04 changes only final RECORD_PROMPT instruction bundle, not each clause independently",
+      "Final-record-only prompt cannot establish cause of preceding dialogue turn/runtime differences",
+      "Server model digest not disclosed; matching ZIP SHA is separate evidence",
+      "Actual E03/E04 dialogue and final note not independently reviewed",
+      "Calls/tokens not disclosed; efficiency components cannot be attributed",
+      "Displayed areas rounded to 2 decimals and total to 3",
+      "Higher safety score does not establish absence of unsafe errors"
     ]
-  }
+  },
+  "prior_comparisons": [
+    {
+      "control": "E00",
+      "candidate": "E03",
+      "total_score_delta": 0.304,
+      "displayed_area_deltas": {
+        "information": 0.54,
+        "reasoning": 1.95,
+        "tests_followup": -0.25,
+        "safety": 0.0,
+        "communication": -0.56,
+        "efficiency": -1.38
+      },
+      "displayed_case_seconds_sum_control": 1620,
+      "displayed_case_seconds_sum_candidate": 2757,
+      "displayed_case_seconds_increase": 1137,
+      "displayed_case_seconds_change_percent": 70.18518518518519,
+      "case_seconds_are_not_whole_job_elapsed": true,
+      "quality_conclusion": "mixed_sample_result_overall_clinical_improvement_unverified",
+      "adopted_as_verified_improvement": false,
+      "limits": [
+        "Same three reused public samples",
+        "E01 score unavailable so review and retrieval effects not isolated",
+        "Server model digest not disclosed; matched uploaded ZIP SHA is a separate fact",
+        "Actual dialogue and final note not independently reviewed",
+        "Calls and tokens not disclosed; no attribution of efficiency loss to a specific cost component",
+        "Displayed area scores rounded to 2 decimals; total rounded to 3"
+      ]
+    }
+  ]
 }
