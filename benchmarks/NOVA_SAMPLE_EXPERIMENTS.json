@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_utc": "2026-10-12T12:09:52.488139+00:00",
+  "updated_at_utc": "2026-10-12T13:02:06.083495+00:00",
   "sample_scores_are_not_official": true,
   "clinical_improvement_verified": false,
   "experiments": [
@@ -226,9 +226,16 @@
       "id": "E05",
       "recipe": "Frozen E03 with closing explanation hint threshold2to6 only; E04 RECORD prompt not inherited",
       "control": "E03",
-      "status": "sample_in_progress",
-      "score": null,
-      "areas": null,
+      "status": "completed",
+      "score": 39.932,
+      "areas": {
+        "information": 5.2,
+        "reasoning": 8.89,
+        "tests_followup": 0.22,
+        "safety": 3.75,
+        "communication": 3.39,
+        "efficiency": 18.48
+      },
       "server_model_calls": null,
       "server_tokens": null,
       "server_model_digest": null,
@@ -249,6 +256,12 @@
           "status": "normal",
           "turns": 30,
           "seconds": 1096
+        },
+        {
+          "case_id": "C03",
+          "status": "normal",
+          "turns": 30,
+          "seconds": 1055
         }
       ],
       "limitations": [
@@ -271,44 +284,64 @@
       "submitted_at_kst": "2026-10-12 20:59",
       "server_zip_sha256": "a92020b5889fe550c3dfeb9a5ecd9b48ae396079571c43002778d93923c61a2d",
       "server_zip_hash_matches": true,
-      "observed_at_utc": "2026-10-12T12:39:13.278994+00:00",
-      "server_file_status": "building_validating",
-      "completed_cases": 2,
-      "whole_evaluation_complete": false,
-      "case_results_visibility": "Two normal case results shown; last case unobserved; total and area scores not shown",
-      "observation_window_kst": "2026-10-12 21:38-21:39"
+      "observed_at_utc": null,
+      "server_file_status": "validated",
+      "completed_cases": 3,
+      "whole_evaluation_complete": true,
+      "case_results_visibility": "Three normal cases and total/area scores shown",
+      "observation_window_kst": "2026-10-12 21:59–22:00 KST",
+      "normal_cases": 3,
+      "case_count": 3,
+      "expected_cases": 3,
+      "case_turns": [
+        30,
+        30,
+        30
+      ],
+      "case_seconds": [
+        1021,
+        1096,
+        1055
+      ],
+      "completion_observation_window_kst": "2026-10-12 21:59–22:00 KST",
+      "adopted_as_verified_improvement": false,
+      "recorded_at_utc": "2026-10-12T13:02:06.083495+00:00"
     }
   ],
   "comparison_limit": "E01 has no score. E03 versus E00 changes review and retrieval together; E03 versus E02 repairs storage only but E02 never reached dialogue. Reused public samples and unconfirmed server digest do not establish independent clinical improvement.",
   "latest_comparison": {
     "control": "E03",
-    "candidate": "E04",
-    "total_score_delta": -1.404,
+    "candidate": "E05",
+    "total_score_delta": -2.551,
     "displayed_area_deltas": {
-      "information": 0.8,
-      "reasoning": -2.78,
-      "tests_followup": -0.69,
-      "safety": 1.25,
-      "communication": -0.17,
-      "efficiency": 0.18
+      "information": -0.55,
+      "reasoning": -0.28,
+      "tests_followup": -0.47,
+      "safety": -2.5,
+      "communication": 1.39,
+      "efficiency": -0.14
     },
     "displayed_case_seconds_sum_control": 2757,
-    "displayed_case_seconds_sum_candidate": 1975,
-    "displayed_case_seconds_change": -782,
-    "displayed_case_seconds_change_percent": -28.36416394631846,
+    "displayed_case_seconds_sum_candidate": 3172,
+    "displayed_case_seconds_change": 415,
+    "displayed_case_seconds_change_percent": 15.052593398621692,
+    "case_turns_sum_control": 87,
+    "case_turns_sum_candidate": 90,
     "case_seconds_are_not_whole_job_elapsed": true,
-    "quality_conclusion": "lower_total_mixed_sample_result_no_verified_quality_improvement",
+    "quality_conclusion": "lower_total_and_safety_communication_gain_no_verified_quality_improvement",
     "adopted_as_verified_improvement": false,
-    "baseline_E00_total_score_delta": -1.1,
+    "baseline_E00_total_score_delta": -2.247,
+    "E04_total_score_delta": -1.147,
     "limits": [
       "Same three reused public samples, one run per candidate",
-      "E04 changes only final RECORD_PROMPT instruction bundle, not each clause independently",
-      "Final-record-only prompt cannot establish cause of preceding dialogue turn/runtime differences",
-      "Server model digest not disclosed; matching ZIP SHA is separate evidence",
-      "Actual E03/E04 dialogue and final note not independently reviewed",
+      "Only the existing closing-hint threshold changes; SAY is not forced or reserved",
+      "Server model digest is undisclosed; ZIP SHA matching is separate evidence",
+      "Actual E03/E05 dialogue and final records have not been independently reviewed",
+      "Communication score rise does not prove omissions resolved; safety score decline does not identify specific unsafe errors",
       "Calls/tokens not disclosed; efficiency components cannot be attributed",
-      "Displayed areas rounded to 2 decimals and total to 3",
-      "Higher safety score does not establish absence of unsafe errors"
+      "Displayed area scores rounded to 2 decimals and total to 3",
+      "Turn/time and clinical differences are not established causal effects from a single run",
+      "HBT01 uses a different local free-text protocol and cannot explain this NOVA result"
     ]
   },
   "prior_comparisons": [
@@ -338,6 +371,37 @@
         "Actual dialogue and final note not independently reviewed",
         "Calls and tokens not disclosed; no attribution of efficiency loss to a specific cost component",
         "Displayed area scores rounded to 2 decimals; total rounded to 3"
+      ]
+    },
+    {
+      "control": "E03",
+      "candidate": "E04",
+      "total_score_delta": -1.404,
+      "displayed_area_deltas": {
+        "information": 0.8,
+        "reasoning": -2.78,
+        "tests_followup": -0.69,
+        "safety": 1.25,
+        "communication": -0.17,
+        "efficiency": 0.18
+      },
+      "displayed_case_seconds_sum_control": 2757,
+      "displayed_case_seconds_sum_candidate": 1975,
+      "displayed_case_seconds_change": -782,
+      "displayed_case_seconds_change_percent": -28.36416394631846,
+      "case_seconds_are_not_whole_job_elapsed": true,
+      "quality_conclusion": "lower_total_mixed_sample_result_no_verified_quality_improvement",
+      "adopted_as_verified_improvement": false,
+      "baseline_E00_total_score_delta": -1.1,
+      "limits": [
+        "Same three reused public samples, one run per candidate",
+        "E04 changes only final RECORD_PROMPT instruction bundle, not each clause independently",
+        "Final-record-only prompt cannot establish cause of preceding dialogue turn/runtime differences",
+        "Server model digest not disclosed; matching ZIP SHA is separate evidence",
+        "Actual E03/E04 dialogue and final note not independently reviewed",
+        "Calls/tokens not disclosed; efficiency components cannot be attributed",
+        "Displayed areas rounded to 2 decimals and total to 3",
+        "Higher safety score does not establish absence of unsafe errors"
       ]
     }
   ]
