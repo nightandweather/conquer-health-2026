@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_utc": "2026-10-12T11:19:35.256754+00:00",
+  "updated_at_utc": "2026-10-12T11:33:44.321589+00:00",
   "sample_scores_are_not_official": true,
   "clinical_improvement_verified": false,
   "experiments": [
@@ -146,13 +146,19 @@
       "score": null,
       "areas": null,
       "expected_cases": 3,
-      "completed_cases": 1,
+      "completed_cases": 2,
       "case_results": [
         {
           "case_id": "C01",
           "status": "normal",
           "turns": 23,
           "seconds": 583
+        },
+        {
+          "case_id": "C10",
+          "status": "normal",
+          "turns": 30,
+          "seconds": 710
         }
       ],
       "server_model_calls": null,
@@ -182,8 +188,8 @@
       "official_submission_count": 0,
       "last_observed_at_utc": null,
       "last_observation_window_utc": [
-        "2026-10-12T11:17:26.378Z",
-        "2026-10-12T11:19:01Z"
+        "2026-10-12T11:32:33Z",
+        "2026-10-12T11:33:00Z"
       ]
     }
   ],

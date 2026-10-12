@@ -12,7 +12,7 @@
 | E01 | 초안 뒤 같은 Doctor의 검토1회 | 서버 장애 복구 대기, 점수 없음 | `results/codex-review-once-sdk101-v1/` |
 | E02 | 검토 + 오프라인 지침 검색 | 디스크 부족으로 준비 실패, 점수 없음 | `results/codex-guideline-agent-v1/` |
 | E03 | 지침 색인을 RAM 전용으로 수정 | 완료 42.483; 전체 품질 개선 미확인 | `results/codex-memory-guideline-agent-v1/` |
-| E04 | E03의 최종 기록 지시 묶음만 변경 | 평가 중; C01 정상23턴·583초, 총점 없음 | `results/codex-record-contract-agent-v1/` |
+| E04 | E03의 최종 기록 지시 묶음만 변경 | 평가 중; 2/3건 정상(C01 23턴·583초, C10 30턴·710초), 총점 없음 | `results/codex-record-contract-agent-v1/` |
 
 각 회차에서 계획, 코드·ZIP 해시, 검사 결과, 독립 감사, 제출 링크·서버 해시, 관측 시각, 점수·6영역·증례별 턴·시간·오류, 비교와 채택 여부, 게시 검증을 남긴다. 해당 자료가 아직 없으면 미확인/미완료로 유지한다. 첫 접수와 후속 관측의 원래 파일을 덮어쓰지 않는다. `phase.json`과 공개 집계는 최신 상태를 가리키는 변경 가능한 색인이다.
 
