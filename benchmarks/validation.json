@@ -1163,5 +1163,26 @@
     "codex_guided_cycle_tests": 12,
     "review_packet_and_export_tests": 33,
     "previous_suite_verified_at_utc": "2026-10-11T05:50:18+00:00"
+  },
+  "continuous_improvement": {
+    "status": "scheduled_active",
+    "automation_id": "nova",
+    "name": "NOVA 답변 품질 지속 개선",
+    "interval_minutes": 30,
+    "kind": "thread_heartbeat",
+    "verified_at_utc": "2026-10-12T02:11:19.650586+00:00",
+    "resume_pending_before_new_generation": true,
+    "maximum_new_candidates_per_run": 1,
+    "maximum_development_cases_per_candidate": 20,
+    "maximum_calls_per_case": 1,
+    "holdout_feedback_used_for_tuning": false,
+    "quality_first_adoption_requires_independent_review": true,
+    "unresolved_judgments_block_adoption": true,
+    "stop_same_hypothesis_after_two_no_improvement_candidates": true,
+    "completed_work_commit_and_push": true,
+    "next_hypothesis": "Frozen original grounded-v2 instructions/context/settings; reasoning low versus medium only",
+    "next_experiment_status": "planned_runner_parameter_support_required",
+    "new_generation_calls_in_this_request": 0,
+    "previous_prompt_loop_result_preserved": "two_candidates_not_adopted"
   }
 }
