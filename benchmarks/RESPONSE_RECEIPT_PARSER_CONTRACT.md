@@ -1,5 +1,7 @@
 # 응답 관측과 기존 파서의 합성 결합 계약 — 미실행 설계
 
+후속 상태: [6개 합성 결합 검사 완료 기록](RESPONSE_RECEIPT_PARSER_CHECK.md)이 게시되었다. 아래는 실행 전 계약 snapshot이며 실제 런타임 연결은 여전히 없다.
+
 2026-10-13 KST. [완료한 오프라인 어댑터](RESPONSE_RECEIPT_OFFLINE_ADAPTER.md)는 가짜 parser stub을 사용한다. 앞선 28회 응답 재현은 기존 실행기의 해석을 확인했지만 새 구조 저장과 결합하지 않았다. 따라서 후속 범위는 **기존 `_SourceTransport`의 inner client 반환 앞에 구조 저장을 넣었을 때의 합성 결합 동작**으로 한정한다. 이번에는 코드·합성 실행·실제 모델 호출·NOVA 제출을 추가하지 않았다.
 
 ## 확인할 경계

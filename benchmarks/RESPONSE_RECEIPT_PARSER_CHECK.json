@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-12T15:35:21.772532+00:00",
+  "status": "synthetic_parser_composition_verified_runtime_unconnected",
+  "implementation": "One new test-only module; frozen helper, offline adapter, envelope wrapper and old runners unchanged.",
+  "source_contract_sha256": "8aaa7f6bdeca9737c1567362e69cdab9e8794637f77db6db6c3f6014a20b63b6",
+  "test_source_sha256": "c1d50a599ecd6d4c0bc6b95e7550bfe57fc6c00bb53ef1a16a1bd3feb24814a3",
+  "unique_test_methods": 6,
+  "preregistered_branches": 10,
+  "direct_branches": 3,
+  "observed_branches": 7,
+  "final_verifications": [
+    {
+      "repository": "nova-2026-doctor-agent",
+      "unique_test_methods": 6,
+      "selected_modules": 1,
+      "full_suite": false,
+      "fake_invocations": 10,
+      "pipeline_helper_entries": 6,
+      "outer_wrapper_entries": 10,
+      "observer_normal_returns": 3,
+      "legacy_normal_returns": 4,
+      "legacy_error_outcomes": 6,
+      "network_attempts": 0,
+      "production_transport_constructor_attempts": 0,
+      "production_transport_method_attempts": 0,
+      "module_run_seconds": 0.084886,
+      "outer_call_seconds_sum": 0.002934709074907005
+    },
+    {
+      "repository": "conquer-health-publish",
+      "unique_test_methods": 6,
+      "selected_modules": 1,
+      "full_suite": false,
+      "fake_invocations": 10,
+      "pipeline_helper_entries": 6,
+      "outer_wrapper_entries": 10,
+      "observer_normal_returns": 3,
+      "legacy_normal_returns": 4,
+      "legacy_error_outcomes": 6,
+      "network_attempts": 0,
+      "production_transport_constructor_attempts": 0,
+      "production_transport_method_attempts": 0,
+      "module_run_seconds": 0.089666,
+      "outer_call_seconds_sum": 0.002878122846595943
+    }
+  ],
+  "accounting": {
+    "author_development_runs": [
+      {
+        "run": 1,
+        "tests": 6,
+        "failures": 1,
+        "fake": 10,
+        "note": "Wrong provenance expectation; production helper unchanged."
+      },
+      {
+        "run": 2,
+        "tests": 6,
+        "failures": 0,
+        "fake": 10,
+        "note": "Before independent coverage repair."
+      },
+      {
+        "run": 3,
+        "tests": 6,
+        "failures": 0,
+        "fake": 10,
+        "note": "Independent rejection paths verified after narrow test repair."
+      }
+    ],
+    "root_private_verifications": [
+      {
+        "version": 1,
+        "tests": 6,
+        "failures": 0,
+        "fake": 10,
+        "final_source": false
+      },
+      {
+        "version": 2,
+        "tests": 6,
+        "failures": 0,
+        "fake": 10,
+        "final_source": true
+      }
+    ],
+    "root_public_verifications": [
+      {
+        "version": 1,
+        "tests": 6,
+        "failures": 0,
+        "fake": 10,
+        "final_source": true
+      }
+    ],
+    "independent_narrow_checks": {
+      "checks": 2,
+      "fake": 1,
+      "helper": 1,
+      "outer": 1,
+      "observer_returns": 0,
+      "full_matrix_rerun": false
+    },
+    "all_recorded_fake_invocations": 61,
+    "all_recorded_pipeline_helper_entries": 37,
+    "all_recorded_outer_wrapper_entries": 61,
+    "all_recorded_observer_normal_returns": 18,
+    "note": "Development and verification reruns are not additional unique tests. Independent checks are not added to 6 test methods. Pure recovery metadata comparisons are not pipeline helper entries."
+  },
+  "verified_boundaries": [
+    "Three paired fixtures preserve exact synthetic request bytes, per-branch original object identity, fingerprints and legacy outcomes.",
+    "Missing raw total remains missing in the helper receipt while legacy derived total stays separate.",
+    "Empty length envelope returns normally in the wrapper but is not labelled a complete clinical answer or substituted with reasoning.",
+    "Invalid finish retains structural evidence before unchanged invalid_provider_response rejection.",
+    "An object seen before storage failure can have independently recorded observation true while legacy provider_response_received stays false/transport_failure.",
+    "When both structural and failure writes fail, readable files and a later committed terminal do not promote recovered observation from null.",
+    "Interrupt after structural persistence preserves that evidence while legacy wrapper returns interrupted with flag false.",
+    "Every registered reservation and alternate out is checked through its own fixed rejection reason with zero additional fake/outer calls; source/request/integrity mismatches remain permanently blocking."
+  ],
+  "repairs": [
+    {
+      "kind": "test_expectation",
+      "detail": "Expected helper provenance corrected to existing derived_prompt_plus_completion."
+    },
+    {
+      "kind": "test_coverage",
+      "detail": "Benign consumed/alternate-out rejections no longer create a global block that masks other checks; source/request/integrity blocks retained."
+    }
+  ],
+  "observation_limit": "Outer wrapper entry is not standalone semantic-parser entry. Wrapper acceptance is not final-answer completeness, clinical accuracy or a review gate.",
+  "source_integrity": {
+    "preserved_selected_prior_files": 128,
+    "all_hashes_match": true,
+    "whole_backup": false,
+    "snapshot_source_files": 13,
+    "additional_fixture_registry_digest": 1,
+    "final_private_public_pins_match": true
+  },
+  "privacy": "Only synthetic fixtures and structural fingerprints; no historical actual responses or individual clinical reviews processed. No answer/reasoning body, reasoning hash, arbitrary exception text/traceback/path copied into synthetic receipts. Content hashes are not anonymization.",
+  "zero_activity": {
+    "actual_model_calls": 0,
+    "provider_HTTP_calls": 0,
+    "live_metadata_queries": 0,
+    "live_template_queries": 0,
+    "NOVA_submissions": 0,
+    "clinical_reviews": 0,
+    "blind_exports": 0,
+    "historical_actual_response_replays": 0
+  },
+  "limitations": [
+    "Not a live runtime connection or a production general-purpose adapter.",
+    "No expanded observation of Transport pre-return rejects or actual HTTP bytes.",
+    "No claim of universal power-loss durability, OS-wide network isolation or authentication against full evidence/code rewrite.",
+    "No comparison of HBT02/HBT03 clinical quality, rescue of spent candidates, new model identity check or attribution of NOVA scores.",
+    "Runtime timing covers selected module execution or sum of synthetic outer calls only, not whole development/audit/publication."
+  ],
+  "clinical_comparison": null,
+  "upstream_root_cause": null,
+  "adopted_as_clinical_improvement": false
+}
