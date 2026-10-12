@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_utc": "2026-10-12T11:44:56.495989+00:00",
+  "updated_at_utc": "2026-10-12T12:00:06.863691+00:00",
   "sample_scores_are_not_official": true,
   "clinical_improvement_verified": false,
   "experiments": [
@@ -221,6 +221,44 @@
         "2026-10-12T11:43:19Z"
       ],
       "adopted_as_verified_improvement": false
+    },
+    {
+      "id": "E05",
+      "recipe": "Frozen E03 with closing explanation hint threshold2to6 only; E04 RECORD prompt not inherited",
+      "control": "E03",
+      "status": "sample_queued",
+      "score": null,
+      "areas": null,
+      "server_model_calls": null,
+      "server_tokens": null,
+      "server_model_digest": null,
+      "url": "https://nova.snubhai.org/submissions/eee34e55-73af-4b48-86f1-3a2ed386fac6/",
+      "sample_submissions": 1,
+      "official_submissions": 0,
+      "local_model_calls": 0,
+      "clinical_improvement_verified": false,
+      "case_results": [],
+      "limitations": [
+        "Actual E03/E04 server dialogue/final records not found in inspected UI/docs and local result folders",
+        "Threshold6 replaces prior EXAM hint for remaining6..3; may reduce information/exam opportunities",
+        "Not six reserved or forced SAY actions; other30-cap/runtime policies fixed"
+      ],
+      "zip_sha256": "a92020b5889fe550c3dfeb9a5ecd9b48ae396079571c43002778d93923c61a2d",
+      "zip_bytes": 36089,
+      "local_validation": {
+        "new_synthetic_tests": 16,
+        "private_full_tests": 563,
+        "public_selected_tests": 158,
+        "public_selected_modules": 10,
+        "full_public_suite": false,
+        "independent_audit_passed": true,
+        "real_model_calls": 0,
+        "full_corpus_prepare_newly_executed": false
+      },
+      "submitted_at_kst": "2026-10-12 20:59",
+      "server_zip_sha256": "a92020b5889fe550c3dfeb9a5ecd9b48ae396079571c43002778d93923c61a2d",
+      "server_zip_hash_matches": true,
+      "observed_at_utc": "2026-10-12T12:00:06.863691+00:00"
     }
   ],
   "comparison_limit": "E01 has no score. E03 versus E00 changes review and retrieval together; E03 versus E02 repairs storage only but E02 never reached dialogue. Reused public samples and unconfirmed server digest do not establish independent clinical improvement.",
