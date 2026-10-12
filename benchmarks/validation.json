@@ -3,16 +3,14 @@
   "verified_date": "2026-10-12",
   "state": "source_index_generation_and_independent_review_completed_not_adopted",
   "tests": {
-    "scope": "Private full regression and16 explicitly selected public modules after offline prepare adapter",
-    "total_tests": 457,
-    "executed_tests": 457,
-    "passed_tests": 457,
+    "scope": "Private full suite and 17 explicitly selected public modules after review-once candidate",
+    "executed_tests": 482,
+    "passed_tests": 482,
     "all_executed_passed": true,
-    "blocked_tests": [],
-    "public_targeted_executed": 334,
-    "public_targeted_passed": 334,
-    "public_targeted_scope": "16 explicit source-index/placement/budget/runner/queue/viewer/Markdown plus guideline/context/benchmark-QC/day0/prepare modules; not full public suite",
-    "verified_at_utc": "2026-10-12T07:49:55.041657+00:00"
+    "public_targeted_executed": 359,
+    "public_targeted_passed": 359,
+    "public_full_suite_claimed": false,
+    "verified_at_utc": "2026-10-12T08:57:49.215185+00:00"
   },
   "data": {
     "dataset_kind": "legacy_consensus_val_200",
@@ -2235,5 +2233,47 @@
     "earlier_failed_logs_preserved": true,
     "initial_followup_failed_runs": 2,
     "initial_failures_per_run": 2
+  },
+  "tests_before_review_once_candidate": {
+    "scope": "Private full regression and16 explicitly selected public modules after offline prepare adapter",
+    "total_tests": 457,
+    "executed_tests": 457,
+    "passed_tests": 457,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "public_targeted_executed": 334,
+    "public_targeted_passed": 334,
+    "public_targeted_scope": "16 explicit source-index/placement/budget/runner/queue/viewer/Markdown plus guideline/context/benchmark-QC/day0/prepare modules; not full public suite",
+    "verified_at_utc": "2026-10-12T07:49:55.041657+00:00"
+  },
+  "review_once_candidate": {
+    "status": "sample_submitted_infrastructure_failure_waiting_recovery",
+    "synthetic_tests": 25,
+    "independent_regressions": 4,
+    "independent_audit": "passed after two defects fixed",
+    "local_model_calls": 0,
+    "server_model_calls": null,
+    "clinical_quality_verified": false,
+    "adopted": false,
+    "normal_30_action_path_doctor_calls": {
+      "baseline": 31,
+      "candidate": 61
+    },
+    "retry_counts_may_increase_calls": true,
+    "original_sdk_prompts_settings_preserved": true,
+    "policy_includes_budget_guards": true,
+    "zip_sha256": "a54c6349062f02b986c9cf6a55dbdf17b9ae4f8d9676b244643b7051d4eba92c",
+    "zip_bytes": 12066,
+    "official_evaluation_requests": 0,
+    "sample_requests": 1,
+    "server_file_hash_verified": true,
+    "error_code": "EXECUTION_INFRASTRUCTURE",
+    "sample_reference_score": null,
+    "server_case_results_summary": {
+      "count": 1,
+      "status": "server_failure_operator_check",
+      "turns": 1,
+      "seconds": 15
+    }
   }
 }
