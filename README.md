@@ -85,6 +85,9 @@ API 키도 제거했습니다. `LUNIT_FM_API_KEY` 환경변수로 주입하십�
 
 ## NOVA gpt-oss-20b 비교
 
+[교수님 공유용 200문항 유형 목록과 검토 요약](benchmarks/HEALTHBENCH_FOR_PROFESSOR.md)을 정리했습니다.
+질문 유형·대화 이력 구성·실험 결과·검토 요청 사항과 공식 원문 배포 경로를 확인할 수 있습니다.
+
 루닛 호출 설정을 로컬 gpt-oss-20b로 비교하는 [HealthBench 실험 코드와 검증 기록](benchmarks/README.md)을 추가했습니다.
 복구한 Consensus 검증 자료 200문항의 입력 검증 후, 3문항 × 2설정의 답변 6개를 생성했습니다.
 기본 호출은 2개 완료·1개 잘림, 루닛 설정은 세 문항 모두 재호출 후 완료했습니다.
