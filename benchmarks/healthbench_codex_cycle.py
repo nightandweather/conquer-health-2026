@@ -29,6 +29,12 @@ from .healthbench_score import _answer_index
 
 
 REVIEW_REQUIRED = 'independent_codex_review_required'
+REASONING_EFFORTS = ('low', 'medium', 'high')
+
+
+def validate_reasoning_effort(reasoning_effort: str) -> None:
+    if not isinstance(reasoning_effort, str) or reasoning_effort not in REASONING_EFFORTS:
+        raise ValueError('--reasoning-effort must be low, medium or high')
 
 
 class ModelMetadataUnavailable(ValueError):
@@ -214,16 +220,20 @@ def load_instructions(path: Path, name: str, version: str) -> tuple[str, dict]:
     return text, metadata
 
 
-def make_payload(item: dict, instructions: str, model: str = DEFAULT_MODEL) -> dict:
+def make_payload(item: dict, instructions: str, model: str = DEFAULT_MODEL, *,
+                 reasoning_effort: str = 'low') -> dict:
     """Keep original roles/text, appending only the generic last-user suffix."""
+    validate_reasoning_effort(reasoning_effort)
     body = build_payload(item, 'grounded_call', model)
+    body['reasoning_effort'] = reasoning_effort
     body['messages'][-1]['content'] = item['prompt'][-1]['content'] + '\n\n[' + instructions + ']'
     return body
 
 
 def generate_candidate(item: dict, instructions: str, name: str, model: str, transport,
-                       *, dataset_sha256: str, block_on_transport_failure: bool = False) -> dict:
-    body = make_payload(item, instructions, model)
+                       *, dataset_sha256: str, block_on_transport_failure: bool = False,
+                       reasoning_effort: str = 'low') -> dict:
+    body = make_payload(item, instructions, model, reasoning_effort=reasoning_effort)
     started = time.monotonic()
     attempt = {'number': 1, 'max_tokens': body['max_tokens'], 'temperature': body['temperature'],
                'reasoning_effort': body['reasoning_effort'], 'request_sha256': canonical_hash(body),
@@ -265,7 +275,9 @@ def run_cycle(data: Path, baseline_manifest: Path, instructions_file: Path, out:
               prepare_only: bool = False, base_url: str = DEFAULT_BASE_URL,
               model: str = DEFAULT_MODEL, timeout: float = 300, transport=None,
               allow_finalized_dev_control: bool = False,
-              expected_baseline_snapshot: dict | None = None) -> tuple[dict, int]:
+              expected_baseline_snapshot: dict | None = None,
+              reasoning_effort: str = 'low') -> tuple[dict, int]:
+    validate_reasoning_effort(reasoning_effort)
     if not isinstance(model, str) or not model.strip():
         raise ValueError('--model requires a nonempty name')
     if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or timeout <= 0:
@@ -281,7 +293,7 @@ def run_cycle(data: Path, baseline_manifest: Path, instructions_file: Path, out:
     if expected_baseline_snapshot is not None and baseline != expected_baseline_snapshot:
         raise ValueError('Baseline source changed after the queue validated its development control')
     instructions, source = load_instructions(instructions_file, name, name if version is None else version)
-    payloads = [make_payload(item, instructions, model) for item in selected]
+    payloads = [make_payload(item, instructions, model, reasoning_effort=reasoning_effort) for item in selected]
     client = transport if transport is not None else Transport(base_url, os.environ.get('HEALTHBENCH_API_KEY', ''), timeout)
     metadata = {'name': model, 'digest': None, 'metadata_status': 'not_requested'}
     if not prepare_only:
@@ -300,7 +312,7 @@ def run_cycle(data: Path, baseline_manifest: Path, instructions_file: Path, out:
                 'split': {'name': 'development', 'limit': DEVELOPMENT_LIMIT,
                           'selection': 'first 20 frozen baseline IDs; heldout excluded'},
                 'baseline': baseline, 'instructions': source, 'model': metadata,
-                'arms': {name: {'max_tokens': 2048, 'temperature': 0, 'reasoning_effort': 'low',
+                'arms': {name: {'max_tokens': 2048, 'temperature': 0, 'reasoning_effort': reasoning_effort,
                                 'max_attempts': 1, 'suffix': instructions, 'prompt_revision': source['version']}},
                 'config': {'model': model, 'base_url': base_url.rstrip('/'), 'timeout': timeout,
                            'prepare_only': prepare_only, 'maximum_calls_per_case': 1, 'resume': False,
@@ -329,7 +341,8 @@ def run_cycle(data: Path, baseline_manifest: Path, instructions_file: Path, out:
                     if hashlib.sha256(instructions_file.read_bytes()).hexdigest() != source['byte_sha256']:
                         raise ValueError('Instructions file changed during generation')
                     record = generate_candidate(item, instructions, name, model, client,
-                                                dataset_sha256=dataset['sha256'], block_on_transport_failure=not records)
+                                                dataset_sha256=dataset['sha256'], block_on_transport_failure=not records,
+                                                reasoning_effort=reasoning_effort)
                     record.update(model_digest=metadata.get('digest'), instructions_byte_sha256=source['byte_sha256'],
                                   instructions_name=name, instructions_version=source['version'])
                     records.append(record)
@@ -379,11 +392,13 @@ def main(argv=None) -> int:
     parser.add_argument('--base-url', default=DEFAULT_BASE_URL)
     parser.add_argument('--model', default=DEFAULT_MODEL)
     parser.add_argument('--timeout', type=float, default=300)
+    parser.add_argument('--reasoning-effort', choices=REASONING_EFFORTS, default='low')
     args = parser.parse_args(argv)
     try:
         summary, code = run_cycle(args.data, args.baseline_manifest, args.instructions_file, args.out,
                                   name=args.candidate_name, version=args.instructions_version,
                                   prepare_only=args.prepare_only, base_url=args.base_url, model=args.model, timeout=args.timeout,
+                                  reasoning_effort=args.reasoning_effort,
                                   allow_finalized_dev_control=args.allow_finalized_dev_control)
     except (ValueError, OSError, subprocess.SubprocessError) as exc:
         parser.error(str(exc))

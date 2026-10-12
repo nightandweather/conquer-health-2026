@@ -11,7 +11,8 @@ import unittest
 from unittest.mock import patch
 
 from benchmarks.healthbench import (DEFAULT_BASE_URL, DEFAULT_MODEL, RequestFailure, arm_config,
-                                    canonical_hash, generate, load_dataset)
+                                    build_payload, canonical_hash, generate, load_dataset)
+from benchmarks import healthbench_codex_cycle as cycle
 from benchmarks.healthbench_codex_cycle import REVIEW_REQUIRED, make_payload, run_cycle
 
 
@@ -124,6 +125,97 @@ class CodexCycleTests(unittest.TestCase):
         for secret in ('RUBRIC_SECRET_SENTINEL', 'REFERENCE_SECRET_SENTINEL',
                        'CANARY_SECRET_SENTINEL', 'CASE_CRITICISM_SECRET_SENTINEL'):
             self.assertNotIn(secret, encoded)
+
+    def test_default_low_payload_retains_legacy_serialized_bytes(self):
+        text = self.instructions.read_text()
+        legacy = build_payload(self.items[0], 'grounded_call')
+        legacy['messages'][-1]['content'] = self.items[0]['prompt'][-1]['content'] + '\n\n[' + text + ']'
+        for payload in (make_payload(self.items[0], text),
+                        make_payload(self.items[0], text, reasoning_effort='low')):
+            self.assertEqual(json.dumps(payload, ensure_ascii=False).encode(),
+                             json.dumps(legacy, ensure_ascii=False).encode())
+
+    def test_medium_generation_changes_only_effort_and_keeps_input_hash(self):
+        results = {}
+        for effort in ('low', 'medium'):
+            self.out = self.root / 'results' / effort
+            transport = FakeTransport([response()] * 20)
+            summary, code = self.run_cycle(transport=transport, reasoning_effort=effort)
+            self.assertEqual((summary['calls'], code), (20, 0))
+            records = [json.loads(line) for line in (self.out / 'answers.jsonl').read_text().splitlines()]
+            manifest = json.loads((self.out / 'manifest.json').read_text())
+            self.assertEqual(manifest['arms']['codex_guided_v3']['reasoning_effort'], effort)
+            for payload, row, prepared in zip(transport.payloads, records, manifest['prepared_requests']):
+                self.assertEqual(len(row['attempts']), 1)
+                self.assertEqual(row['attempts'][0]['reasoning_effort'], effort)
+                self.assertEqual(row['request_sha256'], canonical_hash(payload))
+                self.assertEqual(row['attempts'][0]['request_sha256'], prepared['request_sha256'])
+                self.assertEqual(row['input_sha256'], canonical_hash(payload['messages']))
+                self.assertEqual(row['attempts'][0]['input_sha256'], prepared['input_sha256'])
+                self.assertEqual((payload['max_tokens'], payload['temperature']), (2048, 0))
+            results[effort] = (transport.payloads, records)
+        for low, medium, low_row, medium_row in zip(results['low'][0], results['medium'][0],
+                                                   results['low'][1], results['medium'][1]):
+            self.assertEqual({key for key in low if low[key] != medium[key]}, {'reasoning_effort'})
+            self.assertEqual(low['messages'], medium['messages'])
+            self.assertEqual(low_row['input_sha256'], medium_row['input_sha256'])
+            self.assertNotEqual(low_row['request_sha256'], medium_row['request_sha256'])
+
+    def test_high_payload_is_supported_without_other_request_changes(self):
+        text = self.instructions.read_text()
+        low = make_payload(self.items[0], text)
+        self.assertEqual(make_payload(self.items[0], text, reasoning_effort='high'), low | {'reasoning_effort': 'high'})
+
+    def test_invalid_reasoning_effort_rejects_payload_generation_and_cycle_before_io(self):
+        for effort in (None, True, False, '', 'LOW', ' medium ', 'unknown', 1, [], {}):
+            with self.subTest(effort=effort):
+                transport = FakeTransport([])
+                with patch('urllib.request.OpenerDirector.open', side_effect=AssertionError('No network')):
+                    with self.assertRaisesRegex(ValueError, 'reasoning-effort'):
+                        make_payload(self.items[0], self.instructions.read_text(), reasoning_effort=effort)
+                    with self.assertRaisesRegex(ValueError, 'reasoning-effort'):
+                        cycle.generate_candidate(self.items[0], 'Generic instructions', 'codex_guided_v3',
+                                                 DEFAULT_MODEL, transport, dataset_sha256='synthetic',
+                                                 reasoning_effort=effort)
+                    for prepare_only in (False, True):
+                        with self.assertRaisesRegex(ValueError, 'reasoning-effort'):
+                            self.run_cycle(transport=transport, prepare_only=prepare_only, reasoning_effort=effort)
+                self.assertEqual((transport.metadata_calls, transport.payloads), (0, []))
+                self.assertFalse(self.out.exists())
+
+    def test_cli_passes_default_low_and_selected_levels_and_rejects_unknown(self):
+        argv = ['--data', str(self.data), '--baseline-manifest', str(self.baseline),
+                '--instructions-file', str(self.instructions), '--out', str(self.out), '--prepare-only']
+        summary = {'status': 'prepared', 'written_answers': 0, 'planned_answers': 20, 'calls': 0}
+        for effort in (None, 'low', 'medium', 'high'):
+            with self.subTest(effort=effort), patch.object(cycle, 'run_cycle', return_value=(summary, 0)) as runner:
+                with patch('sys.stdout'):
+                    self.assertEqual(cycle.main(argv + ([] if effort is None else ['--reasoning-effort', effort])), 0)
+                self.assertEqual(runner.call_args.kwargs['reasoning_effort'], effort or 'low')
+        with patch.object(cycle, 'run_cycle') as runner, patch('sys.stderr'):
+            with self.assertRaises(SystemExit) as error:
+                cycle.main(argv + ['--reasoning-effort', 'unknown'])
+            self.assertEqual(error.exception.code, 2)
+            runner.assert_not_called()
+        self.assertFalse(self.out.exists())
+
+    def test_medium_candidate_keeps_finalized_control_fixed_at_low(self):
+        self.finalize_partial_control()
+        transport = FakeTransport([response()] * 20)
+        summary, code = self.run_cycle(transport=transport, reasoning_effort='medium', allow_finalized_dev_control=True)
+        self.assertEqual((summary['calls'], code), (20, 0))
+        manifest = json.loads((self.out / 'manifest.json').read_text())
+        self.assertEqual(manifest['baseline']['development_control']['arm_config_sha256'],
+                         canonical_hash(arm_config(('grounded_call',))['grounded_call']))
+        self.assertTrue(all(payload['reasoning_effort'] == 'medium' for payload in transport.payloads))
+        self.baseline_value['arms']['grounded_call']['reasoning_effort'] = 'medium'
+        self.write_baseline()
+        self.out = self.root / 'results' / 'wrong-control'
+        transport = FakeTransport([])
+        with self.assertRaisesRegex(ValueError, 'fixed arm configuration'):
+            self.run_cycle(transport=transport, reasoning_effort='medium', allow_finalized_dev_control=True)
+        self.assertEqual((transport.metadata_calls, transport.payloads), (0, []))
+        self.assertFalse(self.out.exists())
 
     def test_prepare_running_baseline_has_no_network_or_answers_and_records_hashes(self):
         self.baseline_value['status'] = 'running'

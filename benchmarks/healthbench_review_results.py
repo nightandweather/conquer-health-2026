@@ -275,8 +275,14 @@ def export_reviews(data: Path, answers: Path, manifest: Path, review_dir: Path,
             status = 'reviewed' if known_failure else 'uncertain' if uncertain else 'reviewed'
             quality_status = ('inference_failure' if known_failure else 'uncertain' if uncertain
                               else 'needs_review' if candidate['flags'] else 'no_flags_recorded')
-            note = candidate['note'] or '; '.join(flag['category'] + ': ' + flag['explanation']
-                                                 for flag in candidate['flags'])
+            # A summary note must not hide a concrete safety warning in the
+            # bounded viewer. This changes presentation only, never judgments.
+            visible_flags = sorted(candidate['flags'], key=lambda flag:
+                                   0 if 'safety' in flag['category'].lower() else 1)
+            note = '; '.join(flag['category'] + ': ' + flag['explanation']
+                             for flag in visible_flags)
+            if candidate['note']:
+                note += ('; 검증자 메모: ' if note else '') + candidate['note']
             if candidate['flags']:
                 note = '추가 검토 필요: ' + note
             if known_failure:

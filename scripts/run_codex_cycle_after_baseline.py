@@ -21,8 +21,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from benchmarks.healthbench import DEFAULT_BASE_URL, DEFAULT_MODEL, canonical_hash, load_dataset, utc_now, write_json
-from benchmarks.healthbench_codex_cycle import (REVIEW_REQUIRED, ModelMetadataUnavailable, _output_path, codex_baseline_snapshot,
-                                               load_instructions, make_payload, run_cycle)
+from benchmarks.healthbench_codex_cycle import (REASONING_EFFORTS, REVIEW_REQUIRED, ModelMetadataUnavailable, _output_path,
+                                               codex_baseline_snapshot, load_instructions, make_payload, run_cycle,
+                                               validate_reasoning_effort)
 from benchmarks.healthbench_score import _answer_index
 
 
@@ -59,13 +60,20 @@ def validate_baseline(value: dict, dataset: dict) -> None:
         raise ValueError('Development prompt hashes disagree with the baseline')
     if not isinstance(value.get('arms'), dict) or 'grounded_call' not in value['arms']:
         raise ValueError('Baseline requires grounded_call as the comparison control')
+    control = value['arms']['grounded_call']
+    if (not isinstance(control, dict)
+            or any(canonical_hash(control.get(key)) != canonical_hash(expected) for key, expected in
+                   {'max_tokens': 2048, 'temperature': 0, 'reasoning_effort': 'low'}.items())):
+        raise ValueError('Baseline grounded_call requires its fixed low reasoning configuration')
 
 
 def comparison_snapshot(data: Path, baseline_manifest: Path, candidate: Path, out: Path,
                         name: str, instructions: str, instructions_metadata: dict,
                         *, packet_runner=None, allow_finalized_dev_control: bool = False,
-                        expected_baseline_snapshot: dict | None = None) -> dict:
+                        expected_baseline_snapshot: dict | None = None,
+                        reasoning_effort: str = 'low') -> dict:
     """Validate immutable source snapshots, then preserve actual selected rows."""
+    validate_reasoning_effort(reasoning_effort)
     out = _output_path(out)
     items, dataset = load_dataset(data, limit=0)
     data_rows = {item['prompt_id']: item for item in items}
@@ -92,10 +100,17 @@ def comparison_snapshot(data: Path, baseline_manifest: Path, candidate: Path, ou
             or candidate_manifest.get('model', {}).get('digest') != baseline['model']['digest']
             or candidate_manifest.get('instructions', {}).get('byte_sha256') != instructions_metadata['byte_sha256']):
         raise ValueError('Candidate manifest identity differs from the queued development experiment')
-    expected_config = {'max_tokens': 2048, 'temperature': 0, 'reasoning_effort': 'low',
+    expected_config = {'max_tokens': 2048, 'temperature': 0, 'reasoning_effort': reasoning_effort,
                        'max_attempts': 1, 'suffix': instructions, 'prompt_revision': instructions_metadata['version']}
-    if candidate_manifest.get('arms', {}).get(name) != expected_config:
+    if canonical_hash(candidate_manifest.get('arms', {}).get(name)) != canonical_hash(expected_config):
         raise ValueError('Candidate arm configuration differs from the queued general prompt')
+    payloads = {item['prompt_id']: make_payload(item, instructions, reasoning_effort=reasoning_effort)
+                for item in dev_items}
+    expected_requests = [{'prompt_id': item['prompt_id'], 'prompt_sha256': canonical_hash(item['prompt']),
+                          'input_sha256': canonical_hash(payloads[item['prompt_id']]['messages']),
+                          'request_sha256': canonical_hash(payloads[item['prompt_id']])} for item in dev_items]
+    if candidate_manifest.get('prepared_requests') != expected_requests:
+        raise ValueError('Candidate prepared payload hashes differ from the queued reasoning configuration')
     sources, source_rows = {}, {}
     for label, path, raw_manifest, manifest_value in (
             ('baseline', baseline_manifest.parent / 'answers.jsonl', baseline_raw, baseline),
@@ -129,11 +144,18 @@ def comparison_snapshot(data: Path, baseline_manifest: Path, candidate: Path, ou
                     or row.get('model') != DEFAULT_MODEL or row.get('model_digest') != baseline['model']['digest']):
                 raise ValueError('Source answer dataset, prompt or model identity changed')
             if source == 'candidate':
-                payload = make_payload(data_rows[prompt_id], instructions)
+                payload = payloads[prompt_id]
                 if (row.get('request_sha256') != canonical_hash(payload)
                         or row.get('input_sha256') != canonical_hash(payload['messages'])
                         or row.get('instructions_byte_sha256') != instructions_metadata['byte_sha256']):
                     raise ValueError('Candidate payload or instruction hash changed')
+                attempts = row.get('attempts')
+                if (not isinstance(attempts, list) or len(attempts) != 1 or not isinstance(attempts[0], dict)
+                        or attempts[0].get('request_sha256') != canonical_hash(payload)
+                        or attempts[0].get('input_sha256') != canonical_hash(payload['messages'])
+                        or any(canonical_hash(attempts[0].get(key)) != canonical_hash(payload[key])
+                               for key in ('max_tokens', 'temperature', 'reasoning_effort'))):
+                    raise ValueError('Candidate attempt payload hashes or inference settings changed')
             copied.append(deepcopy(row))
             provenance.append({'source': source, 'arm': row['arm'], 'prompt_id': prompt_id,
                                'original_status': row['status'], 'full_row_sha256': canonical_hash(row)})
@@ -167,7 +189,8 @@ def comparison_snapshot(data: Path, baseline_manifest: Path, candidate: Path, ou
 def run_queue(data: Path, baseline_manifest: Path, instructions_file: Path, out: Path, *,
               name: str = 'codex_guided_v3', version: str | None = None, maximum_wait_seconds: float = 7200,
               cycle_runner=None, packet_runner=None, clock=time.monotonic, sleeper=time.sleep,
-              allow_finalized_dev_control: bool = False) -> int:
+              allow_finalized_dev_control: bool = False, reasoning_effort: str = 'low') -> int:
+    validate_reasoning_effort(reasoning_effort)
     if (isinstance(maximum_wait_seconds, bool) or not isinstance(maximum_wait_seconds, (int, float))
             or not math.isfinite(maximum_wait_seconds) or maximum_wait_seconds <= 0):
         raise ValueError('Maximum wait must be positive and finite')
@@ -183,6 +206,7 @@ def run_queue(data: Path, baseline_manifest: Path, instructions_file: Path, out:
              'baseline_scope_sha256': frozen_scope, 'baseline_initial_byte_sha256': _sha(initial_raw),
              'dataset_sha256': dataset['sha256'], 'development_prompt_ids': dataset['selected_prompt_ids'],
              'instructions': instruction_metadata, 'model': deepcopy(baseline['model']),
+             'reasoning_effort': reasoning_effort,
              'allow_finalized_dev_control': allow_finalized_dev_control,
              'score': None, 'score_status': REVIEW_REQUIRED}
     out.mkdir(parents=True, mode=0o700)
@@ -225,12 +249,14 @@ def run_queue(data: Path, baseline_manifest: Path, instructions_file: Path, out:
         runner = cycle_runner or run_cycle
         summary, code = runner(data, baseline_manifest, instructions_file, out / 'candidate',
                                name=name, version=version, model=DEFAULT_MODEL, base_url=DEFAULT_BASE_URL,
+                               reasoning_effort=reasoning_effort,
                                allow_finalized_dev_control=allow_finalized_dev_control,
                                expected_baseline_snapshot=validated)
         state['generation'] = summary
         if (out / 'candidate' / 'answers.jsonl').exists():
             state['comparison'] = comparison_snapshot(data, baseline_manifest, out / 'candidate', out / 'comparison',
                                                       name, instructions, instruction_metadata, packet_runner=packet_runner,
+                                                      reasoning_effort=reasoning_effort,
                                                       allow_finalized_dev_control=allow_finalized_dev_control,
                                                       expected_baseline_snapshot=validated)
         if code == 130:
@@ -257,6 +283,7 @@ def main(argv=None) -> int:
     parser.add_argument('--candidate-name', default='codex_guided_v3')
     parser.add_argument('--instructions-version')
     parser.add_argument('--maximum-wait-seconds', type=float, default=7200)
+    parser.add_argument('--reasoning-effort', choices=REASONING_EFFORTS, default='low')
     parser.add_argument('--allow-finalized-dev-control', action='store_true',
                         help='Explicitly validate completed dev20 controls while retaining original partial baseline status')
     args = parser.parse_args(argv)
@@ -264,6 +291,7 @@ def main(argv=None) -> int:
         code = run_queue(args.data, args.baseline_manifest, args.instructions_file, args.out,
                          name=args.candidate_name, version=args.instructions_version,
                          maximum_wait_seconds=args.maximum_wait_seconds,
+                         reasoning_effort=args.reasoning_effort,
                          allow_finalized_dev_control=args.allow_finalized_dev_control)
     except (ValueError, OSError) as exc:
         parser.error(str(exc))

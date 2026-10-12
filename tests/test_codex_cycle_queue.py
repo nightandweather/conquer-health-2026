@@ -27,6 +27,7 @@ class FakeClock:
 class FakeTransport:
     def __init__(self, *, partial=False):
         self.calls = 0
+        self.payloads = []
         self.partial = partial
 
     def model_metadata(self, model):
@@ -34,6 +35,7 @@ class FakeTransport:
 
     def complete(self, payload):
         self.calls += 1
+        self.payloads.append(deepcopy(payload))
         return {'choices': [{'message': {'content': 'Synthetic generated answer.'},
                              'finish_reason': 'length' if self.partial and self.calls == 1 else 'stop'}],
                 'usage': {'prompt_tokens': 10, 'completion_tokens': 20, 'total_tokens': 30}}
@@ -136,6 +138,7 @@ class CodexCycleQueueTests(unittest.TestCase):
         args, kwargs = self.generated[0]
         self.assertEqual(kwargs['model'], DEFAULT_MODEL)
         self.assertEqual(kwargs['base_url'], DEFAULT_BASE_URL)
+        self.assertEqual(kwargs['reasoning_effort'], 'low')
         rows = [json.loads(line) for line in (self.out / 'comparison' / 'answers.jsonl').read_text().splitlines()]
         self.assertEqual(len(rows), 40)
         self.assertEqual({row['prompt_id'] for row in rows}, {item['prompt_id'] for item in self.items[:20]})
@@ -143,10 +146,77 @@ class CodexCycleQueueTests(unittest.TestCase):
         self.assertEqual(self.packet_calls[0][1]['paired_arms'], ('grounded_call', 'codex_guided_v3'))
         state = json.loads((self.out / 'queue.json').read_text())
         self.assertEqual(state['status'], 'completed')
+        self.assertEqual(state['reasoning_effort'], 'low')
         self.assertIsNone(state['score'])
         self.assertEqual(state['score_status'], 'independent_codex_review_required')
         self.assertEqual((self.out / 'queue.json').stat().st_mode & 0o777, 0o600)
         self.assertEqual(self.out.stat().st_mode & 0o777, 0o700)
+
+    def test_medium_queue_propagates_effort_and_preserves_low_control(self):
+        self.finalize_partial_control()
+        transport = FakeTransport()
+        def medium_cycle(*args, **kwargs):
+            self.generated.append((args, kwargs))
+            return cycle.run_cycle(*args, **kwargs, transport=transport)
+        code = queue.run_queue(self.data, self.baseline, self.instructions, self.out,
+                               cycle_runner=medium_cycle, packet_runner=self.fake_packets,
+                               reasoning_effort='medium', allow_finalized_dev_control=True)
+        self.assertEqual((code, transport.calls), (0, 20))
+        self.assertEqual(self.generated[0][1]['reasoning_effort'], 'medium')
+        state = json.loads((self.out / 'queue.json').read_text())
+        candidate = json.loads((self.out / 'candidate' / 'manifest.json').read_text())
+        comparison = json.loads((self.out / 'comparison' / 'manifest.json').read_text())
+        self.assertEqual(state['reasoning_effort'], 'medium')
+        self.assertEqual(candidate['arms']['codex_guided_v3']['reasoning_effort'], 'medium')
+        self.assertEqual(comparison['arms']['codex_guided_v3']['reasoning_effort'], 'medium')
+        self.assertEqual(comparison['arms']['grounded_call']['reasoning_effort'], 'low')
+        for prepared, payload in zip(candidate['prepared_requests'], transport.payloads):
+            self.assertEqual(payload['reasoning_effort'], 'medium')
+            self.assertEqual(prepared['request_sha256'], canonical_hash(payload))
+            self.assertEqual(prepared['input_sha256'], canonical_hash(payload['messages']))
+
+    def test_default_and_explicit_low_preserve_answer_and_review_packet_bytes(self):
+        from benchmarks.healthbench_review import create_review_packets
+        self.baseline_value['status'] = 'completed'
+        self.write_baseline()
+        packets, answers = [], []
+        with patch('benchmarks.healthbench_review.ROOT', self.root), patch.object(cycle.time, 'monotonic', return_value=0):
+            for options in ({}, {'reasoning_effort': 'low'}):
+                self.out = self.root / 'results' / ('explicit-low' if options else 'default-low')
+                self.assertEqual(queue.run_queue(self.data, self.baseline, self.instructions, self.out,
+                                                 cycle_runner=self.fake_cycle, packet_runner=create_review_packets,
+                                                 **options), 0)
+                answers.append((self.out / 'candidate' / 'answers.jsonl').read_bytes())
+                review = self.out / 'comparison' / 'review'
+                packets.append({path.relative_to(review): path.read_bytes() for path in review.rglob('*.json')})
+        self.assertEqual(answers[0], answers[1])
+        self.assertEqual(packets[0], packets[1])
+
+    def test_invalid_reasoning_effort_rejects_queue_and_comparison_before_io(self):
+        for effort in (None, True, False, '', 'LOW', ' medium ', 'unknown', 1, [], {}):
+            with self.subTest(effort=effort), patch('urllib.request.OpenerDirector.open', side_effect=AssertionError('No network')):
+                with self.assertRaisesRegex(ValueError, 'reasoning-effort'):
+                    self.run_queue(reasoning_effort=effort)
+                with self.assertRaisesRegex(ValueError, 'reasoning-effort'):
+                    queue.comparison_snapshot(self.data, self.baseline, self.root / 'missing-candidate', self.out,
+                                              'codex_guided_v3', 'Generic instructions', {}, reasoning_effort=effort)
+            self.assertEqual((self.generated, self.packet_calls), ([], []))
+            self.assertFalse(self.out.exists())
+
+    def test_queue_cli_passes_default_low_and_selected_levels_and_rejects_unknown(self):
+        argv = ['--data', str(self.data), '--baseline-manifest', str(self.baseline),
+                '--instructions-file', str(self.instructions), '--out', str(self.out)]
+        for effort in (None, 'low', 'medium', 'high'):
+            with self.subTest(effort=effort), patch.object(queue, 'run_queue', return_value=0) as runner:
+                with patch('sys.stdout'):
+                    self.assertEqual(queue.main(argv + ([] if effort is None else ['--reasoning-effort', effort])), 0)
+                self.assertEqual(runner.call_args.kwargs['reasoning_effort'], effort or 'low')
+        with patch.object(queue, 'run_queue') as runner, patch('sys.stderr'):
+            with self.assertRaises(SystemExit) as error:
+                queue.main(argv + ['--reasoning-effort', 'unknown'])
+            self.assertEqual(error.exception.code, 2)
+            runner.assert_not_called()
+        self.assertFalse(self.out.exists())
 
     def test_failed_interrupted_or_partial_baseline_never_calls_generation(self):
         for status in ('failed', 'interrupted', 'partial', 'blocked'):
@@ -244,6 +314,70 @@ class CodexCycleQueueTests(unittest.TestCase):
                     queue.comparison_snapshot(self.data, self.baseline, candidate, target,
                                               'codex_guided_v3', text, source, packet_runner=self.fake_packets)
                 self.assertFalse(target.exists())
+
+    def test_medium_comparison_rejects_effort_manifest_and_attempt_hash_mismatches_before_writes(self):
+        self.baseline_value['status'] = 'completed'
+        self.write_baseline()
+        candidate = self.root / 'results' / 'medium-source'
+        cycle.run_cycle(self.data, self.baseline, self.instructions, candidate,
+                        transport=FakeTransport(), reasoning_effort='medium')
+        text, source = cycle.load_instructions(self.instructions, 'codex_guided_v3', 'codex_guided_v3')
+        manifest_path, answer_path = candidate / 'manifest.json', candidate / 'answers.jsonl'
+        original_manifest, original_answers = manifest_path.read_bytes(), answer_path.read_bytes()
+        for variant in ('queued_effort', 'arm_effort', 'arm_temperature', 'prepared_request', 'prepared_input',
+                        'row_request', 'row_input', 'attempt_effort', 'attempt_request', 'attempt_input',
+                        'attempt_temperature', 'attempt_max_tokens'):
+            with self.subTest(variant=variant):
+                manifest = json.loads(original_manifest)
+                rows = [json.loads(line) for line in original_answers.decode().splitlines()]
+                effort = 'medium'
+                if variant == 'queued_effort':
+                    effort = 'low'
+                elif variant == 'arm_effort':
+                    manifest['arms']['codex_guided_v3']['reasoning_effort'] = 'low'
+                elif variant == 'arm_temperature':
+                    manifest['arms']['codex_guided_v3']['temperature'] = False
+                elif variant.startswith('prepared_'):
+                    manifest['prepared_requests'][0][variant.removeprefix('prepared_') + '_sha256'] = 'wrong'
+                elif variant.startswith('row_'):
+                    rows[0][variant.removeprefix('row_') + '_sha256'] = 'wrong'
+                else:
+                    key = variant.removeprefix('attempt_')
+                    key = key + '_sha256' if key in ('request', 'input') else key
+                    key = 'reasoning_effort' if key == 'effort' else key
+                    rows[0]['attempts'][0][key] = False if key == 'temperature' else 'wrong'
+                manifest_path.write_text(json.dumps(manifest))
+                answer_path.write_text(''.join(json.dumps(row) + '\n' for row in rows))
+                target = self.root / 'results' / ('medium-mismatch-' + variant)
+                with self.assertRaises(ValueError):
+                    queue.comparison_snapshot(self.data, self.baseline, candidate, target,
+                                              'codex_guided_v3', text, source, packet_runner=self.fake_packets,
+                                              reasoning_effort=effort)
+                self.assertFalse(target.exists())
+                self.assertEqual(self.packet_calls, [])
+
+    def test_queue_rejects_runner_that_returns_candidate_with_different_effort(self):
+        self.baseline_value['status'] = 'completed'
+        self.write_baseline()
+        def wrong_effort_cycle(*args, **kwargs):
+            kwargs['reasoning_effort'] = 'low'
+            return cycle.run_cycle(*args, **kwargs, transport=FakeTransport())
+        code = queue.run_queue(self.data, self.baseline, self.instructions, self.out,
+                               cycle_runner=wrong_effort_cycle, packet_runner=self.fake_packets,
+                               reasoning_effort='medium')
+        self.assertEqual(code, 2)
+        state = json.loads((self.out / 'queue.json').read_text())
+        self.assertEqual((state['status'], state['reasoning_effort']), ('blocked', 'medium'))
+        self.assertFalse((self.out / 'comparison').exists())
+        self.assertEqual(self.packet_calls, [])
+
+    def test_nonlow_control_is_rejected_even_when_candidate_requests_medium(self):
+        self.baseline_value['arms']['grounded_call']['reasoning_effort'] = 'medium'
+        self.write_baseline()
+        with self.assertRaisesRegex(ValueError, 'fixed low'):
+            self.run_queue(reasoning_effort='medium')
+        self.assertFalse(self.out.exists())
+        self.assertEqual(self.generated, [])
 
     def test_nonlocal_baseline_or_existing_queue_fails_before_any_calls(self):
         self.baseline_value['config']['base_url'] = 'https://example.org/v1'

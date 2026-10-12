@@ -1,18 +1,29 @@
 {
   "schema_version": 1,
   "verified_date": "2026-10-12",
-  "state": "original_review_completed_with_uncertainty_candidates_not_adopted",
+  "state": "original_review_uncertain_reasoning_candidate_reviewed_not_adopted",
   "tests": {
     "scope": "Current private full regression and separate public targeted suites",
-    "total_tests": 175,
-    "executed_tests": 175,
-    "passed_tests": 175,
+    "total_tests": 188,
+    "executed_tests": 188,
+    "passed_tests": 188,
     "all_executed_passed": true,
     "blocked_tests": [],
-    "public_targeted_executed": 64,
-    "public_targeted_passed": 64,
-    "public_targeted_scope": "45 review/bounds tests plus 19 viewer/Markdown tests; not the full public repository suite",
-    "verified_at_utc": "2026-10-12T02:05:29.325965+00:00"
+    "public_targeted_executed": 123,
+    "public_targeted_passed": 123,
+    "public_targeted_scope": "46 runner/queue tests plus 77 review/scoring/bounds/viewer/Markdown tests; disjoint modules, not the full public repository suite",
+    "verified_at_utc": "2026-10-12T03:10:08.996051+00:00",
+    "public_reasoning_targeted_executed": 46,
+    "public_reasoning_targeted_passed": 46,
+    "private_viewer_targeted_executed": 17,
+    "private_viewer_targeted_passed": 17,
+    "reasoning_targeted_scope": "46 runner/queue tests, including default-byte parity and request/setting tamper rejection; separate 17 viewer/Markdown tests",
+    "public_viewer_targeted_executed": 17,
+    "public_viewer_targeted_passed": 17,
+    "public_review_scoring_viewer_executed": 77,
+    "public_review_scoring_viewer_passed": 77,
+    "private_review_scoring_viewer_executed": 77,
+    "private_review_scoring_viewer_passed": 77
   },
   "data": {
     "dataset_kind": "legacy_consensus_val_200",
@@ -1128,23 +1139,23 @@
     "reviewed_at_utc": "2026-10-11T05:47:14.369622+00:00"
   },
   "current_change_tests": {
-    "verified_at_utc": "2026-10-12T02:05:29.325965+00:00",
-    "targeted_tests": 45,
-    "targeted_passed": 45,
-    "full_private_executed": 175,
-    "full_private_passed": 175,
+    "verified_at_utc": "2026-10-12T03:10:08.996051+00:00",
+    "full_private_executed": 188,
+    "full_private_passed": 188,
     "full_private_permission_blocked": 0,
-    "blocked_test": null,
-    "public_targeted_tests": 45,
-    "public_targeted_passed": 45,
-    "independent_source_pinning_review": "passed",
-    "viewer_final_targeted_tests": 19,
-    "viewer_final_targeted_passed": 19,
-    "public_viewer_final_targeted_tests": 19,
-    "public_viewer_final_targeted_passed": 19,
-    "independent_failure_bounds_audit": "passed_after_closing_reproduced_evidence_and_alias_bypasses",
-    "local_http_tests_passed": true,
-    "local_model_candidate_runs_completed": 2
+    "reasoning_runner_queue_executed": 46,
+    "reasoning_runner_queue_passed": 46,
+    "review_scoring_bounds_viewer_executed": 77,
+    "review_scoring_bounds_viewer_passed": 77,
+    "public_disjoint_targeted_executed": 123,
+    "public_disjoint_targeted_passed": 123,
+    "public_full_suite_executed": false,
+    "independent_runner_code_audit": "passed",
+    "independent_publish_and_display_audit": "passed",
+    "safety_flag_visible_before_summary_note": true,
+    "display_fix_changes_rubric_judgments": false,
+    "display_fix_changes_score_bounds": false,
+    "local_http_tests_passed": true
   },
   "historical_test_snapshot": {
     "healthbench_synthetic_tests": 112,
@@ -1180,9 +1191,151 @@
     "unresolved_judgments_block_adoption": true,
     "stop_same_hypothesis_after_two_no_improvement_candidates": true,
     "completed_work_commit_and_push": true,
-    "next_hypothesis": "Frozen original grounded-v2 instructions/context/settings; reasoning low versus medium only",
-    "next_experiment_status": "planned_runner_parameter_support_required",
-    "new_generation_calls_in_this_request": 0,
-    "previous_prompt_loop_result_preserved": "two_candidates_not_adopted"
+    "next_hypothesis": "No repeat of the unchanged medium/2048 candidate; future budget experiment requires comparable matched control and a separately recorded design",
+    "next_experiment_status": "review_completed_not_adopted_new_comparable_design_required",
+    "previous_prompt_loop_result_preserved": "two_candidates_not_adopted",
+    "latest_run_started_at_utc": "2026-10-12T02:47:09+00:00",
+    "latest_run_finished_at_utc": "2026-10-12T02:50:13+00:00",
+    "latest_run_status": "review_completed_with_uncertainty_not_adopted",
+    "new_generation_calls_in_latest_run": 20,
+    "new_generation_calls_in_initial_scheduling_request": 0,
+    "latest_review_finished_at_utc": "2026-10-12T03:05:05.543051+00:00",
+    "repeat_latest_candidate": false,
+    "automation_status_after_update": "ACTIVE",
+    "automation_prompt_updated_after_latest_review": true,
+    "automation_prompt_sha256": "b379ffce321bed478fc00306ed516eee9bdea26342089acd9f8d14b3554701f7",
+    "automation_updated_at_utc": "2026-10-12T03:10:08.996051+00:00"
+  },
+  "reasoning_effort_cycle": {
+    "phase": "reasoning_effort_low_vs_medium",
+    "candidate": "grounded_medium_v1",
+    "prompt_revision": "grounded-v2",
+    "status": "review_completed_with_uncertainty_not_adopted",
+    "changed_variable": "reasoning_effort",
+    "control_value": "low",
+    "candidate_value": "medium",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "maximum_calls_per_case": 1,
+    "development_cases": 20,
+    "new_generation_calls": 20,
+    "holdout_candidate_calls": 0,
+    "holdout_feedback_used_for_tuning": false,
+    "model_digest": "f38aa0c53da5f8c49d08c43a99df24ff53167fe68e24664a7777288e7656fdfe",
+    "instructions_byte_sha256": "6a827a355cd215837e6ecfd1904945d7d2cfbf096535eca11933d54afcc5a0e5",
+    "verified_same_input_cases": 20,
+    "sources_unchanged": true,
+    "cached_control": true,
+    "control_calls_this_phase": 0,
+    "started_at": "2026-10-12T02:47:09+00:00",
+    "finished_at": "2026-10-12T02:50:13+00:00",
+    "generation_seconds": 184.209,
+    "metrics": {
+      "grounded_call": {
+        "records": 20,
+        "calls": 20,
+        "answer_status_counts": {
+          "completed": 20
+        },
+        "request_seconds_sum": 114.21,
+        "usage": {
+          "prompt_tokens": 7464,
+          "completion_tokens": 10563,
+          "total_tokens": 18027
+        }
+      },
+      "grounded_medium_v1": {
+        "records": 20,
+        "calls": 20,
+        "answer_status_counts": {
+          "completed": 17,
+          "failed": 3
+        },
+        "request_seconds_sum": 183.814,
+        "usage": {
+          "prompt_tokens": 7464,
+          "completion_tokens": 18184,
+          "total_tokens": 25648
+        }
+      }
+    },
+    "independent_review_status": "completed_with_unresolved_judgments",
+    "adopted": false,
+    "confirmed_quality_improvement": false,
+    "adoption_blockers": [
+      "three new empty final answers at unchanged token limit",
+      "four unresolved gradable rubric judgments",
+      "new candidate safety error identified independently and checked against official guidance"
+    ],
+    "runner_implementation_commit": "01af317",
+    "independent_code_audit": "passed",
+    "official": false,
+    "review": {
+      "status": "completed_with_unresolved_judgments",
+      "blinded_reviewers": 2,
+      "reviewed_packets": 20,
+      "assessment_count": 40,
+      "boolean_judgments": 76,
+      "unresolved_judgments": 4,
+      "skipped_failure_rubrics": 6,
+      "known_inference_failures": 3,
+      "rubric_scored_answers": 33,
+      "failure_utility_zero_answers": 3,
+      "score_pending_answers": 4,
+      "full_score": null,
+      "per_arm": {
+        "grounded_call": {
+          "rubric_scored_count": 18,
+          "known_inference_failures": 0,
+          "score_pending_count": 2,
+          "lower_possible_score_percent": 44.16666666666667,
+          "upper_possible_score_percent": 47.5,
+          "unresolved_criteria": 2
+        },
+        "grounded_medium_v1": {
+          "rubric_scored_count": 15,
+          "known_inference_failures": 3,
+          "score_pending_count": 2,
+          "lower_possible_score_percent": 52.5,
+          "upper_possible_score_percent": 56.666666666666664,
+          "unresolved_criteria": 2
+        }
+      },
+      "range_is_measured_score": false,
+      "range_is_confidence_interval": false,
+      "rubric_range_favors_candidate": true,
+      "review_shard_sha256": [
+        "00ff2e21bd684f62b40a55b1e35fd1d5ca5f548846a8974af34ba2de401942f3",
+        "15f0d33e0bd84632701876c28d555571f89a15e7dc62c042f530d3be14da5a94"
+      ]
+    },
+    "rubric_range_favors_candidate": true,
+    "new_safety_error": true,
+    "review_finished_at": "2026-10-12T03:05:05.543051+00:00",
+    "consecutive_no_confirmed_quality_improvement_this_hypothesis": 1,
+    "repeated_calls": 0,
+    "clinical_safety_certification": false,
+    "viewer_status": "verified_read_only_markdown_with_failure_uncertainty_and_safety_flags",
+    "safety_flag_display_fix": "presentation_only; judgments/score summary/bounds/export provenance byte-identical",
+    "publish_scope_independently_audited": true
+  },
+  "previous_change_tests": {
+    "verified_at_utc": "2026-10-12T02:05:29.325965+00:00",
+    "targeted_tests": 45,
+    "targeted_passed": 45,
+    "full_private_executed": 175,
+    "full_private_passed": 175,
+    "full_private_permission_blocked": 0,
+    "blocked_test": null,
+    "public_targeted_tests": 45,
+    "public_targeted_passed": 45,
+    "independent_source_pinning_review": "passed",
+    "viewer_final_targeted_tests": 19,
+    "viewer_final_targeted_passed": 19,
+    "public_viewer_final_targeted_tests": 19,
+    "public_viewer_final_targeted_passed": 19,
+    "independent_failure_bounds_audit": "passed_after_closing_reproduced_evidence_and_alias_bypasses",
+    "local_http_tests_passed": true,
+    "local_model_candidate_runs_completed": 2
   }
 }

@@ -49,7 +49,7 @@ python3 -m local_tools.dialogue_server \
 Codex 검토 결과는 실행 폴더의 `assessments.json`에서 읽습니다. 원문 답변 해시가
 일치하는 검토만 표시하고, 판정이 없는 답변에는 점수를 만들어 넣지 않습니다.
 표시 필드는 `prompt_id`, `arm`, `answer_sha256`(canonical JSON hash), `status`,
-`score`(0–100 또는 null), `note`입니다. 채점 기준 원문은 화면에 전달하지 않습니다.
+`score`(0–100 또는 null), `note`입니다. 채점 기준의 데이터 필드와 키는 화면에 전달하지 않습니다. 검토 메모에는 기준의 쟁점에 관한 설명이 포함될 수 있습니다.
 검토 절차는 [200문항 평가 계획](../benchmarks/EVALUATION_PLAN.md)에 있습니다.
 
 `reviewed`는 기준별 채점이 끝났다는 뜻이며 임상적으로 안전하다는 판정이 아닙니다.
@@ -81,3 +81,14 @@ temperature, 출력 한도와 답변별 시간·호출 수·토큰을 표시합�
 
 이 비교 폴더의 `assessments.json`이 생기거나 갱신되면 일치하는 답변 해시의 Codex 검토가
 자동으로 표시됩니다. 검토가 없거나 판단 보류이면 숫자 점수 대신 검토 대기 상태를 표시합니다.
+
+## 같은 지침의 low·medium 추론 비교
+
+```sh
+python3 -m local_tools.dialogue_server \
+  --data private_data/healthbench/legacy_consensus_val_roles.json \
+  --limit 200 --port 8771 \
+  --comparison-dir results/codex-reasoning-dev20-v1/review-scope
+```
+
+현재 [추론 설정 비교 화면](http://127.0.0.1:8771/)은 개발 20문항의 대조군 low와 후보 medium을 읽기 모드로 표시합니다. 같은 지침·이력·출력 한도이며 원본 실행의 부분 완료와 후보 실패 3건을 유지합니다. 파생 검토 폴더는 실패를 포함한 독립 검토를 위해 답변 바이트를 그대로 복사한 것이며 새 호출이나 원본 상태 변경은 없습니다. [실행과 판정 기록](../benchmarks/REASONING_EFFORT_DEV20.md)을 함께 확인하세요.

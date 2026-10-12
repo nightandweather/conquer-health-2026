@@ -207,17 +207,21 @@ Codex 재검토·채택 판정은 후속 단계입니다. 준비 모드는
 품질이 같을 때만 시간·토큰 절감도 검토합니다. 평가용 180문항의 개별 피드백은 지침이나
 설정 수정의 근거로 사용하지 않습니다.
 
-다음 가설은 원래 grounded-v2 지침·이력·temperature 0·2,048토큰·1호출을 유지하고
-추론 설정만 low에서 medium으로 바꾸는 비교입니다. 이는 추론 부족이 오류의 원인이라는
-결론이 아니며 아직 실행하지 않았습니다. 현재 실행기와 큐의 low 고정을 파라미터로
-전달하는 최소 수정과 검증이 먼저 필요합니다. 원래 지침을 파일로 보관할 때는 끝 개행도
-추가하지 않아 대조군과 메시지 해시를 동일하게 유지합니다. 요청의 유일한 차이가 추론
-설정인지 확인하고, NOVA SDK 지원과 실제 여러 턴 개선은 별도 검증합니다.
+새 추론 설정 phase에서는 원래 grounded-v2 지침·이력·temperature 0·2,048토큰·1호출을 유지하고 추론 설정만 low에서 medium으로 바꿨습니다. 실행기와 큐의 `--reasoning-effort` 전달, 기본 low 동작 보존, 설정·요청 변조 거부를 구현·검증했습니다. [고정 원래 지침](prompts/grounded_v2_frozen.txt)은 끝 개행도 추가하지 않아 입력 해시가 동일합니다.
 
-검증한 코드·일반 지침·합성 테스트·공개 가능한 집계와 미채택 이유도 기존 개발 브랜치에
-커밋·푸시합니다. 품질 개선으로 채택한 설정은 이유와 근거를 기록하고 비교 화면과 기존
-PR을 갱신합니다. 실제 자료·답변·기준·환자 정보·키·개별 근거는 로컬 비공개 결과에
-보관합니다. 이번 요청에서는 예약과 다음 phase 계획만 설정했으며 신규 모델 호출은 0회입니다.
+```sh
+python3 -m benchmarks.healthbench_codex_cycle \
+  --data private_data/healthbench/legacy_consensus_val_roles.json \
+  --baseline-manifest results/healthbench-live-20261011-045938-5bd962/manifest.json \
+  --instructions-file benchmarks/prompts/grounded_v2_frozen.txt \
+  --candidate-name grounded_medium_v1 --instructions-version grounded-v2 \
+  --reasoning-effort medium --allow-finalized-dev-control \
+  --out results/UNIQUE_REASONING_ROUND --prepare-only
+```
+
+위 예는 호출 없는 준비 모드이며 출력 폴더는 새 회차마다 고유하게 지정합니다. 실제 이번 회차는 개발 20문항·20호출로 종료됐고 정상 17개·빈 답변 실패 3개입니다. 실패는 length 종료·2,048 출력 토큰으로 기록했고 재호출하지 않았습니다. 설정을 가린 새 독립 검증자 두 명이 40개 기록을 모두 검토했습니다. 기준 판정 76개를 확정하고 4개를 보류했으며 실패 답변의 6개 기준은 생략했습니다. 이번 기준 점수 범위는 높아졌지만 새 안전 오류·실패 3건·보류로 채택하지 않았습니다. [이번 추론 비교 기록](REASONING_EFFORT_DEV20.md)에 생성 시간·토큰·검토 상태와 미채택 이유를 기록합니다. 기존 v3/v4 종료 결과와 원래 200문항 검토는 별도로 유지합니다.
+
+검증한 코드·일반 지침·합성 테스트·공개 가능한 집계와 미채택 이유도 기존 개발 브랜치에 커밋·푸시하고 비교 화면과 기존 PR을 갱신합니다. 실제 자료·답변·기준·환자 정보·키·개별 근거는 로컬 비공개 결과에 보관합니다. NOVA SDK 지원과 실제 여러 턴 동작의 개선은 별도 검증하며 아직 이 설정을 제출 에이전트에 적용하지 않았습니다.
 
 ## 여러 턴의 검증
 

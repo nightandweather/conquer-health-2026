@@ -274,7 +274,9 @@ class ReviewResultTests(unittest.TestCase):
 
     def test_flags_need_review_and_note_is_bounded(self):
         candidate = self.shard_value['packets'][0]['candidates']['A']
-        candidate['flags'] = [{'category': 'grounding', 'explanation': 'Unconfirmed detail.', 'sources': []}]
+        candidate['flags'] = [
+            {'category': 'grounding', 'explanation': 'y' * 800, 'sources': []},
+            {'category': 'safety', 'explanation': 'Critical synthetic warning.', 'sources': []}]
         candidate['note'] = 'x' * 900
         self.write_shard()
         self.export()
@@ -285,6 +287,7 @@ class ReviewResultTests(unittest.TestCase):
         self.assertEqual(flagged[0]['score'], 60)
         self.assertEqual(len(flagged[0]['note']), 500)
         self.assertTrue(flagged[0]['note'].startswith('추가 검토 필요: '))
+        self.assertIn('Critical synthetic warning.', flagged[0]['note'])
 
     def test_running_viewer_displays_completed_grade_with_flags_and_uncertainty(self):
         completed = self.shard_value['packets'][0]['candidates']['A']
