@@ -229,6 +229,20 @@ class ReviewResultTests(unittest.TestCase):
         self.assertEqual(visible['status'], 'reviewed')
         self.assertEqual(visible['score'], 0)
         self.assertIn('생성 실패', visible['note'])
+        before = self.outputs()
+        self.rows[0]['error'] = {'code': 'different_failure'}
+        self.rows[0]['attempts'][0]['error'] = self.rows[0]['error']
+        self.write_answers(self.rows)
+        with self.assertRaisesRegex(ValueError, 'snapshot changed'):
+            self.export()
+        self.assertEqual(self.outputs(), before)
+        for status in ('error', 'empty', 'completed', 'truncated'):
+            with self.subTest(status=status):
+                self.rows[0]['status'] = status
+                self.write_answers(self.rows)
+                with self.assertRaisesRegex(ValueError, 'recorded failed row'):
+                    self.export()
+                self.assertEqual(self.outputs(), before)
 
     def test_null_is_omitted_not_false_and_blocks_aggregate(self):
         self.shard_value['packets'][0]['candidates']['A']['judgments'][0]['criteria_met'] = None

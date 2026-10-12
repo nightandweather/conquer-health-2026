@@ -1,24 +1,18 @@
 {
   "schema_version": 1,
   "verified_date": "2026-10-12",
-  "state": "stopped_no_confirmed_quality_improvement",
+  "state": "original_review_completed_with_uncertainty_candidates_not_adopted",
   "tests": {
-    "healthbench_synthetic_tests": 112,
-    "local_viewer_tests": 13,
-    "nova_existing_regression_tests": 8,
-    "total_tests": 146,
-    "executed_tests": 146,
-    "passed_tests": 146,
+    "scope": "Current private full regression and separate public targeted suites",
+    "total_tests": 175,
+    "executed_tests": 175,
+    "passed_tests": 175,
     "all_executed_passed": true,
     "blocked_tests": [],
-    "previous_http_test": "rechecked with current network access; passed",
-    "refinement_queue_tests": 3,
-    "public_packaged_tests": 138,
-    "public_packaged_passed_tests": 138,
-    "codex_cycle_queue_tests": 10,
-    "codex_guided_cycle_tests": 12,
-    "review_packet_and_export_tests": 33,
-    "previous_suite_verified_at_utc": "2026-10-11T05:50:18+00:00"
+    "public_targeted_executed": 64,
+    "public_targeted_passed": 64,
+    "public_targeted_scope": "45 review/bounds tests plus 19 viewer/Markdown tests; not the full public repository suite",
+    "verified_at_utc": "2026-10-12T02:05:29.325965+00:00"
   },
   "data": {
     "dataset_kind": "legacy_consensus_val_200",
@@ -135,7 +129,7 @@
     "zip_bytes": 7275,
     "sha256": "f8c95613f13572d3ff1fb7142aec4550829053ef5f4f85260aafb60f98c5505e"
   },
-  "notice": "Original 200-case generation remains partial (343 completed, 56 truncated, 1 failed). Remaining original-answer review in progress. Two dev20 candidates generated and independently reviewed; neither adopted; accuracy gain unconfirmed.",
+  "notice": "Original 200-case generation remains partial (343 completed, 56 truncated, 1 failed). All 400 saved records reviewed: 834 boolean rubric judgments, 40 unresolved, 2 failed-answer criteria skipped. No confirmed full point score. Two dev20 candidates generated and reviewed; neither adopted; accuracy gain unconfirmed.",
   "viewer": {
     "status": "implemented_and_browser_opened",
     "host": "127.0.0.1",
@@ -164,6 +158,17 @@
       "numeric_score_count": 33,
       "pending_score_count": 7,
       "visual_verification": "Browser inspected: real arm names, source statuses, Markdown content and exact-answer-hash assessments."
+    },
+    "latest_original_comparison": {
+      "url": "http://127.0.0.1:8770/",
+      "read_only": true,
+      "selected_count": 200,
+      "record_count": 400,
+      "assessment_count": 400,
+      "numeric_grade_count": 360,
+      "inference_failure_zero_count": 1,
+      "pending_grade_count": 40,
+      "visual_verification": "Browser checked Markdown readability, true source status counts and the separate failed-answer zero. Loaded store verified all 400 exact-answer assessments, 360 numeric displays and 40 pending scores."
     }
   },
   "latest_comparison": {
@@ -260,7 +265,7 @@
     ],
     "grader": "Codex rubric review; not the official grading model",
     "score": null,
-    "score_status": "generation_finalized_codex_review_incomplete",
+    "score_status": "all_records_reviewed_40_rubric_judgments_unresolved",
     "canonical_score_comparable": false,
     "started_at": "2026-10-11T04:59:38+00:00",
     "progress_checked_at_utc": "2026-10-11T20:58:27.566231+00:00",
@@ -272,14 +277,14 @@
     "nonempty_answers": 399,
     "codex_review": {
       "development_packets_reviewed": 20,
-      "answers_reviewed": 80,
-      "boolean_judgments": 169,
-      "unresolved_judgments": 1,
+      "answers_reviewed": 400,
+      "boolean_judgments": 834,
+      "unresolved_judgments": 40,
       "full_aggregate_status": "incomplete",
       "rubric_quality_note": "An archived criterion appears to reward unnecessary hedging; kept literal labels and separate rubric_issue flags. Do not tune generation to exploit it.",
-      "viewer_assessments_verified": 80,
-      "viewer_numeric_grades_verified": 79,
-      "viewer_verified_at_utc": "2026-10-11T05:45:41+00:00",
+      "viewer_assessments_verified": 400,
+      "viewer_numeric_grades_verified": 360,
+      "viewer_verified_at_utc": "2026-10-12T02:03:23.710099+00:00",
       "development_diagnostic": {
         "selected_count": 20,
         "raw_default_percent": 20.833333333333336,
@@ -288,20 +293,636 @@
         "notice": "Development-only Codex judgments on reconstructed data; mixed instruction/settings comparison; concrete clinical flags remain."
       },
       "resolved_pending_judgments": 1,
-      "heldout_packets_reviewed": 20,
+      "heldout_packets_reviewed": 180,
       "development_boolean_judgments": 86,
       "development_unresolved_judgments": 0,
-      "heldout_boolean_judgments": 83,
-      "heldout_unresolved_judgments": 1,
+      "heldout_boolean_judgments": 748,
+      "heldout_unresolved_judgments": 40,
       "holdout_feedback_not_used_for_prompt_changes": true,
       "packets_ready": 199,
       "packets_pending": 1,
-      "review_snapshot_refreshed_at_utc": "2026-10-11T20:58:27.566231+00:00",
-      "remaining_review_status": "in_progress_three_independent_blinded_reviewers",
+      "review_snapshot_refreshed_at_utc": "2026-10-12T02:01:57.081019+00:00",
+      "remaining_review_status": "completed_with_unresolved_judgments",
       "final_review_packets_ready": 200,
       "existing_packets_byte_identical": 199,
       "known_failure_policy": "Explicit finalized-run option; recorded failure utility zero; no fabricated medical rubric judgments",
-      "uncertainty_reporting": "Possible weighted score bounds, distinct from measured score and confidence interval"
+      "uncertainty_reporting": "Possible weighted score bounds, distinct from measured score and confidence interval",
+      "reviewed_packet_count": 200,
+      "known_inference_failure_count": 1,
+      "skipped_failure_rubric_count": 2,
+      "viewer_pending_grades": 40,
+      "reviewed_fraction": 1.0,
+      "all_recorded_rubric_instances_accounted_for": true,
+      "original_generation_files_sha_verified_unchanged": true,
+      "finalized_failure_validation": "All known-failure classifications require recorded failed-row attempt evidence; finalized entire answer snapshot pinned; success/truncated attempt hiding rejected; aliases and empty-success records rejected",
+      "score_slices": {
+        "all_200": {
+          "selected_count": 200,
+          "history_count": 81,
+          "official": false,
+          "possible_score_range_not_measured_score": true,
+          "is_confidence_interval": false,
+          "arms": {
+            "grounded_call": {
+              "status": "bounded",
+              "lower_score_percent": 50.33333333333334,
+              "upper_score_percent": 54.91666666666667,
+              "unresolved_criterion_count": 21,
+              "known_inference_failure_count": 0,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            },
+            "raw_default": {
+              "status": "bounded",
+              "lower_score_percent": 20.833333333333332,
+              "upper_score_percent": 25.16666666666667,
+              "unresolved_criterion_count": 19,
+              "known_inference_failure_count": 1,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            }
+          },
+          "metrics": {
+            "raw_default": {
+              "answer_count": 200,
+              "attempted_calls": 200,
+              "status_counts": {
+                "completed": 143,
+                "truncated": 56,
+                "failed": 1
+              },
+              "request_seconds": 3229.667,
+              "usage": {
+                "prompt_tokens": 42784,
+                "completion_tokens": 285749,
+                "total_tokens": 328533
+              },
+              "reviewed_records": 200,
+              "numeric_grade_count": 181,
+              "pending_grade_count": 19,
+              "records_with_flags": 196,
+              "flag_category_counts": {
+                "medical_error": 39,
+                "unsupported_patient_fact": 34,
+                "unnecessary_question": 1,
+                "omission": 39,
+                "history_confusion": 2,
+                "rubric_issue": 24,
+                "factual_error": 15,
+                "oververbose": 12,
+                "unsupported_claim": 4,
+                "unsafe_instruction": 8,
+                "unclear": 2,
+                "truncated": 7,
+                "history_contradiction": 16,
+                "overrefusal": 1,
+                "language_error": 1,
+                "unsupported_citation": 2,
+                "overtriage": 2,
+                "clinical_ambiguity": 1,
+                "insufficient_help": 1,
+                "unclear_cpr": 1,
+                "clinical_error": 113,
+                "readability": 73,
+                "unsafe_emergency_condition": 19,
+                "unsupported_facts": 10,
+                "clinical_accuracy_unverified": 12,
+                "alarmism": 1,
+                "unsafe_medication_instruction": 8,
+                "unsupported_medical_claim": 31,
+                "instruction_following": 4,
+                "dangerous_emergency_conditions": 5,
+                "unsupported_patient_facts": 6,
+                "calculation_error": 2,
+                "repetition": 4,
+                "dangerous_emergency_omission": 1,
+                "unsupported_plan": 1,
+                "inference_failure": 1,
+                "internal_contradiction": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            },
+            "grounded_call": {
+              "answer_count": 200,
+              "attempted_calls": 200,
+              "status_counts": {
+                "completed": 200
+              },
+              "request_seconds": 1159.832,
+              "usage": {
+                "prompt_tokens": 77097,
+                "completion_tokens": 101355,
+                "total_tokens": 178452
+              },
+              "reviewed_records": 200,
+              "numeric_grade_count": 179,
+              "pending_grade_count": 21,
+              "records_with_flags": 178,
+              "flag_category_counts": {
+                "unsupported_patient_fact": 14,
+                "medical_error": 19,
+                "omission": 87,
+                "unnecessary_question": 1,
+                "rubric_issue": 23,
+                "factual_error": 7,
+                "unsupported_citation": 2,
+                "unsafe_instruction": 3,
+                "history_contradiction": 5,
+                "unsupported_claim": 4,
+                "insufficient_help": 1,
+                "unclear": 1,
+                "question_gating": 1,
+                "regional_inaccuracy": 1,
+                "overgeneralization": 1,
+                "insufficient_reassurance": 1,
+                "extra_detail": 1,
+                "unsafe_emergency_condition": 12,
+                "clinical_error": 62,
+                "clinical_accuracy_unverified": 13,
+                "readability": 9,
+                "instruction_following": 4,
+                "unsupported_medical_claim": 15,
+                "dangerous_emergency_conditions": 3,
+                "unsupported_facts": 4,
+                "unsafe_medication_instruction": 2,
+                "alarmism": 1,
+                "unsupported_patient_facts": 3,
+                "unnecessary_context": 1,
+                "dangerous_emergency_omission": 1,
+                "overtriage": 2,
+                "repetition": 1,
+                "calculation_error": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            }
+          }
+        },
+        "development_20": {
+          "selected_count": 20,
+          "history_count": 5,
+          "official": false,
+          "possible_score_range_not_measured_score": true,
+          "is_confidence_interval": false,
+          "arms": {
+            "grounded_call": {
+              "status": "exact",
+              "lower_score_percent": 50.0,
+              "upper_score_percent": 50.0,
+              "unresolved_criterion_count": 0,
+              "known_inference_failure_count": 0,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            },
+            "raw_default": {
+              "status": "exact",
+              "lower_score_percent": 20.833333333333336,
+              "upper_score_percent": 20.833333333333336,
+              "unresolved_criterion_count": 0,
+              "known_inference_failure_count": 0,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            }
+          },
+          "metrics": {
+            "raw_default": {
+              "answer_count": 20,
+              "attempted_calls": 20,
+              "status_counts": {
+                "completed": 15,
+                "truncated": 5
+              },
+              "request_seconds": 341.412,
+              "usage": {
+                "prompt_tokens": 4033,
+                "completion_tokens": 31678,
+                "total_tokens": 35711
+              },
+              "reviewed_records": 20,
+              "numeric_grade_count": 20,
+              "pending_grade_count": 0,
+              "records_with_flags": 20,
+              "flag_category_counts": {
+                "medical_error": 39,
+                "unsupported_patient_fact": 7,
+                "unnecessary_question": 1,
+                "omission": 10,
+                "history_confusion": 2,
+                "rubric_issue": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            },
+            "grounded_call": {
+              "answer_count": 20,
+              "attempted_calls": 20,
+              "status_counts": {
+                "completed": 20
+              },
+              "request_seconds": 114.21,
+              "usage": {
+                "prompt_tokens": 7464,
+                "completion_tokens": 10563,
+                "total_tokens": 18027
+              },
+              "reviewed_records": 20,
+              "numeric_grade_count": 20,
+              "pending_grade_count": 0,
+              "records_with_flags": 19,
+              "flag_category_counts": {
+                "unsupported_patient_fact": 5,
+                "medical_error": 19,
+                "omission": 14,
+                "unnecessary_question": 1,
+                "rubric_issue": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            }
+          }
+        },
+        "holdout_180": {
+          "selected_count": 180,
+          "history_count": 76,
+          "official": false,
+          "possible_score_range_not_measured_score": true,
+          "is_confidence_interval": false,
+          "arms": {
+            "grounded_call": {
+              "status": "bounded",
+              "lower_score_percent": 50.370370370370374,
+              "upper_score_percent": 55.46296296296296,
+              "unresolved_criterion_count": 21,
+              "known_inference_failure_count": 0,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            },
+            "raw_default": {
+              "status": "bounded",
+              "lower_score_percent": 20.833333333333336,
+              "upper_score_percent": 25.64814814814815,
+              "unresolved_criterion_count": 19,
+              "known_inference_failure_count": 1,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            }
+          },
+          "metrics": {
+            "raw_default": {
+              "answer_count": 180,
+              "attempted_calls": 180,
+              "status_counts": {
+                "completed": 128,
+                "truncated": 51,
+                "failed": 1
+              },
+              "request_seconds": 2888.255,
+              "usage": {
+                "prompt_tokens": 38751,
+                "completion_tokens": 254071,
+                "total_tokens": 292822
+              },
+              "reviewed_records": 180,
+              "numeric_grade_count": 161,
+              "pending_grade_count": 19,
+              "records_with_flags": 176,
+              "flag_category_counts": {
+                "factual_error": 15,
+                "oververbose": 12,
+                "omission": 29,
+                "unsupported_claim": 4,
+                "unsafe_instruction": 8,
+                "unclear": 2,
+                "unsupported_patient_fact": 27,
+                "truncated": 7,
+                "rubric_issue": 23,
+                "history_contradiction": 16,
+                "overrefusal": 1,
+                "language_error": 1,
+                "unsupported_citation": 2,
+                "overtriage": 2,
+                "clinical_ambiguity": 1,
+                "insufficient_help": 1,
+                "unclear_cpr": 1,
+                "clinical_error": 113,
+                "readability": 73,
+                "unsafe_emergency_condition": 19,
+                "unsupported_facts": 10,
+                "clinical_accuracy_unverified": 12,
+                "alarmism": 1,
+                "unsafe_medication_instruction": 8,
+                "unsupported_medical_claim": 31,
+                "instruction_following": 4,
+                "dangerous_emergency_conditions": 5,
+                "unsupported_patient_facts": 6,
+                "calculation_error": 2,
+                "repetition": 4,
+                "dangerous_emergency_omission": 1,
+                "unsupported_plan": 1,
+                "inference_failure": 1,
+                "internal_contradiction": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            },
+            "grounded_call": {
+              "answer_count": 180,
+              "attempted_calls": 180,
+              "status_counts": {
+                "completed": 180
+              },
+              "request_seconds": 1045.622,
+              "usage": {
+                "prompt_tokens": 69633,
+                "completion_tokens": 90792,
+                "total_tokens": 160425
+              },
+              "reviewed_records": 180,
+              "numeric_grade_count": 159,
+              "pending_grade_count": 21,
+              "records_with_flags": 159,
+              "flag_category_counts": {
+                "factual_error": 7,
+                "omission": 73,
+                "unsupported_citation": 2,
+                "rubric_issue": 22,
+                "unsafe_instruction": 3,
+                "history_contradiction": 5,
+                "unsupported_claim": 4,
+                "insufficient_help": 1,
+                "unclear": 1,
+                "question_gating": 1,
+                "regional_inaccuracy": 1,
+                "overgeneralization": 1,
+                "insufficient_reassurance": 1,
+                "unsupported_patient_fact": 9,
+                "extra_detail": 1,
+                "unsafe_emergency_condition": 12,
+                "clinical_error": 62,
+                "clinical_accuracy_unverified": 13,
+                "readability": 9,
+                "instruction_following": 4,
+                "unsupported_medical_claim": 15,
+                "dangerous_emergency_conditions": 3,
+                "unsupported_facts": 4,
+                "unsafe_medication_instruction": 2,
+                "alarmism": 1,
+                "unsupported_patient_facts": 3,
+                "unnecessary_context": 1,
+                "dangerous_emergency_omission": 1,
+                "overtriage": 2,
+                "repetition": 1,
+                "calculation_error": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            }
+          }
+        },
+        "with_history_81": {
+          "selected_count": 81,
+          "history_count": 81,
+          "official": false,
+          "possible_score_range_not_measured_score": true,
+          "is_confidence_interval": false,
+          "arms": {
+            "grounded_call": {
+              "status": "bounded",
+              "lower_score_percent": 53.70370370370371,
+              "upper_score_percent": 59.053497942386834,
+              "unresolved_criterion_count": 10,
+              "known_inference_failure_count": 0,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            },
+            "raw_default": {
+              "status": "bounded",
+              "lower_score_percent": 19.54732510288066,
+              "upper_score_percent": 25.514403292181072,
+              "unresolved_criterion_count": 11,
+              "known_inference_failure_count": 0,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            }
+          },
+          "metrics": {
+            "raw_default": {
+              "answer_count": 81,
+              "attempted_calls": 81,
+              "status_counts": {
+                "completed": 67,
+                "truncated": 14
+              },
+              "request_seconds": 1181.781,
+              "usage": {
+                "prompt_tokens": 30551,
+                "completion_tokens": 104420,
+                "total_tokens": 134971
+              },
+              "reviewed_records": 81,
+              "numeric_grade_count": 70,
+              "pending_grade_count": 11,
+              "records_with_flags": 81,
+              "flag_category_counts": {
+                "medical_error": 14,
+                "omission": 14,
+                "history_confusion": 2,
+                "unsupported_patient_fact": 10,
+                "unsafe_instruction": 2,
+                "unclear": 2,
+                "oververbose": 4,
+                "factual_error": 4,
+                "history_contradiction": 8,
+                "unsupported_claim": 2,
+                "unsupported_citation": 1,
+                "truncated": 1,
+                "overtriage": 1,
+                "clinical_ambiguity": 1,
+                "rubric_issue": 7,
+                "insufficient_help": 1,
+                "clinical_error": 57,
+                "readability": 28,
+                "unsafe_emergency_condition": 9,
+                "unsupported_medical_claim": 12,
+                "instruction_following": 2,
+                "dangerous_emergency_conditions": 3,
+                "unsafe_medication_instruction": 2,
+                "clinical_accuracy_unverified": 3,
+                "unsupported_facts": 4,
+                "repetition": 3,
+                "dangerous_emergency_omission": 1,
+                "unsupported_patient_facts": 1,
+                "calculation_error": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            },
+            "grounded_call": {
+              "answer_count": 81,
+              "attempted_calls": 81,
+              "status_counts": {
+                "completed": 81
+              },
+              "request_seconds": 433.494,
+              "usage": {
+                "prompt_tokens": 44438,
+                "completion_tokens": 37470,
+                "total_tokens": 81908
+              },
+              "reviewed_records": 81,
+              "numeric_grade_count": 71,
+              "pending_grade_count": 10,
+              "records_with_flags": 70,
+              "flag_category_counts": {
+                "medical_error": 5,
+                "omission": 34,
+                "unsupported_patient_fact": 4,
+                "factual_error": 2,
+                "history_contradiction": 5,
+                "insufficient_help": 1,
+                "unsafe_instruction": 1,
+                "rubric_issue": 6,
+                "unsupported_claim": 1,
+                "regional_inaccuracy": 1,
+                "overgeneralization": 1,
+                "unsafe_emergency_condition": 5,
+                "clinical_error": 27,
+                "readability": 3,
+                "unsupported_medical_claim": 8,
+                "instruction_following": 1,
+                "dangerous_emergency_conditions": 3,
+                "unsafe_medication_instruction": 2,
+                "clinical_accuracy_unverified": 3,
+                "dangerous_emergency_omission": 1,
+                "calculation_error": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            }
+          }
+        },
+        "single_turn_119": {
+          "selected_count": 119,
+          "history_count": 0,
+          "official": false,
+          "possible_score_range_not_measured_score": true,
+          "is_confidence_interval": false,
+          "arms": {
+            "grounded_call": {
+              "status": "bounded",
+              "lower_score_percent": 48.0392156862745,
+              "upper_score_percent": 52.10084033613446,
+              "unresolved_criterion_count": 11,
+              "known_inference_failure_count": 0,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            },
+            "raw_default": {
+              "status": "bounded",
+              "lower_score_percent": 21.708683473389353,
+              "upper_score_percent": 24.92997198879552,
+              "unresolved_criterion_count": 8,
+              "known_inference_failure_count": 1,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            }
+          },
+          "metrics": {
+            "raw_default": {
+              "answer_count": 119,
+              "attempted_calls": 119,
+              "status_counts": {
+                "completed": 76,
+                "truncated": 42,
+                "failed": 1
+              },
+              "request_seconds": 2047.886,
+              "usage": {
+                "prompt_tokens": 12233,
+                "completion_tokens": 181329,
+                "total_tokens": 193562
+              },
+              "reviewed_records": 119,
+              "numeric_grade_count": 111,
+              "pending_grade_count": 8,
+              "records_with_flags": 115,
+              "flag_category_counts": {
+                "medical_error": 25,
+                "unsupported_patient_fact": 24,
+                "unnecessary_question": 1,
+                "omission": 25,
+                "rubric_issue": 17,
+                "factual_error": 11,
+                "oververbose": 8,
+                "unsupported_claim": 2,
+                "truncated": 6,
+                "unsafe_instruction": 6,
+                "overrefusal": 1,
+                "language_error": 1,
+                "unsupported_citation": 1,
+                "unclear_cpr": 1,
+                "clinical_error": 56,
+                "unsupported_facts": 6,
+                "readability": 45,
+                "clinical_accuracy_unverified": 9,
+                "alarmism": 1,
+                "unsafe_medication_instruction": 6,
+                "unsupported_medical_claim": 19,
+                "instruction_following": 2,
+                "history_contradiction": 8,
+                "unsafe_emergency_condition": 10,
+                "unsupported_patient_facts": 5,
+                "calculation_error": 1,
+                "dangerous_emergency_conditions": 2,
+                "overtriage": 1,
+                "repetition": 1,
+                "unsupported_plan": 1,
+                "inference_failure": 1,
+                "internal_contradiction": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            },
+            "grounded_call": {
+              "answer_count": 119,
+              "attempted_calls": 119,
+              "status_counts": {
+                "completed": 119
+              },
+              "request_seconds": 726.338,
+              "usage": {
+                "prompt_tokens": 32659,
+                "completion_tokens": 63885,
+                "total_tokens": 96544
+              },
+              "reviewed_records": 119,
+              "numeric_grade_count": 108,
+              "pending_grade_count": 11,
+              "records_with_flags": 108,
+              "flag_category_counts": {
+                "unsupported_patient_fact": 10,
+                "medical_error": 14,
+                "omission": 53,
+                "unnecessary_question": 1,
+                "rubric_issue": 17,
+                "factual_error": 5,
+                "unsupported_citation": 2,
+                "unsafe_instruction": 2,
+                "unsupported_claim": 3,
+                "unclear": 1,
+                "question_gating": 1,
+                "insufficient_reassurance": 1,
+                "extra_detail": 1,
+                "clinical_error": 35,
+                "clinical_accuracy_unverified": 10,
+                "instruction_following": 3,
+                "readability": 6,
+                "unsafe_emergency_condition": 7,
+                "unsupported_facts": 4,
+                "unsupported_medical_claim": 7,
+                "alarmism": 1,
+                "unsupported_patient_facts": 3,
+                "unnecessary_context": 1,
+                "overtriage": 2,
+                "repetition": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            }
+          }
+        }
+      }
     },
     "finished_at": "2026-10-11T06:12:48+00:00",
     "seconds": 4389.593,
@@ -311,7 +932,7 @@
       "total_tokens": 506985
     }
   },
-  "verified_at_utc": "2026-10-12T01:47:59.745613+00:00",
+  "verified_at_utc": "2026-10-12T02:05:29.325965+00:00",
   "refinement": {
     "status": "superseded_by_codex_verifier_protocol",
     "plan": "REFINEMENT_PLAN.md",
@@ -507,20 +1128,40 @@
     "reviewed_at_utc": "2026-10-11T05:47:14.369622+00:00"
   },
   "current_change_tests": {
-    "verified_at_utc": "2026-10-12T01:47:59.745613+00:00",
-    "targeted_tests": 42,
-    "targeted_passed": 42,
-    "full_private_executed": 172,
-    "full_private_passed": 172,
+    "verified_at_utc": "2026-10-12T02:05:29.325965+00:00",
+    "targeted_tests": 45,
+    "targeted_passed": 45,
+    "full_private_executed": 175,
+    "full_private_passed": 175,
     "full_private_permission_blocked": 0,
     "blocked_test": null,
-    "all_network_checks_passed": false,
-    "public_targeted_tests": 42,
-    "public_targeted_passed": 42,
+    "public_targeted_tests": 45,
+    "public_targeted_passed": 45,
     "independent_source_pinning_review": "passed",
     "viewer_final_targeted_tests": 19,
     "viewer_final_targeted_passed": 19,
     "public_viewer_final_targeted_tests": 19,
-    "public_viewer_final_targeted_passed": 19
+    "public_viewer_final_targeted_passed": 19,
+    "independent_failure_bounds_audit": "passed_after_closing_reproduced_evidence_and_alias_bypasses",
+    "local_http_tests_passed": true,
+    "local_model_candidate_runs_completed": 2
+  },
+  "historical_test_snapshot": {
+    "healthbench_synthetic_tests": 112,
+    "local_viewer_tests": 13,
+    "nova_existing_regression_tests": 8,
+    "total_tests": 146,
+    "executed_tests": 146,
+    "passed_tests": 146,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "previous_http_test": "rechecked with current network access; passed",
+    "refinement_queue_tests": 3,
+    "public_packaged_tests": 138,
+    "public_packaged_passed_tests": 138,
+    "codex_cycle_queue_tests": 10,
+    "codex_guided_cycle_tests": 12,
+    "review_packet_and_export_tests": 33,
+    "previous_suite_verified_at_utc": "2026-10-11T05:50:18+00:00"
   }
 }

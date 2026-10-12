@@ -40,7 +40,11 @@ REVIEWER_COUNT = 4
 
 
 def _reviewable_row(row: dict | None, include_known_inference_failures: bool = False) -> bool:
-    if row is None or not isinstance(row.get("answer"), str):
+    if row is None:
+        return False
+    if not isinstance(row.get("answer"), str):
+        if include_known_inference_failures and row.get("status") == "failed":
+            raise ValueError("Known inference failure requires an explicit string answer and attempt evidence")
         return False
     if row.get("status") in REVIEWABLE:
         return bool(row["answer"].strip())
@@ -50,6 +54,12 @@ def _reviewable_row(row: dict | None, include_known_inference_failures: bool = F
     if (not isinstance(attempts, list) or not attempts or type(selected) is not int or selected < 1
             or not isinstance(error, dict) or not isinstance(error.get("code"), str) or not error["code"]):
         raise ValueError("Known inference failure requires recorded final-attempt evidence")
+    if any(not isinstance(attempt, dict) or type(attempt.get("number")) is not int
+           or attempt["number"] != number for number, attempt in enumerate(attempts, 1)):
+        raise ValueError("Known inference failure requires ordered unique attempt evidence")
+    if any(attempt.get("status") in REVIEWABLE and isinstance(attempt.get("answer"), str)
+           and attempt["answer"].strip() for attempt in attempts):
+        raise ValueError("Known inference failure cannot discard a completed or truncated answer")
     matches = [attempt for attempt in attempts if isinstance(attempt, dict)
                and type(attempt.get("number")) is int and attempt["number"] == selected]
     if (len(matches) != 1 or matches[0].get("status") != "failed"
@@ -64,6 +74,14 @@ def _failure_review_policy(manifest: dict, enabled: bool) -> None:
     if enabled and (manifest.get("status") not in {"completed", "partial"}
                     or not isinstance(manifest.get("finished_at"), str) or not manifest["finished_at"]):
         raise ValueError("Known failure review requires a finalized generation manifest")
+
+
+def _validate_known_failure(row: dict) -> None:
+    # The opt-in accepts this generator's recorded failed rows only. Scorer
+    # aliases/empty successful rows must not bypass the attempt-evidence gate.
+    if row.get("status") != "failed":
+        raise ValueError("Known inference failure must use a recorded failed row")
+    _reviewable_row(row, True)
 
 
 def _json_object(raw: bytes, label: str) -> dict:
@@ -253,6 +271,9 @@ def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path,
         if row.get("prompt_sha256") != expected_hashes[row["prompt_id"]]:
             raise ValueError("Answer prompt SHA does not match its dataset prompt")
         _validate_arm_identity(row, configs)
+        if (include_known_inference_failures
+                and answer_kinds[(row["arm"], row["prompt_id"])]["kind"] == "known_inference_failure"):
+            _validate_known_failure(row)
         row_index[(row["arm"], row["prompt_id"])] = row
 
     scope = {"dataset_sha256": dataset["sha256"], "selected_prompt_ids": selected,
@@ -311,6 +332,8 @@ def create_review_packets(data: Path, answers: Path, manifest: Path, out: Path,
         if (not isinstance(first_sha, str) or len(first_sha) != 64
                 or any(character not in "0123456789abcdef" for character in first_sha)):
             raise ValueError("Existing first answers snapshot SHA is invalid")
+        if include_known_inference_failures and first_sha != snapshot_sha:
+            raise ValueError("Finalized failure review answers snapshot changed")
         entry_content = {key: value for key, value in entry.items() if key != "entry_sha256"}
         if entry.get("entry_sha256") != canonical_hash(entry_content):
             raise ValueError("Existing private packet metadata changed")

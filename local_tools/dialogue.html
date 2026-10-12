@@ -150,7 +150,7 @@ let state=null,selected=0,bottomPinned={},readMode=true,caseSignature='',filtere
 const el=id=>document.getElementById(id);
 const text=(tag,value,cls)=>{const node=document.createElement(tag);node.textContent=value;if(cls)node.className=cls;return node};
 function displayArms(){return Array.isArray(state.arms)&&state.arms.length?state.arms:defaultArms;}
-function armLabel(arm){return state.read_only&&arm==='grounded_call'?'대조군 · 기존 개선 설정':labels[arm]||(arm.startsWith('codex_guided_')?'Codex 개선 후보 · '+arm:arm);}
+function armLabel(arm){return state.read_only&&displayArms().some(name=>name.startsWith('codex_guided_'))&&arm==='grounded_call'?'대조군 · 기존 개선 설정':labels[arm]||(arm.startsWith('codex_guided_')?'Codex 개선 후보 · '+arm:arm);}
 function armSettings(arm){
  const config=(state.arm_config||{})[arm]||{},parts=[];
  if(config.prompt_revision)parts.push(String(config.prompt_revision));
@@ -186,7 +186,7 @@ function render(){
  el('connection').textContent=state.busy?'● 실행 중':'● 로컬 연결';el('connection').className='sub '+(state.busy?'busy':'');
  el('runAll').disabled=state.busy||state.read_only;el('runPair').disabled=state.busy||state.read_only;
  el('runAll').hidden=state.read_only||state.cases.length>3;el('runPair').hidden=Boolean(state.read_only);el('runPair').textContent=state.cases.length>3?`${state.cases.length}문항 기본·개선 비교 (${state.cases.length*2}답변)`:'기본·개선 다시 비교';
- el('pageTitle').textContent=state.read_only?'Codex 개선 전·후 답변 비교':'같은 질문, 세 가지 답변';
+ el('pageTitle').textContent=state.read_only?(displayArms().some(arm=>arm.startsWith('codex_guided_'))?'Codex 개선 전·후 답변 비교':'HealthBench 기본·지침 설정 비교'):'같은 질문, 세 가지 답변';
  el('modelSettings').textContent=state.read_only?`${state.model} · 저장된 ${displayArms().length}개 설정 · 읽기 전용`:'gpt-oss-20b · 기본 / 루닛 호출 지침 / 사실 보존 지침';
  el('notice').textContent=`복구한 HealthBench 자료 ${state.cases.length}문항의 답변 생성·비교입니다. Codex 검토 점수는 공식 HealthBench 점수가 아닙니다. 개선 설정은 추가 학습이 아닌 호출 지침 변경입니다.`;
  el('viewMode').textContent=readMode?'원문 보기':'읽기 모드';el('viewMode').setAttribute('aria-pressed',String(!readMode));el('modeLabel').textContent=readMode?'읽기 모드 · Markdown':'원문 모드';
@@ -216,7 +216,7 @@ function render(){
    const assessment=card.querySelector('.assessment'),review=r.assessment;
    const hasScore=review&&Number.isFinite(review.score)&&review.score>=0&&review.score<=100;
    assessment.className='assessment'+(hasScore?' reviewed':'');
-   assessment.textContent=hasScore?`Codex 검토 ${Number(review.score.toFixed(1))} / 100 · 공식 점수 아님`:(review&&['needs_review','uncertain'].includes(review.status)?'Codex 추가 검토 필요 · 점수 미정':'Codex 검토 대기 · 점수 미정');
+   assessment.textContent=hasScore?(r.status==='failed'?'생성 실패 점수 0 / 100 · 의학적 기준 판정 생략':`Codex 검토 ${Number(review.score.toFixed(1))} / 100 · 공식 점수 아님`):(review&&['needs_review','uncertain'].includes(review.status)?'Codex 추가 검토 필요 · 점수 미정':'Codex 검토 대기 · 점수 미정');
    if(review&&typeof review.note==='string'&&review.note.trim())assessment.textContent+='\n'+review.note.trim();
    const value=r.answer||({waiting:'다른 답변이 끝나면 이어서 생성합니다.',generating:'답변을 준비하고 있습니다…',failed:'결과 기록에서 실패 상태를 확인하세요.'}[r.status]||'비교 실행 후 답변이 여기에 표시됩니다.');
    const mode=readMode&&r.answer?'read':'raw';

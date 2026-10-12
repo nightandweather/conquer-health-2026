@@ -162,6 +162,8 @@ def export_reviews(data: Path, answers: Path, manifest: Path, review_dir: Path,
                 or row.get('prompt_sha256') != prompt_hashes[row['prompt_id']]):
             raise ValueError('Answer dataset or prompt hash changed')
         packets._validate_arm_identity(row, configs)
+        if include_failures and answer_kinds[(row['arm'], row['prompt_id'])]['kind'] == 'known_inference_failure':
+            packets._validate_known_failure(row)
         row_index[(row['arm'], row['prompt_id'])] = row
     scope = {'dataset_sha256': dataset['sha256'], 'selected_prompt_ids': selected,
              'selected_prompt_sha256': prompt_hashes, 'arms': manifest_value.get('arms')}
@@ -198,6 +200,8 @@ def export_reviews(data: Path, answers: Path, manifest: Path, review_dir: Path,
             raise ValueError('Private packet candidate or mapping changed')
         if not _valid_sha(entry.get('first_source_answers_sha256')):
             raise ValueError('Invalid first source snapshot hash')
+        if include_failures and entry['first_source_answers_sha256'] != _sha(snapshot):
+            raise ValueError('Finalized failure review answers snapshot changed')
         if entry.get('entry_sha256') != canonical_hash({key: value for key, value in entry.items()
                                                      if key != 'entry_sha256'}):
             raise ValueError('Private packet metadata hash changed')

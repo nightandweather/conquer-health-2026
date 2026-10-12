@@ -139,17 +139,58 @@ class HealthBenchReviewTests(unittest.TestCase):
                     error={'code': 'empty_answer'},
                     attempts=[{'number': 1, 'status': 'failed', 'answer': '',
                                'error': {'code': 'empty_answer'}}])
-        variants = [dict(base, attempts=[]), dict(base, selected_attempt=0),
+        variants = [dict(base, answer=None), {key: value for key, value in base.items() if key != 'answer'},
+                    dict(base, attempts=[]), dict(base, selected_attempt=0),
                     dict(base, selected_attempt=True), dict(base, error=None),
                     dict(base, attempts=[dict(base['attempts'][0], number=True)]),
                     dict(base, attempts=[dict(base['attempts'][0], answer='different')]),
-                    dict(base, attempts=[dict(base['attempts'][0], status='completed')])]
+                    dict(base, attempts=[dict(base['attempts'][0], status='completed')]),
+                    dict(base, attempts=[base['attempts'][0],
+                                        {'number': 2, 'status': 'completed', 'answer': 'Successful answer'}]),
+                    dict(base, attempts=[base['attempts'][0], base['attempts'][0]])]
         for index, row in enumerate(variants):
             with self.subTest(index=index):
                 self.write_answers([row, *self.rows[1:]])
                 out = self.root / 'results' / f'invalid-{index}'
                 with self.assertRaisesRegex(ValueError, 'failure'):
                     create_review_packets(self.data, self.answers, self.manifest, out,
+                                          include_known_inference_failures=True)
+
+    def test_finalized_failure_snapshot_pins_all_attempt_evidence(self):
+        self.manifest_value.update(status='partial', finished_at='2026-01-01T00:00:00Z')
+        self.manifest.write_text(json.dumps(self.manifest_value))
+        self.rows[0].update(status='failed', answer='', selected_attempt=1,
+                            error={'code': 'empty_answer'},
+                            attempts=[{'number': 1, 'status': 'failed', 'answer': '',
+                                       'error': {'code': 'empty_answer'}}])
+        self.write_answers(self.rows)
+        create_review_packets(self.data, self.answers, self.manifest, self.out,
+                              include_known_inference_failures=True)
+        before = self.snapshot()
+        self.rows[0]['error'] = {'code': 'different_failure'}
+        self.rows[0]['attempts'][0]['error'] = self.rows[0]['error']
+        self.write_answers(self.rows)
+        with self.assertRaisesRegex(ValueError, 'snapshot changed'):
+            create_review_packets(self.data, self.answers, self.manifest, self.out,
+                                  include_known_inference_failures=True)
+        self.assertEqual(self.snapshot(), before)
+
+    def test_invalid_failed_row_is_rejected_even_if_other_arm_missing(self):
+        self.manifest_value.update(status='partial', finished_at='2026-01-01T00:00:00Z')
+        self.manifest.write_text(json.dumps(self.manifest_value))
+        self.write_answers([dict(self.rows[0], status='failed', answer=None), *self.rows[2:]])
+        with self.assertRaisesRegex(ValueError, 'failure'):
+            create_review_packets(self.data, self.answers, self.manifest, self.out,
+                                  include_known_inference_failures=True)
+
+    def test_scorer_failure_aliases_cannot_bypass_recorded_failure_policy(self):
+        self.manifest_value.update(status='partial', finished_at='2026-01-01T00:00:00Z')
+        self.manifest.write_text(json.dumps(self.manifest_value))
+        for status in ('error', 'empty', 'completed', 'truncated'):
+            with self.subTest(status=status):
+                self.write_answers([dict(self.rows[0], status=status, answer=''), *self.rows[2:]])
+                with self.assertRaisesRegex(ValueError, 'recorded failed row'):
+                    create_review_packets(self.data, self.answers, self.manifest, self.out,
                                           include_known_inference_failures=True)
 
     def test_failure_policy_does_not_package_missing_or_blocked_answers(self):
