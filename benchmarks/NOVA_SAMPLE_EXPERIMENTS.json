@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_utc": "2026-10-12T11:07:36.770815+00:00",
+  "updated_at_utc": "2026-10-12T11:11:11.303973+00:00",
   "sample_scores_are_not_official": true,
   "clinical_improvement_verified": false,
   "experiments": [
@@ -142,7 +142,7 @@
       "id": "E04",
       "recipe": "E03 final RECORD_PROMPT instruction bundle: grounded tests/treatment/follow-up/disposition and performed-versus-planned education",
       "control": "E03",
-      "status": "queued",
+      "status": "evaluating",
       "score": null,
       "areas": null,
       "expected_cases": 3,
@@ -156,7 +156,7 @@
       "url": "https://nova.snubhai.org/submissions/b08031cc-2785-42a6-929f-64859b0e0ca5/",
       "submitted_at_kst": "2026-10-12 20:05",
       "server_file_sha_matches_local": true,
-      "server_file_status": "registered",
+      "server_file_status": "building_validating",
       "whole_evaluation_complete": false,
       "local_validation": {
         "new_synthetic_tests": 17,
@@ -172,7 +172,8 @@
       },
       "quality_improvement_verified": false,
       "sample_submission_count": 1,
-      "official_submission_count": 0
+      "official_submission_count": 0,
+      "last_observed_at_utc": "2026-10-12T11:11:11.303973+00:00"
     }
   ],
   "comparison_limit": "E01 has no score. E03 versus E00 changes review and retrieval together; E03 versus E02 repairs storage only but E02 never reached dialogue. Reused public samples and unconfirmed server digest do not establish independent clinical improvement.",
