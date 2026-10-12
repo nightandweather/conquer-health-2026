@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at_utc": "2026-10-12T11:11:11.303973+00:00",
+  "updated_at_utc": "2026-10-12T11:19:35.256754+00:00",
   "sample_scores_are_not_official": true,
   "clinical_improvement_verified": false,
   "experiments": [
@@ -146,8 +146,15 @@
       "score": null,
       "areas": null,
       "expected_cases": 3,
-      "completed_cases": null,
-      "case_results": [],
+      "completed_cases": 1,
+      "case_results": [
+        {
+          "case_id": "C01",
+          "status": "normal",
+          "turns": 23,
+          "seconds": 583
+        }
+      ],
       "server_model_calls": null,
       "server_tokens": null,
       "server_model_digest": null,
@@ -173,7 +180,11 @@
       "quality_improvement_verified": false,
       "sample_submission_count": 1,
       "official_submission_count": 0,
-      "last_observed_at_utc": "2026-10-12T11:11:11.303973+00:00"
+      "last_observed_at_utc": null,
+      "last_observation_window_utc": [
+        "2026-10-12T11:17:26.378Z",
+        "2026-10-12T11:19:01Z"
+      ]
     }
   ],
   "comparison_limit": "E01 has no score. E03 versus E00 changes review and retrieval together; E03 versus E02 repairs storage only but E02 never reached dialogue. Reused public samples and unconfirmed server digest do not establish independent clinical improvement.",
