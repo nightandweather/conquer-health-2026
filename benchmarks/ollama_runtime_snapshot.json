@@ -1,0 +1,26 @@
+{
+  "checked_at_utc": "2026-10-11T05:05:49+00:00",
+  "inspection": "metadata only; no generation calls or setting changes",
+  "ollama_version": "0.40.2",
+  "model": "gpt-oss:20b",
+  "thinking": {
+    "values": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "default": "medium"
+  },
+  "stored_parameters": "temperature                    1",
+  "model_max_context": 131072,
+  "template_sha256": "fa6710a93d78da62641e192361344be7a8c0a1c3737f139cf89f20ce1626b99c",
+  "loaded_models": [
+    {
+      "name": "gpt-oss:20b",
+      "digest": "f38aa0c53da5f8c49d08c43a99df24ff53167fe68e24664a7777288e7656fdfe",
+      "context_length": 32768,
+      "size": 12775220836,
+      "size_vram": 12775220836
+    }
+  ]
+}

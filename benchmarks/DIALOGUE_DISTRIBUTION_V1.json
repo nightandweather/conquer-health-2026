@@ -1,0 +1,1036 @@
+{
+  "schema_version": 1,
+  "analysis_date": "2026-10-12",
+  "title_ko": "환자 대화와 의료 질문의 네 축 분포",
+  "scope": {
+    "ACI": "67 training encounters; question-purpose covers the 32 punctuated encounters only",
+    "HealthBench": "20 previously used development requests; other 180 excluded from content analysis",
+    "no_submissions_or_new_answer_generation": true
+  },
+  "question_purpose": {
+    "schema_version": 1,
+    "analysis": "question_purpose",
+    "data_boundary": "ACI-Bench training dialogue only; no notes, validation/test, HealthBench, or NOVA evaluation cases",
+    "unit": "Speaker turn containing literal ?, not a validated count of questions; purposes assigned to turns",
+    "source_groups": {
+      "aci": {
+        "cases": 35,
+        "turns": 1636,
+        "question_proxy_turns": 0,
+        "proxy_by_role": {}
+      },
+      "virtassist": {
+        "cases": 20,
+        "turns": 1114,
+        "question_proxy_turns": 392,
+        "proxy_by_role": {
+          "doctor": 378,
+          "patient": 14
+        }
+      },
+      "virtscribe": {
+        "cases": 12,
+        "turns": 985,
+        "question_proxy_turns": 257,
+        "proxy_by_role": {
+          "doctor": 206,
+          "patient": 51
+        }
+      }
+    },
+    "scope": {
+      "supplied_training_dialogues": 67,
+      "question_mark_preserving_dialogues": 32,
+      "punctuation_free_dialogues_not_measured": 35,
+      "proxy_turns": 649,
+      "doctor_proxy_turns": 584,
+      "patient_proxy_turns": 65
+    },
+    "patient_manual_census": {
+      "denominator": 65,
+      "primary_categories": [
+        {
+          "code": "social_greeting",
+          "name_ko": "인사·관계 형성",
+          "count": 13,
+          "percent_of_role_proxy_turns": 20.0,
+          "percent_of_all_proxy_turns": 2.003
+        },
+        {
+          "code": "understanding_condition",
+          "name_ko": "증상·질환·의학 용어 이해",
+          "count": 16,
+          "percent_of_role_proxy_turns": 24.615,
+          "percent_of_all_proxy_turns": 2.465
+        },
+        {
+          "code": "treatment_medication",
+          "name_ko": "치료·약물·보충제 문의",
+          "count": 11,
+          "percent_of_role_proxy_turns": 16.923,
+          "percent_of_all_proxy_turns": 1.695
+        },
+        {
+          "code": "tests_results_procedures",
+          "name_ko": "검사·결과·시술 문의",
+          "count": 6,
+          "percent_of_role_proxy_turns": 9.231,
+          "percent_of_all_proxy_turns": 0.924
+        },
+        {
+          "code": "followup_daily_life",
+          "name_ko": "다음 단계·재진·일상 관리 문의",
+          "count": 7,
+          "percent_of_role_proxy_turns": 10.769,
+          "percent_of_all_proxy_turns": 1.079
+        },
+        {
+          "code": "logistics_access_research",
+          "name_ko": "예약·비용·접근·연구 참여 문의",
+          "count": 5,
+          "percent_of_role_proxy_turns": 7.692,
+          "percent_of_all_proxy_turns": 0.77
+        },
+        {
+          "code": "confirmation_acknowledgment",
+          "name_ko": "확인·맞장구·꼬리표",
+          "count": 5,
+          "percent_of_role_proxy_turns": 7.692,
+          "percent_of_all_proxy_turns": 0.77
+        },
+        {
+          "code": "other_nonclinical",
+          "name_ko": "기타 비임상·인용 의문",
+          "count": 2,
+          "percent_of_role_proxy_turns": 3.077,
+          "percent_of_all_proxy_turns": 0.308
+        }
+      ],
+      "multilabel_counts": {
+        "social_greeting": 13,
+        "treatment_medication": 12,
+        "understanding_condition": 20,
+        "other_nonclinical": 2,
+        "logistics_access_research": 8,
+        "followup_daily_life": 9,
+        "confirmation_acknowledgment": 5,
+        "tests_results_procedures": 8
+      },
+      "multilabel_turns": 12,
+      "assignments": 77,
+      "proxy_kinds": {
+        "greeting": 13,
+        "direct_information_request": 34,
+        "nonclinical_request": 1,
+        "clarification_request": 9,
+        "narrative_tag": 4,
+        "confirmation_echo": 2,
+        "quoted_question_with_indirect_concern": 1,
+        "quoted_past_self_question": 1
+      },
+      "conditional_direct_or_clarification": {
+        "denominator": 43,
+        "primary": [
+          {
+            "code": "treatment_medication",
+            "count": 11,
+            "percent": 25.581
+          },
+          {
+            "code": "understanding_condition",
+            "count": 14,
+            "percent": 32.558
+          },
+          {
+            "code": "logistics_access_research",
+            "count": 5,
+            "percent": 11.628
+          },
+          {
+            "code": "followup_daily_life",
+            "count": 7,
+            "percent": 16.279
+          },
+          {
+            "code": "tests_results_procedures",
+            "count": 6,
+            "percent": 13.953
+          }
+        ]
+      }
+    },
+    "doctor_manual_sample": {
+      "denominator": 60,
+      "sampling_frame": 584,
+      "seed": 20261012,
+      "design": "Simple random sample of doctor-role question-mark turns; adjacent context inspected, rule predictions hidden while labeling",
+      "primary": [
+        {
+          "code": "social_greeting",
+          "count": 3,
+          "percent": 5.0
+        },
+        {
+          "code": "treatment_medication",
+          "count": 8,
+          "percent": 13.333
+        },
+        {
+          "code": "confirmation_consent",
+          "count": 11,
+          "percent": 18.333
+        },
+        {
+          "code": "symptom_assessment",
+          "count": 30,
+          "percent": 50.0
+        },
+        {
+          "code": "history_context",
+          "count": 4,
+          "percent": 6.667
+        },
+        {
+          "code": "patient_agenda",
+          "count": 2,
+          "percent": 3.333
+        },
+        {
+          "code": "other_unclassified",
+          "count": 1,
+          "percent": 1.667
+        },
+        {
+          "code": "tests_procedures",
+          "count": 1,
+          "percent": 1.667
+        }
+      ],
+      "do_not_generalize": "Counts describe the sampled 60 turns. They are not an exact distribution across 584 turns or all 67 dialogues."
+    },
+    "quality_checks": {
+      "doctor_lexical_rule_primary_agreement_with_same_analyst_manual_sample": {
+        "numerator": 28,
+        "denominator": 60,
+        "percent": 46.667,
+        "decision": "Full rule-derived purpose distribution excluded from headline analysis; no post-audit rule tuning."
+      },
+      "patient_independent_second_analyst_primary_agreement": {
+        "numerator": 9,
+        "denominator": 12,
+        "seed": 20261013,
+        "percent": 75.0,
+        "disagreement_types": [
+          "test timing versus scheduling category (2)",
+          "narrative tag versus follow-up request (1)"
+        ],
+        "decision": "Original labels unchanged; taxonomy boundary uncertainty retained. Agreement is not clinical correctness."
+      }
+    },
+    "limitations": [
+      "The punctuation-free ACI source group is excluded from question-purpose estimates, not treated as no questions.",
+      "Speaker roles are source labels; not medically adjudicated or automatically corrected.",
+      "Patient manual census is a single-annotator interpretive classification; limited second-annotator sample was not fully concordant.",
+      "Question-mark proxy includes greetings, quoted questions, narrative tags, and confirmations; it misses unpunctuated questions.",
+      "Primary category is one label per turn; additional purposes are retained as multilabel assignments and totals can exceed 100%.",
+      "No disease prevalence, clinical correctness, model quality, or actual NOVA patient distribution is inferred."
+    ],
+    "model_api_calls": 0
+  },
+  "ACI_clinical_theme": {
+    "schema_version": 1,
+    "scope": "ACI-Bench selected train dialogues only",
+    "axis": "Chief-complaint-based representative topic; not diagnosis distribution",
+    "annotation_method": "Codex manual census of chief-complaint metadata; not an independently adjudicated clinical label",
+    "denominator": "One primary topic per selected encounter, including nonspecific complaints",
+    "input_sha256": "14ad5b16cd0c6be0a82f214b4c57dc0cbd94e07055d064947c076386b83582ef",
+    "annotations_sha256": "87ef6ff3ee1f08ca89888ee3983fa54a579ebdf2aef0d89e59680f5eb1e75098",
+    "codebook": [
+      {
+        "code": "musculoskeletal",
+        "label_ko": "근골격·사지·등 통증/손상",
+        "definition_ko": "사지·관절·척추 부위의 명시적 통증이나 손상. 부위만 있고 증상이 없는 항목은 제외."
+      },
+      {
+        "code": "respiratory_ent",
+        "label_ko": "호흡기·인후",
+        "definition_ko": "호흡곤란, 폐/기도 질환, 인후 증상. 원인 진단을 추정하지 않음."
+      },
+      {
+        "code": "cardiovascular",
+        "label_ko": "순환기",
+        "definition_ko": "심혈관 질환명, 흉통 또는 그 명시적 추적."
+      },
+      {
+        "code": "endocrine_metabolic",
+        "label_ko": "내분비·대사",
+        "definition_ko": "혈당·갑상선·성선호르몬 관련 명시 주호소."
+      },
+      {
+        "code": "gastrointestinal_hepatic",
+        "label_ko": "소화기·간",
+        "definition_ko": "복부·배변·간 또는 삼킴 관련 주호소. 연하곤란 원인을 추정하지 않음."
+      },
+      {
+        "code": "urinary_renal",
+        "label_ko": "비뇨·신장",
+        "definition_ko": "배뇨 증상이나 신장결석 관련 주호소."
+      },
+      {
+        "code": "skin_wound",
+        "label_ko": "피부·상처",
+        "definition_ko": "피부 병변·가려움·궤양. 사지의 피부 병변은 근골격보다 이 주제를 우선."
+      },
+      {
+        "code": "breast_reproductive",
+        "label_ko": "유방·생식기",
+        "definition_ko": "유방이나 생식기 질환·수술 후 추적의 명시 주호소."
+      },
+      {
+        "code": "neurologic",
+        "label_ko": "신경계 증상",
+        "definition_ko": "두통 등 명시된 신경계 증상. 진단을 추정하지 않음."
+      },
+      {
+        "code": "ocular",
+        "label_ko": "눈 관련 증상",
+        "definition_ko": "눈·눈꺼풀에 국한된 명시 증상. 신경계 원인을 추정하지 않음."
+      },
+      {
+        "code": "hematologic",
+        "label_ko": "혈액 관련",
+        "definition_ko": "빈혈 등이 주호소에 명시됨."
+      },
+      {
+        "code": "preventive_unspecified_followup",
+        "label_ko": "예방·불특정 만성/추적",
+        "definition_ko": "정기 검진, 금연 상담, 장기·질환이 특정되지 않은 만성질환/방문/응급실 추적. 명시 질환의 추적은 해당 주제를 우선."
+      },
+      {
+        "code": "other_unspecified",
+        "label_ko": "기타·불명확",
+        "definition_ko": "검사 이상만 있고 원인이 없거나 신체 부위만 적힌 주호소."
+      },
+      {
+        "code": "mental_health",
+        "label_ko": "정신건강",
+        "definition_ko": "정신건강이 주호소에 직접 명시된 경우. 동반 병력만으로 대표 주제로 승격하지 않음."
+      }
+    ],
+    "overall": {
+      "encounters": 67,
+      "chief_complaint_nonblank": 67,
+      "chief_complaint_blank": 0,
+      "classified": 67,
+      "primary_topic_counts": {
+        "musculoskeletal": 28,
+        "respiratory_ent": 5,
+        "cardiovascular": 4,
+        "endocrine_metabolic": 3,
+        "gastrointestinal_hepatic": 3,
+        "urinary_renal": 2,
+        "skin_wound": 3,
+        "breast_reproductive": 4,
+        "neurologic": 1,
+        "ocular": 1,
+        "hematologic": 1,
+        "preventive_unspecified_followup": 9,
+        "other_unspecified": 3,
+        "mental_health": 0
+      },
+      "primary_topic_percent": {
+        "musculoskeletal": 41.79,
+        "respiratory_ent": 7.46,
+        "cardiovascular": 5.97,
+        "endocrine_metabolic": 4.48,
+        "gastrointestinal_hepatic": 4.48,
+        "urinary_renal": 2.99,
+        "skin_wound": 4.48,
+        "breast_reproductive": 5.97,
+        "neurologic": 1.49,
+        "ocular": 1.49,
+        "hematologic": 1.49,
+        "preventive_unspecified_followup": 13.43,
+        "other_unspecified": 4.48,
+        "mental_health": 0.0
+      },
+      "secondary_metadata_status": {
+        "blank_unknown": 24,
+        "explicit_none": 3,
+        "recorded_items": 40
+      },
+      "secondary_item_count_known_only": {
+        "0": 3,
+        "1": 16,
+        "2": 12,
+        "3": 12
+      },
+      "secondary_item_count_unknown": 24,
+      "secondary_recorded_at_least_two_items": 24,
+      "age_metadata": {
+        "known": 54,
+        "blank": 13,
+        "invalid": 0,
+        "min": 3.0,
+        "max": 91.0,
+        "median": 53.0,
+        "bands": {
+          "18to39": 10,
+          "40to64": 35,
+          "65plus": 8,
+          "under18": 1
+        }
+      },
+      "sex_metadata": {
+        "blank_unknown": 2,
+        "female": 34,
+        "male": 31
+      }
+    },
+    "by_source": {
+      "aci": {
+        "encounters": 35,
+        "chief_complaint_nonblank": 35,
+        "chief_complaint_blank": 0,
+        "classified": 35,
+        "primary_topic_counts": {
+          "musculoskeletal": 17,
+          "respiratory_ent": 4,
+          "cardiovascular": 3,
+          "endocrine_metabolic": 0,
+          "gastrointestinal_hepatic": 2,
+          "urinary_renal": 2,
+          "skin_wound": 2,
+          "breast_reproductive": 1,
+          "neurologic": 1,
+          "ocular": 1,
+          "hematologic": 0,
+          "preventive_unspecified_followup": 1,
+          "other_unspecified": 1,
+          "mental_health": 0
+        },
+        "primary_topic_percent": {
+          "musculoskeletal": 48.57,
+          "respiratory_ent": 11.43,
+          "cardiovascular": 8.57,
+          "endocrine_metabolic": 0.0,
+          "gastrointestinal_hepatic": 5.71,
+          "urinary_renal": 5.71,
+          "skin_wound": 5.71,
+          "breast_reproductive": 2.86,
+          "neurologic": 2.86,
+          "ocular": 2.86,
+          "hematologic": 0.0,
+          "preventive_unspecified_followup": 2.86,
+          "other_unspecified": 2.86,
+          "mental_health": 0.0
+        },
+        "secondary_metadata_status": {
+          "blank_unknown": 23,
+          "recorded_items": 12
+        },
+        "secondary_item_count_known_only": {
+          "1": 6,
+          "2": 5,
+          "3": 1
+        },
+        "secondary_item_count_unknown": 23,
+        "secondary_recorded_at_least_two_items": 6,
+        "age_metadata": {
+          "known": 23,
+          "blank": 12,
+          "invalid": 0,
+          "min": 3.0,
+          "max": 91.0,
+          "median": 46.0,
+          "bands": {
+            "18to39": 6,
+            "40to64": 10,
+            "65plus": 6,
+            "under18": 1
+          }
+        },
+        "sex_metadata": {
+          "blank_unknown": 2,
+          "female": 18,
+          "male": 15
+        }
+      },
+      "virtassist": {
+        "encounters": 20,
+        "chief_complaint_nonblank": 20,
+        "chief_complaint_blank": 0,
+        "classified": 20,
+        "primary_topic_counts": {
+          "musculoskeletal": 8,
+          "respiratory_ent": 1,
+          "cardiovascular": 1,
+          "endocrine_metabolic": 1,
+          "gastrointestinal_hepatic": 0,
+          "urinary_renal": 0,
+          "skin_wound": 0,
+          "breast_reproductive": 0,
+          "neurologic": 0,
+          "ocular": 0,
+          "hematologic": 1,
+          "preventive_unspecified_followup": 6,
+          "other_unspecified": 2,
+          "mental_health": 0
+        },
+        "primary_topic_percent": {
+          "musculoskeletal": 40.0,
+          "respiratory_ent": 5.0,
+          "cardiovascular": 5.0,
+          "endocrine_metabolic": 5.0,
+          "gastrointestinal_hepatic": 0.0,
+          "urinary_renal": 0.0,
+          "skin_wound": 0.0,
+          "breast_reproductive": 0.0,
+          "neurologic": 0.0,
+          "ocular": 0.0,
+          "hematologic": 5.0,
+          "preventive_unspecified_followup": 30.0,
+          "other_unspecified": 10.0,
+          "mental_health": 0.0
+        },
+        "secondary_metadata_status": {
+          "blank_unknown": 1,
+          "recorded_items": 19
+        },
+        "secondary_item_count_known_only": {
+          "1": 4,
+          "2": 5,
+          "3": 10
+        },
+        "secondary_item_count_unknown": 1,
+        "secondary_recorded_at_least_two_items": 15,
+        "age_metadata": {
+          "known": 20,
+          "blank": 0,
+          "invalid": 0,
+          "min": 27.0,
+          "max": 62.0,
+          "median": 55.0,
+          "bands": {
+            "18to39": 2,
+            "40to64": 18
+          }
+        },
+        "sex_metadata": {
+          "female": 9,
+          "male": 11
+        }
+      },
+      "virtscribe": {
+        "encounters": 12,
+        "chief_complaint_nonblank": 12,
+        "chief_complaint_blank": 0,
+        "classified": 12,
+        "primary_topic_counts": {
+          "musculoskeletal": 3,
+          "respiratory_ent": 0,
+          "cardiovascular": 0,
+          "endocrine_metabolic": 2,
+          "gastrointestinal_hepatic": 1,
+          "urinary_renal": 0,
+          "skin_wound": 1,
+          "breast_reproductive": 3,
+          "neurologic": 0,
+          "ocular": 0,
+          "hematologic": 0,
+          "preventive_unspecified_followup": 2,
+          "other_unspecified": 0,
+          "mental_health": 0
+        },
+        "primary_topic_percent": {
+          "musculoskeletal": 25.0,
+          "respiratory_ent": 0.0,
+          "cardiovascular": 0.0,
+          "endocrine_metabolic": 16.67,
+          "gastrointestinal_hepatic": 8.33,
+          "urinary_renal": 0.0,
+          "skin_wound": 8.33,
+          "breast_reproductive": 25.0,
+          "neurologic": 0.0,
+          "ocular": 0.0,
+          "hematologic": 0.0,
+          "preventive_unspecified_followup": 16.67,
+          "other_unspecified": 0.0,
+          "mental_health": 0.0
+        },
+        "secondary_metadata_status": {
+          "explicit_none": 3,
+          "recorded_items": 9
+        },
+        "secondary_item_count_known_only": {
+          "0": 3,
+          "1": 6,
+          "2": 2,
+          "3": 1
+        },
+        "secondary_item_count_unknown": 0,
+        "secondary_recorded_at_least_two_items": 3,
+        "age_metadata": {
+          "known": 11,
+          "blank": 1,
+          "invalid": 0,
+          "min": 36.0,
+          "max": 75.0,
+          "median": 56.0,
+          "bands": {
+            "18to39": 2,
+            "40to64": 7,
+            "65plus": 2
+          }
+        },
+        "sex_metadata": {
+          "female": 7,
+          "male": 5
+        }
+      }
+    },
+    "limitations": [
+      "Labels describe provided chief-complaint wording, not verified diagnoses or an exhaustive dialogue topic inventory.",
+      "Secondary field mixes symptoms, diseases, history and procedures; semicolon items are not distinct diseases or distinct clinical topics.",
+      "Blank secondary fields are unknown rather than no comorbidity. Age/sex are unvalidated source metadata.",
+      "A body-part-only chief complaint remains unspecified; later dialogue/clinical-note answers are not used to infer its topic.",
+      "No holdout inputs, notes, reference answers or model-generation calls were used."
+    ],
+    "model_api_calls": 0
+  },
+  "ACI_flow_and_lexical_review_cues": {
+    "schema_version": 1,
+    "cases": 67,
+    "turns": 3735,
+    "roles_are_source_labels_not_validated_identity": true,
+    "turns_by_source_role": {
+      "doctor": 1928,
+      "patient": 1807
+    },
+    "turns_per_dialogue": {
+      "min": 25,
+      "median": 50,
+      "max": 131,
+      "sum": 3735
+    },
+    "dialogues_with_more_than_30_source_segments": {
+      "count": 62,
+      "denominator": 67,
+      "percent": 92.54
+    },
+    "not_comparable_to_nova_action_turns": true,
+    "dialogue_length_buckets": {
+      "31–60": 39,
+      "61–90": 17,
+      "91+": 6,
+      "1–30": 5
+    },
+    "sources": [
+      {
+        "source": "aci",
+        "cases": 35,
+        "turns": 1636,
+        "cases_with_question_mark": 0,
+        "question_mark_turns_by_source_role": {},
+        "question_marks": 0
+      },
+      {
+        "source": "virtassist",
+        "cases": 20,
+        "turns": 1114,
+        "cases_with_question_mark": 20,
+        "question_mark_turns_by_source_role": {
+          "doctor": 378,
+          "patient": 14
+        },
+        "question_marks": 480
+      },
+      {
+        "source": "virtscribe",
+        "cases": 12,
+        "turns": 985,
+        "cases_with_question_mark": 12,
+        "question_mark_turns_by_source_role": {
+          "doctor": 206,
+          "patient": 51
+        },
+        "question_marks": 279
+      }
+    ],
+    "multiple_question_marks_in_doctor_turn": {
+      "count": 83,
+      "denominator": 584,
+      "percent": 14.21
+    },
+    "next_source_speaker_after_patient_question_turn": {
+      "doctor": 65
+    },
+    "adjacency_does_not_establish_answered_or_answer_quality": true,
+    "review_cues": {
+      "explicit_uncertainty": {
+        "turns": 33,
+        "case_prevalence": {
+          "count": 21,
+          "denominator": 67,
+          "percent": 31.34
+        },
+        "source_role_filter": "patient",
+        "by_source_case_count": {
+          "aci": 13,
+          "virtassist": 3,
+          "virtscribe": 5
+        }
+      },
+      "first_person_concern": {
+        "turns": 4,
+        "case_prevalence": {
+          "count": 4,
+          "denominator": 67,
+          "percent": 5.97
+        },
+        "source_role_filter": "patient",
+        "by_source_case_count": {
+          "aci": 1,
+          "virtassist": 2,
+          "virtscribe": 1
+        }
+      },
+      "provider_language_in_patient_label": {
+        "turns": 4,
+        "case_prevalence": {
+          "count": 3,
+          "denominator": 67,
+          "percent": 4.48
+        },
+        "source_role_filter": "patient",
+        "by_source_case_count": {
+          "aci": 3,
+          "virtassist": 0,
+          "virtscribe": 0
+        }
+      },
+      "numeric_dose_unit": {
+        "turns": 43,
+        "case_prevalence": {
+          "count": 22,
+          "denominator": 67,
+          "percent": 32.84
+        },
+        "source_role_filter": "all",
+        "by_source_case_count": {
+          "aci": 0,
+          "virtassist": 19,
+          "virtscribe": 3
+        }
+      }
+    },
+    "caveats": [
+      "Lexical cue presence, not confirmed ambiguity, error, adverse event, or unsafe care.",
+      "Unpunctuated transcripts are not question-free.",
+      "Role labels are retained; provider-language flags require source/audio adjudication.",
+      "Numeric dosage regex misses word-form quantities and non-unit descriptions.",
+      "Training data only; not NOVA hidden evaluation or a representative patient population."
+    ],
+    "input_sha256": "14ad5b16cd0c6be0a82f214b4c57dc0cbd94e07055d064947c076386b83582ef"
+  },
+  "HealthBench_development_four_axes": {
+    "schema_version": 1,
+    "scope": "Previously used HealthBench dev20 input prompts only; not the 180-case evaluation split",
+    "unit": "One case / final user request; original assistant context retained for flow and source-attribution cues",
+    "input_sha256": "6982325798cb5497ad329a4333cbc5de21a2002c3b5ab138b1d18935fc3da432",
+    "source_file_sha256": "cd3516c601da6f67fc7b6db3439efdf2659a91534c09c6bc1c5d363889ed4033",
+    "annotations_sha256": "95f829d3269781706fa565096c32fc43e4a1599ec1a6059a6ad7a17b057353a1",
+    "cases": 20,
+    "method": "Codex manual census for purpose/topic/cues; deterministic role counts for flow; not independently adjudicated clinical labels",
+    "codebook": {
+      "purpose": [
+        {
+          "code": "treatment_selfcare_choices",
+          "label_ko": "치료·자가관리 선택",
+          "definition_ko": "현재 조건에서 치료나 예방·식이/자가관리 선택을 요청."
+        },
+        {
+          "code": "clinical_documentation",
+          "label_ko": "의료 문서 작성·재작성",
+          "definition_ko": "주어진 사실로 기록 또는 의뢰문을 작성/정리해 달라는 요청."
+        },
+        {
+          "code": "explanation_comparison",
+          "label_ko": "일반 설명·비교",
+          "definition_ko": "질환/증상의 개념, 차이, 일반 경과를 설명해 달라는 요청."
+        },
+        {
+          "code": "evidence_effectiveness",
+          "label_ko": "근거·효과 확인",
+          "definition_ko": "연구 근거/참고문헌 또는 효과 보장 여부를 요청."
+        },
+        {
+          "code": "urgent_next_action",
+          "label_ko": "즉시 행동·진료 시급성",
+          "definition_ko": "지금 기다릴지 행동/진료할지를 묻는 최종 요청."
+        },
+        {
+          "code": "evaluation_next_steps",
+          "label_ko": "평가·검사의 다음 단계",
+          "definition_ko": "이미 받은 평가 뒤 추가 검사/전문가 평가의 다음 단계를 요청."
+        },
+        {
+          "code": "symptom_interpretation",
+          "label_ko": "증상 원인·의미 추정",
+          "definition_ko": "노출/증상/임상 vignette의 원인 또는 의미 추정을 주된 요청으로 해석. 명시 질문 없는 vignette 포함."
+        },
+        {
+          "code": "followup_timing",
+          "label_ko": "정기 추적 시기",
+          "definition_ko": "특정 상황의 방문/검진 간격을 요청."
+        }
+      ],
+      "topic": [
+        {
+          "code": "neuro_mental_attention",
+          "label_ko": "두통·신경/주의집중",
+          "definition_ko": "두통 또는 주의집중/ADHD 관련 입력의 대표 주제."
+        },
+        {
+          "code": "documentation_unspecified",
+          "label_ko": "일반 의료 기록",
+          "definition_ko": "특정 장기/임상 주제가 주어지지 않은 기록 요청."
+        },
+        {
+          "code": "allergy",
+          "label_ko": "알레르기 관련",
+          "definition_ko": "식품 노출 후 알레르기 여부/증상 관련 입력."
+        },
+        {
+          "code": "infant_maternal_nutrition_followup",
+          "label_ko": "영아·임신·산후 관리",
+          "definition_ko": "영아 먹이기, 임신 중 식이, 산후 추적."
+        },
+        {
+          "code": "endocrine_metabolic",
+          "label_ko": "내분비·대사",
+          "definition_ko": "당뇨/인슐린 등 관련 입력."
+        },
+        {
+          "code": "trauma",
+          "label_ko": "외상·현장 구조",
+          "definition_ko": "사고·구조 상황."
+        },
+        {
+          "code": "infection_fever",
+          "label_ko": "감염·발열",
+          "definition_ko": "감염 질환 또는 발열 평가 입력."
+        },
+        {
+          "code": "preventive_immunization",
+          "label_ko": "예방접종",
+          "definition_ko": "예방접종 관련 방문/기록."
+        },
+        {
+          "code": "bite_exposure",
+          "label_ko": "물림·노출",
+          "definition_ko": "절지동물 등에 물린 원인 추정."
+        },
+        {
+          "code": "oncology_genetic_risk",
+          "label_ko": "암·유전위험",
+          "definition_ko": "암 유전위험과 예방 선택."
+        },
+        {
+          "code": "ear_hearing",
+          "label_ko": "귀·청력",
+          "definition_ko": "귀 감각/청력 관련 입력."
+        },
+        {
+          "code": "general_symptoms",
+          "label_ko": "일반 증상",
+          "definition_ko": "특정 장기를 추정하지 않는 오한/어지럼 관련 입력."
+        }
+      ],
+      "flow": [
+        {
+          "code": "single_user_input",
+          "label_ko": "단일 사용자 입력",
+          "definition_ko": "원래 입력에 assistant 메시지가 없음."
+        },
+        {
+          "code": "assistant_history_present",
+          "label_ko": "assistant 이력 포함 후속 요청",
+          "definition_ko": "원래 입력에 assistant 메시지가 하나 이상 있음. 환자 사실로 인증하지 않음."
+        }
+      ],
+      "cues": [
+        {
+          "code": "named_drug_or_substance",
+          "label_ko": "약물·물질 명칭 보존",
+          "definition_ko": "약물/물질명과 사용 맥락이 명시되어 임의 동정/대체를 피할 검토 지점."
+        },
+        {
+          "code": "numeric_dose_or_measurements",
+          "label_ko": "용량·측정값 보존",
+          "definition_ko": "명시 용량/혈당/체온/검사 수치를 보존해야 함. 수치의 정확성은 검증하지 않음."
+        },
+        {
+          "code": "child_pregnancy_postpartum",
+          "label_ko": "소아·임신·산후 조건",
+          "definition_ko": "소아/영아 또는 임신/산후라는 조건이 명시됨."
+        },
+        {
+          "code": "history_source_attribution",
+          "label_ko": "assistant 이력 출처 구분",
+          "definition_ko": "원래 assistant 이력을 읽어야 하는 후속 요청. 이력의 사실성/정합성을 보장하지 않음."
+        },
+        {
+          "code": "underspecified_patient_or_item",
+          "label_ko": "제공 정보 부족·대상 불특정",
+          "definition_ko": "구체적인 기록/동정/효과 요청에 정보가 매우 적거나 대상/기록 부재가 명시됨."
+        },
+        {
+          "code": "inference_requested",
+          "label_ko": "원인·의미 추정 요청",
+          "definition_ko": "증상/노출 원인 또는 의미 추정을 요청하거나 임상 vignette만 제시함. 확정 오류가 아님."
+        },
+        {
+          "code": "urgent_action_language",
+          "label_ko": "즉시 행동·시급성 표현",
+          "definition_ko": "최종 요청 또는 이어진 이력에서 즉시 구조/진료/대기 여부를 묻음. 임상 위험도 등급을 판정하지 않음."
+        },
+        {
+          "code": "guarantee_claim",
+          "label_ko": "효과 보장 표현",
+          "definition_ko": "guaranteed 같은 절대적 효과 보장 여부를 물음."
+        },
+        {
+          "code": "safety_or_tradeoff",
+          "label_ko": "개입 안전·선택의 손익",
+          "definition_ko": "실행할 처치/섭취/수술 선택의 안전·대안·부작용이 요청에 중요하게 포함됨."
+        },
+        {
+          "code": "documentation_fact_boundary",
+          "label_ko": "문서 사실 경계",
+          "definition_ko": "요청된 의료 문서에 없는 사실을 임의로 생성하면 안 되는 상황. 답변 오류 여부는 판정하지 않음."
+        }
+      ]
+    },
+    "exclusive_counts": {
+      "purpose": {
+        "treatment_selfcare_choices": 5,
+        "clinical_documentation": 3,
+        "explanation_comparison": 2,
+        "evidence_effectiveness": 2,
+        "urgent_next_action": 3,
+        "evaluation_next_steps": 1,
+        "symptom_interpretation": 3,
+        "followup_timing": 1
+      },
+      "topic": {
+        "neuro_mental_attention": 4,
+        "documentation_unspecified": 1,
+        "allergy": 2,
+        "infant_maternal_nutrition_followup": 3,
+        "endocrine_metabolic": 1,
+        "trauma": 1,
+        "infection_fever": 2,
+        "preventive_immunization": 1,
+        "bite_exposure": 1,
+        "oncology_genetic_risk": 1,
+        "ear_hearing": 2,
+        "general_symptoms": 1
+      },
+      "flow": {
+        "single_user_input": 15,
+        "assistant_history_present": 5
+      }
+    },
+    "exclusive_percent": {
+      "purpose": {
+        "treatment_selfcare_choices": 25.0,
+        "clinical_documentation": 15.0,
+        "explanation_comparison": 10.0,
+        "evidence_effectiveness": 10.0,
+        "urgent_next_action": 15.0,
+        "evaluation_next_steps": 5.0,
+        "symptom_interpretation": 15.0,
+        "followup_timing": 5.0
+      },
+      "topic": {
+        "neuro_mental_attention": 20.0,
+        "documentation_unspecified": 5.0,
+        "allergy": 10.0,
+        "infant_maternal_nutrition_followup": 15.0,
+        "endocrine_metabolic": 5.0,
+        "trauma": 5.0,
+        "infection_fever": 10.0,
+        "preventive_immunization": 5.0,
+        "bite_exposure": 5.0,
+        "oncology_genetic_risk": 5.0,
+        "ear_hearing": 10.0,
+        "general_symptoms": 5.0
+      },
+      "flow": {
+        "single_user_input": 75.0,
+        "assistant_history_present": 25.0
+      }
+    },
+    "multi_label_cue_counts": {
+      "named_drug_or_substance": 2,
+      "numeric_dose_or_measurements": 2,
+      "child_pregnancy_postpartum": 5,
+      "history_source_attribution": 5,
+      "underspecified_patient_or_item": 4,
+      "inference_requested": 3,
+      "urgent_action_language": 3,
+      "guarantee_claim": 1,
+      "safety_or_tradeoff": 7,
+      "documentation_fact_boundary": 3
+    },
+    "multi_label_cue_percent": {
+      "named_drug_or_substance": 10.0,
+      "numeric_dose_or_measurements": 10.0,
+      "child_pregnancy_postpartum": 25.0,
+      "history_source_attribution": 25.0,
+      "underspecified_patient_or_item": 20.0,
+      "inference_requested": 15.0,
+      "urgent_action_language": 15.0,
+      "guarantee_claim": 5.0,
+      "safety_or_tradeoff": 35.0,
+      "documentation_fact_boundary": 15.0
+    },
+    "cases_with_any_cue": 18,
+    "input_message_roles": {
+      "assistant": 11,
+      "user": 31
+    },
+    "input_message_count_histogram": {
+      "1": 15,
+      "3": 1,
+      "5": 2,
+      "7": 2
+    },
+    "limitations": [
+      "These cases were already used in development. They are neither new independent evaluation data nor a representative HealthBench sample.",
+      "User is a role label, not proof that the speaker is the patient. Documentation and clinician-style requests remain in the denominator.",
+      "Purpose uses the final user's intended request, including requests without a question mark. It is not directly comparable to question-mark-turn counts in ACI.",
+      "Cue labels identify review attention points. They are not verified clinical errors, trap questions, difficulty labels, or medical recommendations.",
+      "Multiple cues may apply to one case; cue percentages may exceed 100 in sum. Topics and purposes have one representative label each.",
+      "Original assistant history is input context, not a new candidate answer and not verified patient evidence."
+    ],
+    "model_api_calls": 0,
+    "generated_answers_read": 0,
+    "reference_rubrics_read": 0,
+    "heldout_individual_contents_analyzed": 0
+  },
+  "HealthBench_whole_archive_existing_metadata": {
+    "cases": 200,
+    "with_original_history": 81,
+    "percent": 40.5,
+    "provenance": "existing role-restoration manifest only; no heldout content analysis",
+    "not_official_HealthBench_full_dataset": true
+  },
+  "interpretation_ko": [
+    "자료별 목적과 분모가 다르므로 합산하거나 같은 질문 발생률로 직접 비교하지 않는다.",
+    "질문 목적은 탐색적 수작업 분류이며 임상 정답이나 어려움 판정이 아니다.",
+    "ACI 출처별 문장부호와 화자 표기 차이는 이력 처리 전에 점검할 대상이다.",
+    "개별 문항의 분포를 대회 비공개 출제 확률로 해석하지 않는다."
+  ]
+}

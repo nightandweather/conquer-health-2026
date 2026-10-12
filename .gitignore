@@ -9,3 +9,13 @@ run*.json
 *.pyc
 __pycache__/
 node_modules/
+private_data/
+results/
+.venv/
+.env
+.env.*
+*.key
+*.pem
+*.gguf
+*.safetensors
+healthbench_data/

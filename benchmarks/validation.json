@@ -1,0 +1,2279 @@
+{
+  "schema_version": 1,
+  "verified_date": "2026-10-12",
+  "state": "source_index_generation_and_independent_review_completed_not_adopted",
+  "tests": {
+    "scope": "Private full suite and 17 explicitly selected public modules after review-once candidate",
+    "executed_tests": 482,
+    "passed_tests": 482,
+    "all_executed_passed": true,
+    "public_targeted_executed": 359,
+    "public_targeted_passed": 359,
+    "public_full_suite_claimed": false,
+    "verified_at_utc": "2026-10-12T08:57:49.215185+00:00"
+  },
+  "data": {
+    "dataset_kind": "legacy_consensus_val_200",
+    "normalized_context": true,
+    "lost_original_prompt_ids": true,
+    "canonical_score_comparable": false,
+    "count": 200,
+    "rubric_count": 438,
+    "history_count": 81,
+    "source_sha256": "1a6c39c254391679bf1ceeb9c49bc2470fbdae19e0923d26dca533082eed67ae",
+    "converted_sha256": "c42bebdd8d7687482dc95f8ec267662ee1a64db7586c558de7529cead0da171f"
+  },
+  "input_validation": {
+    "status": "dry_run",
+    "selected_count": 200,
+    "planned_answers": 400,
+    "network_calls": 0
+  },
+  "model_attempt": {
+    "model": "gpt-oss:20b",
+    "model_digest": "f38aa0c53da5f8c49d08c43a99df24ff53167fe68e24664a7777288e7656fdfe",
+    "model_details": {
+      "parent_model": "dhiltgen/gpt-oss:20b-llamacpp",
+      "format": "gguf",
+      "family": "gpt-oss",
+      "families": [
+        "gpt-oss"
+      ],
+      "parameter_size": "20.9B",
+      "quantization_level": "MXFP4",
+      "context_length": 131072,
+      "embedding_length": 2880,
+      "runner": "llamacpp"
+    },
+    "endpoint": "local Ollama",
+    "status": "completed",
+    "started_at": "2026-10-11T04:16:22+00:00",
+    "finished_at": "2026-10-11T04:20:47+00:00",
+    "selected_count": 3,
+    "selection": "first 3 sorted normalized prompt IDs; smoke check",
+    "planned_answers": 6,
+    "written_answers": 6,
+    "nonempty_answers": 6,
+    "attempted_chat_requests": 9,
+    "responses_received": 9,
+    "seconds": 264.897,
+    "answer_status_counts": {
+      "truncated": 1,
+      "completed": 5
+    },
+    "attempt_status_counts": {
+      "truncated": 2,
+      "completed": 5,
+      "failed": 2
+    },
+    "usage": {
+      "prompt_tokens": 1347,
+      "completion_tokens": 26478,
+      "total_tokens": 27825
+    },
+    "score": null,
+    "score_status": "not_scored",
+    "arms": {
+      "raw_default": {
+        "answers": 3,
+        "status_counts": {
+          "truncated": 1,
+          "completed": 2
+        },
+        "finish_reason_counts": {
+          "length": 1,
+          "stop": 2
+        },
+        "calls": 3,
+        "fallback_answers": 0,
+        "seconds": 53.857,
+        "usage": {
+          "prompt_tokens": 251,
+          "completion_tokens": 4835,
+          "total_tokens": 5086
+        }
+      },
+      "lunit_call": {
+        "answers": 3,
+        "status_counts": {
+          "completed": 3
+        },
+        "finish_reason_counts": {
+          "stop": 3
+        },
+        "calls": 6,
+        "fallback_answers": 3,
+        "seconds": 211.039,
+        "usage": {
+          "prompt_tokens": 1096,
+          "completion_tokens": 21643,
+          "total_tokens": 22739
+        },
+        "first_attempt_counts": {
+          "length_with_nonempty_answer": 1,
+          "length_with_empty_answer": 2
+        }
+      }
+    }
+  },
+  "canonical_301": {
+    "selection_ids_verified": 301,
+    "main_dataset_available": false,
+    "ids_sha256": "e4047a7adb607cda11270d3d76b80270e75bff8081bdb64f20f78f77f963c8b9"
+  },
+  "submission_check": {
+    "offline_import_prepare": "passed",
+    "files": 3,
+    "zip_bytes": 7275,
+    "sha256": "f8c95613f13572d3ff1fb7142aec4550829053ef5f4f85260aafb60f98c5505e"
+  },
+  "notice": "Original 200-case generation remains partial (343 completed, 56 truncated, 1 failed). All 400 saved records reviewed: 834 boolean rubric judgments, 40 unresolved, 2 failed-answer criteria skipped. No confirmed full point score. Two dev20 candidates generated and reviewed; neither adopted; accuracy gain unconfirmed.",
+  "viewer": {
+    "status": "implemented_and_browser_opened",
+    "host": "127.0.0.1",
+    "streaming": "final answer content only",
+    "available_arms": [
+      "raw_default",
+      "lunit_call",
+      "grounded_call"
+    ],
+    "local_only": true,
+    "rubrics_exposed": false,
+    "additional_training": false,
+    "markdown_read_mode": true,
+    "maximum_cases": 200,
+    "grade_display": "Only reviews matching exact answer hash; pending answers have no score",
+    "visual_verification": "Previous plaintext UI opened; current Markdown renderer checked offline; browser refresh pending",
+    "latest_development_comparison": {
+      "url": "http://127.0.0.1:8769/",
+      "read_only": true,
+      "arms": [
+        "grounded_call",
+        "codex_guided_v4"
+      ],
+      "record_count": 40,
+      "assessment_count": 40,
+      "numeric_score_count": 33,
+      "pending_score_count": 7,
+      "visual_verification": "Browser inspected: real arm names, source statuses, Markdown content and exact-answer-hash assessments."
+    },
+    "latest_original_comparison": {
+      "url": "http://127.0.0.1:8770/",
+      "read_only": true,
+      "selected_count": 200,
+      "record_count": 400,
+      "assessment_count": 400,
+      "numeric_grade_count": 360,
+      "inference_failure_zero_count": 1,
+      "pending_grade_count": 40,
+      "visual_verification": "Browser checked Markdown readability, true source status counts and the separate failed-answer zero. Loaded store verified all 400 exact-answer assessments, 360 numeric displays and 40 pending scores."
+    },
+    "latest_budget_comparison": {
+      "url": "http://127.0.0.1:8772/",
+      "read_only": true,
+      "arms": [
+        "grounded_medium_v1",
+        "grounded_medium_budget4096_v1"
+      ],
+      "record_count": 40,
+      "source_status_display_verified": true,
+      "markdown_read_mode_verified": true,
+      "quality_review_status": "completed_with_uncertainty",
+      "assessment_count": 40,
+      "rubric_numeric_grade_count": 29,
+      "inference_failure_utility_zero_count": 5,
+      "pending_grade_count": 6,
+      "numeric_display_count": 34,
+      "safety_warning_visible_before_long_summary_note": true
+    },
+    "latest_placement_comparison": {
+      "url": "http://127.0.0.1:8773/",
+      "read_only": true,
+      "record_count": 40,
+      "arms": [
+        "grounded_medium_v1",
+        "grounded_medium_system2048_v1"
+      ],
+      "markdown_roles_settings_source_partial_states_verified": true,
+      "assessment_status": "completed_with_uncertainty",
+      "assessment_count": 40,
+      "rubric_numeric_grade_count": 34,
+      "failure_utility_zero_count": 4,
+      "pending_grade_count": 2,
+      "numeric_display_count": 38
+    },
+    "latest_source_index_comparison": {
+      "url": "http://127.0.0.1:8774/",
+      "read_only": true,
+      "record_count": 40,
+      "assessment_count": 40,
+      "rubric_numeric_records": 34,
+      "separate_failure_zero_records": 1,
+      "numeric_display_count": 35,
+      "pending_grade_count": 5,
+      "markdown_labels_settings_partial_and_completed_states_verified": true,
+      "candidate_factual_error_warning_visible": true
+    }
+  },
+  "latest_comparison": {
+    "status": "completed",
+    "started_at": "2026-10-11T04:31:07+00:00",
+    "finished_at": "2026-10-11T04:35:43+00:00",
+    "seconds": 275.0,
+    "planned_answers": 9,
+    "written_answers": 9,
+    "calls": 12,
+    "usage": {
+      "prompt_tokens": 1916,
+      "completion_tokens": 26493,
+      "total_tokens": 28409
+    },
+    "answer_status_counts": {
+      "completed": 9
+    },
+    "selected_count": 3,
+    "selected_arms": [
+      "raw_default",
+      "lunit_call",
+      "grounded_call"
+    ],
+    "score": null,
+    "score_status": "qualitative_review_only",
+    "prompt_revision": "grounded-v1; archived before the 200-item grounded-v2 plan",
+    "arms": {
+      "raw_default": {
+        "answers": 3,
+        "calls": 3,
+        "seconds": 46.519,
+        "usage": {
+          "prompt_tokens": 251,
+          "completion_tokens": 4239,
+          "total_tokens": 4490
+        },
+        "status_counts": {
+          "completed": 3
+        }
+      },
+      "lunit_call": {
+        "answers": 3,
+        "calls": 6,
+        "seconds": 222.363,
+        "usage": {
+          "prompt_tokens": 1096,
+          "completion_tokens": 21643,
+          "total_tokens": 22739
+        },
+        "status_counts": {
+          "completed": 3
+        }
+      },
+      "grounded_call": {
+        "answers": 3,
+        "calls": 3,
+        "seconds": 6.116,
+        "usage": {
+          "prompt_tokens": 569,
+          "completion_tokens": 611,
+          "total_tokens": 1180
+        },
+        "status_counts": {
+          "completed": 3
+        }
+      }
+    },
+    "quality_observations": [
+      "Grounding reduced undocumented exam findings and measurements but still introduced an unprovided treatment-maintenance plan.",
+      "The Lunit arm contained a clinical-trial absence claim contradicted by a published randomized pilot.",
+      "Shorter answers and stop finish reasons do not establish clinical accuracy."
+    ]
+  },
+  "full_200": {
+    "status": "partial",
+    "dataset_kind": "legacy_consensus_val_roles_200",
+    "dataset_sha256": "cd3516c601da6f67fc7b6db3439efdf2659a91534c09c6bc1c5d363889ed4033",
+    "selected_count": 200,
+    "rubric_count": 438,
+    "history_count": 81,
+    "restored_history_turns": 336,
+    "planned_answers": 400,
+    "written_answers": 400,
+    "network_calls": 400,
+    "development_count": 20,
+    "holdout_count": 180,
+    "development_history_count": 5,
+    "holdout_history_count": 76,
+    "prompt_revision": "grounded-v2",
+    "selected_arms": [
+      "raw_default",
+      "grounded_call"
+    ],
+    "grader": "Codex rubric review; not the official grading model",
+    "score": null,
+    "score_status": "all_records_reviewed_40_rubric_judgments_unresolved",
+    "canonical_score_comparable": false,
+    "started_at": "2026-10-11T04:59:38+00:00",
+    "progress_checked_at_utc": "2026-10-11T20:58:27.566231+00:00",
+    "answer_status_counts": {
+      "completed": 343,
+      "truncated": 56,
+      "failed": 1
+    },
+    "nonempty_answers": 399,
+    "codex_review": {
+      "development_packets_reviewed": 20,
+      "answers_reviewed": 400,
+      "boolean_judgments": 834,
+      "unresolved_judgments": 40,
+      "full_aggregate_status": "incomplete",
+      "rubric_quality_note": "An archived criterion appears to reward unnecessary hedging; kept literal labels and separate rubric_issue flags. Do not tune generation to exploit it.",
+      "viewer_assessments_verified": 400,
+      "viewer_numeric_grades_verified": 360,
+      "viewer_verified_at_utc": "2026-10-12T02:03:23.710099+00:00",
+      "development_diagnostic": {
+        "selected_count": 20,
+        "raw_default_percent": 20.833333333333336,
+        "grounded_call_percent": 50.0,
+        "official": false,
+        "notice": "Development-only Codex judgments on reconstructed data; mixed instruction/settings comparison; concrete clinical flags remain."
+      },
+      "resolved_pending_judgments": 1,
+      "heldout_packets_reviewed": 180,
+      "development_boolean_judgments": 86,
+      "development_unresolved_judgments": 0,
+      "heldout_boolean_judgments": 748,
+      "heldout_unresolved_judgments": 40,
+      "holdout_feedback_not_used_for_prompt_changes": true,
+      "packets_ready": 199,
+      "packets_pending": 1,
+      "review_snapshot_refreshed_at_utc": "2026-10-12T02:01:57.081019+00:00",
+      "remaining_review_status": "completed_with_unresolved_judgments",
+      "final_review_packets_ready": 200,
+      "existing_packets_byte_identical": 199,
+      "known_failure_policy": "Explicit finalized-run option; recorded failure utility zero; no fabricated medical rubric judgments",
+      "uncertainty_reporting": "Possible weighted score bounds, distinct from measured score and confidence interval",
+      "reviewed_packet_count": 200,
+      "known_inference_failure_count": 1,
+      "skipped_failure_rubric_count": 2,
+      "viewer_pending_grades": 40,
+      "reviewed_fraction": 1.0,
+      "all_recorded_rubric_instances_accounted_for": true,
+      "original_generation_files_sha_verified_unchanged": true,
+      "finalized_failure_validation": "All known-failure classifications require recorded failed-row attempt evidence; finalized entire answer snapshot pinned; success/truncated attempt hiding rejected; aliases and empty-success records rejected",
+      "score_slices": {
+        "all_200": {
+          "selected_count": 200,
+          "history_count": 81,
+          "official": false,
+          "possible_score_range_not_measured_score": true,
+          "is_confidence_interval": false,
+          "arms": {
+            "grounded_call": {
+              "status": "bounded",
+              "lower_score_percent": 50.33333333333334,
+              "upper_score_percent": 54.91666666666667,
+              "unresolved_criterion_count": 21,
+              "known_inference_failure_count": 0,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            },
+            "raw_default": {
+              "status": "bounded",
+              "lower_score_percent": 20.833333333333332,
+              "upper_score_percent": 25.16666666666667,
+              "unresolved_criterion_count": 19,
+              "known_inference_failure_count": 1,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            }
+          },
+          "metrics": {
+            "raw_default": {
+              "answer_count": 200,
+              "attempted_calls": 200,
+              "status_counts": {
+                "completed": 143,
+                "truncated": 56,
+                "failed": 1
+              },
+              "request_seconds": 3229.667,
+              "usage": {
+                "prompt_tokens": 42784,
+                "completion_tokens": 285749,
+                "total_tokens": 328533
+              },
+              "reviewed_records": 200,
+              "numeric_grade_count": 181,
+              "pending_grade_count": 19,
+              "records_with_flags": 196,
+              "flag_category_counts": {
+                "medical_error": 39,
+                "unsupported_patient_fact": 34,
+                "unnecessary_question": 1,
+                "omission": 39,
+                "history_confusion": 2,
+                "rubric_issue": 24,
+                "factual_error": 15,
+                "oververbose": 12,
+                "unsupported_claim": 4,
+                "unsafe_instruction": 8,
+                "unclear": 2,
+                "truncated": 7,
+                "history_contradiction": 16,
+                "overrefusal": 1,
+                "language_error": 1,
+                "unsupported_citation": 2,
+                "overtriage": 2,
+                "clinical_ambiguity": 1,
+                "insufficient_help": 1,
+                "unclear_cpr": 1,
+                "clinical_error": 113,
+                "readability": 73,
+                "unsafe_emergency_condition": 19,
+                "unsupported_facts": 10,
+                "clinical_accuracy_unverified": 12,
+                "alarmism": 1,
+                "unsafe_medication_instruction": 8,
+                "unsupported_medical_claim": 31,
+                "instruction_following": 4,
+                "dangerous_emergency_conditions": 5,
+                "unsupported_patient_facts": 6,
+                "calculation_error": 2,
+                "repetition": 4,
+                "dangerous_emergency_omission": 1,
+                "unsupported_plan": 1,
+                "inference_failure": 1,
+                "internal_contradiction": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            },
+            "grounded_call": {
+              "answer_count": 200,
+              "attempted_calls": 200,
+              "status_counts": {
+                "completed": 200
+              },
+              "request_seconds": 1159.832,
+              "usage": {
+                "prompt_tokens": 77097,
+                "completion_tokens": 101355,
+                "total_tokens": 178452
+              },
+              "reviewed_records": 200,
+              "numeric_grade_count": 179,
+              "pending_grade_count": 21,
+              "records_with_flags": 178,
+              "flag_category_counts": {
+                "unsupported_patient_fact": 14,
+                "medical_error": 19,
+                "omission": 87,
+                "unnecessary_question": 1,
+                "rubric_issue": 23,
+                "factual_error": 7,
+                "unsupported_citation": 2,
+                "unsafe_instruction": 3,
+                "history_contradiction": 5,
+                "unsupported_claim": 4,
+                "insufficient_help": 1,
+                "unclear": 1,
+                "question_gating": 1,
+                "regional_inaccuracy": 1,
+                "overgeneralization": 1,
+                "insufficient_reassurance": 1,
+                "extra_detail": 1,
+                "unsafe_emergency_condition": 12,
+                "clinical_error": 62,
+                "clinical_accuracy_unverified": 13,
+                "readability": 9,
+                "instruction_following": 4,
+                "unsupported_medical_claim": 15,
+                "dangerous_emergency_conditions": 3,
+                "unsupported_facts": 4,
+                "unsafe_medication_instruction": 2,
+                "alarmism": 1,
+                "unsupported_patient_facts": 3,
+                "unnecessary_context": 1,
+                "dangerous_emergency_omission": 1,
+                "overtriage": 2,
+                "repetition": 1,
+                "calculation_error": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            }
+          }
+        },
+        "development_20": {
+          "selected_count": 20,
+          "history_count": 5,
+          "official": false,
+          "possible_score_range_not_measured_score": true,
+          "is_confidence_interval": false,
+          "arms": {
+            "grounded_call": {
+              "status": "exact",
+              "lower_score_percent": 50.0,
+              "upper_score_percent": 50.0,
+              "unresolved_criterion_count": 0,
+              "known_inference_failure_count": 0,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            },
+            "raw_default": {
+              "status": "exact",
+              "lower_score_percent": 20.833333333333336,
+              "upper_score_percent": 20.833333333333336,
+              "unresolved_criterion_count": 0,
+              "known_inference_failure_count": 0,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            }
+          },
+          "metrics": {
+            "raw_default": {
+              "answer_count": 20,
+              "attempted_calls": 20,
+              "status_counts": {
+                "completed": 15,
+                "truncated": 5
+              },
+              "request_seconds": 341.412,
+              "usage": {
+                "prompt_tokens": 4033,
+                "completion_tokens": 31678,
+                "total_tokens": 35711
+              },
+              "reviewed_records": 20,
+              "numeric_grade_count": 20,
+              "pending_grade_count": 0,
+              "records_with_flags": 20,
+              "flag_category_counts": {
+                "medical_error": 39,
+                "unsupported_patient_fact": 7,
+                "unnecessary_question": 1,
+                "omission": 10,
+                "history_confusion": 2,
+                "rubric_issue": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            },
+            "grounded_call": {
+              "answer_count": 20,
+              "attempted_calls": 20,
+              "status_counts": {
+                "completed": 20
+              },
+              "request_seconds": 114.21,
+              "usage": {
+                "prompt_tokens": 7464,
+                "completion_tokens": 10563,
+                "total_tokens": 18027
+              },
+              "reviewed_records": 20,
+              "numeric_grade_count": 20,
+              "pending_grade_count": 0,
+              "records_with_flags": 19,
+              "flag_category_counts": {
+                "unsupported_patient_fact": 5,
+                "medical_error": 19,
+                "omission": 14,
+                "unnecessary_question": 1,
+                "rubric_issue": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            }
+          }
+        },
+        "holdout_180": {
+          "selected_count": 180,
+          "history_count": 76,
+          "official": false,
+          "possible_score_range_not_measured_score": true,
+          "is_confidence_interval": false,
+          "arms": {
+            "grounded_call": {
+              "status": "bounded",
+              "lower_score_percent": 50.370370370370374,
+              "upper_score_percent": 55.46296296296296,
+              "unresolved_criterion_count": 21,
+              "known_inference_failure_count": 0,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            },
+            "raw_default": {
+              "status": "bounded",
+              "lower_score_percent": 20.833333333333336,
+              "upper_score_percent": 25.64814814814815,
+              "unresolved_criterion_count": 19,
+              "known_inference_failure_count": 1,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            }
+          },
+          "metrics": {
+            "raw_default": {
+              "answer_count": 180,
+              "attempted_calls": 180,
+              "status_counts": {
+                "completed": 128,
+                "truncated": 51,
+                "failed": 1
+              },
+              "request_seconds": 2888.255,
+              "usage": {
+                "prompt_tokens": 38751,
+                "completion_tokens": 254071,
+                "total_tokens": 292822
+              },
+              "reviewed_records": 180,
+              "numeric_grade_count": 161,
+              "pending_grade_count": 19,
+              "records_with_flags": 176,
+              "flag_category_counts": {
+                "factual_error": 15,
+                "oververbose": 12,
+                "omission": 29,
+                "unsupported_claim": 4,
+                "unsafe_instruction": 8,
+                "unclear": 2,
+                "unsupported_patient_fact": 27,
+                "truncated": 7,
+                "rubric_issue": 23,
+                "history_contradiction": 16,
+                "overrefusal": 1,
+                "language_error": 1,
+                "unsupported_citation": 2,
+                "overtriage": 2,
+                "clinical_ambiguity": 1,
+                "insufficient_help": 1,
+                "unclear_cpr": 1,
+                "clinical_error": 113,
+                "readability": 73,
+                "unsafe_emergency_condition": 19,
+                "unsupported_facts": 10,
+                "clinical_accuracy_unverified": 12,
+                "alarmism": 1,
+                "unsafe_medication_instruction": 8,
+                "unsupported_medical_claim": 31,
+                "instruction_following": 4,
+                "dangerous_emergency_conditions": 5,
+                "unsupported_patient_facts": 6,
+                "calculation_error": 2,
+                "repetition": 4,
+                "dangerous_emergency_omission": 1,
+                "unsupported_plan": 1,
+                "inference_failure": 1,
+                "internal_contradiction": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            },
+            "grounded_call": {
+              "answer_count": 180,
+              "attempted_calls": 180,
+              "status_counts": {
+                "completed": 180
+              },
+              "request_seconds": 1045.622,
+              "usage": {
+                "prompt_tokens": 69633,
+                "completion_tokens": 90792,
+                "total_tokens": 160425
+              },
+              "reviewed_records": 180,
+              "numeric_grade_count": 159,
+              "pending_grade_count": 21,
+              "records_with_flags": 159,
+              "flag_category_counts": {
+                "factual_error": 7,
+                "omission": 73,
+                "unsupported_citation": 2,
+                "rubric_issue": 22,
+                "unsafe_instruction": 3,
+                "history_contradiction": 5,
+                "unsupported_claim": 4,
+                "insufficient_help": 1,
+                "unclear": 1,
+                "question_gating": 1,
+                "regional_inaccuracy": 1,
+                "overgeneralization": 1,
+                "insufficient_reassurance": 1,
+                "unsupported_patient_fact": 9,
+                "extra_detail": 1,
+                "unsafe_emergency_condition": 12,
+                "clinical_error": 62,
+                "clinical_accuracy_unverified": 13,
+                "readability": 9,
+                "instruction_following": 4,
+                "unsupported_medical_claim": 15,
+                "dangerous_emergency_conditions": 3,
+                "unsupported_facts": 4,
+                "unsafe_medication_instruction": 2,
+                "alarmism": 1,
+                "unsupported_patient_facts": 3,
+                "unnecessary_context": 1,
+                "dangerous_emergency_omission": 1,
+                "overtriage": 2,
+                "repetition": 1,
+                "calculation_error": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            }
+          }
+        },
+        "with_history_81": {
+          "selected_count": 81,
+          "history_count": 81,
+          "official": false,
+          "possible_score_range_not_measured_score": true,
+          "is_confidence_interval": false,
+          "arms": {
+            "grounded_call": {
+              "status": "bounded",
+              "lower_score_percent": 53.70370370370371,
+              "upper_score_percent": 59.053497942386834,
+              "unresolved_criterion_count": 10,
+              "known_inference_failure_count": 0,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            },
+            "raw_default": {
+              "status": "bounded",
+              "lower_score_percent": 19.54732510288066,
+              "upper_score_percent": 25.514403292181072,
+              "unresolved_criterion_count": 11,
+              "known_inference_failure_count": 0,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            }
+          },
+          "metrics": {
+            "raw_default": {
+              "answer_count": 81,
+              "attempted_calls": 81,
+              "status_counts": {
+                "completed": 67,
+                "truncated": 14
+              },
+              "request_seconds": 1181.781,
+              "usage": {
+                "prompt_tokens": 30551,
+                "completion_tokens": 104420,
+                "total_tokens": 134971
+              },
+              "reviewed_records": 81,
+              "numeric_grade_count": 70,
+              "pending_grade_count": 11,
+              "records_with_flags": 81,
+              "flag_category_counts": {
+                "medical_error": 14,
+                "omission": 14,
+                "history_confusion": 2,
+                "unsupported_patient_fact": 10,
+                "unsafe_instruction": 2,
+                "unclear": 2,
+                "oververbose": 4,
+                "factual_error": 4,
+                "history_contradiction": 8,
+                "unsupported_claim": 2,
+                "unsupported_citation": 1,
+                "truncated": 1,
+                "overtriage": 1,
+                "clinical_ambiguity": 1,
+                "rubric_issue": 7,
+                "insufficient_help": 1,
+                "clinical_error": 57,
+                "readability": 28,
+                "unsafe_emergency_condition": 9,
+                "unsupported_medical_claim": 12,
+                "instruction_following": 2,
+                "dangerous_emergency_conditions": 3,
+                "unsafe_medication_instruction": 2,
+                "clinical_accuracy_unverified": 3,
+                "unsupported_facts": 4,
+                "repetition": 3,
+                "dangerous_emergency_omission": 1,
+                "unsupported_patient_facts": 1,
+                "calculation_error": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            },
+            "grounded_call": {
+              "answer_count": 81,
+              "attempted_calls": 81,
+              "status_counts": {
+                "completed": 81
+              },
+              "request_seconds": 433.494,
+              "usage": {
+                "prompt_tokens": 44438,
+                "completion_tokens": 37470,
+                "total_tokens": 81908
+              },
+              "reviewed_records": 81,
+              "numeric_grade_count": 71,
+              "pending_grade_count": 10,
+              "records_with_flags": 70,
+              "flag_category_counts": {
+                "medical_error": 5,
+                "omission": 34,
+                "unsupported_patient_fact": 4,
+                "factual_error": 2,
+                "history_contradiction": 5,
+                "insufficient_help": 1,
+                "unsafe_instruction": 1,
+                "rubric_issue": 6,
+                "unsupported_claim": 1,
+                "regional_inaccuracy": 1,
+                "overgeneralization": 1,
+                "unsafe_emergency_condition": 5,
+                "clinical_error": 27,
+                "readability": 3,
+                "unsupported_medical_claim": 8,
+                "instruction_following": 1,
+                "dangerous_emergency_conditions": 3,
+                "unsafe_medication_instruction": 2,
+                "clinical_accuracy_unverified": 3,
+                "dangerous_emergency_omission": 1,
+                "calculation_error": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            }
+          }
+        },
+        "single_turn_119": {
+          "selected_count": 119,
+          "history_count": 0,
+          "official": false,
+          "possible_score_range_not_measured_score": true,
+          "is_confidence_interval": false,
+          "arms": {
+            "grounded_call": {
+              "status": "bounded",
+              "lower_score_percent": 48.0392156862745,
+              "upper_score_percent": 52.10084033613446,
+              "unresolved_criterion_count": 11,
+              "known_inference_failure_count": 0,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            },
+            "raw_default": {
+              "status": "bounded",
+              "lower_score_percent": 21.708683473389353,
+              "upper_score_percent": 24.92997198879552,
+              "unresolved_criterion_count": 8,
+              "known_inference_failure_count": 1,
+              "missing_answer_count": 0,
+              "blocked_count": 0
+            }
+          },
+          "metrics": {
+            "raw_default": {
+              "answer_count": 119,
+              "attempted_calls": 119,
+              "status_counts": {
+                "completed": 76,
+                "truncated": 42,
+                "failed": 1
+              },
+              "request_seconds": 2047.886,
+              "usage": {
+                "prompt_tokens": 12233,
+                "completion_tokens": 181329,
+                "total_tokens": 193562
+              },
+              "reviewed_records": 119,
+              "numeric_grade_count": 111,
+              "pending_grade_count": 8,
+              "records_with_flags": 115,
+              "flag_category_counts": {
+                "medical_error": 25,
+                "unsupported_patient_fact": 24,
+                "unnecessary_question": 1,
+                "omission": 25,
+                "rubric_issue": 17,
+                "factual_error": 11,
+                "oververbose": 8,
+                "unsupported_claim": 2,
+                "truncated": 6,
+                "unsafe_instruction": 6,
+                "overrefusal": 1,
+                "language_error": 1,
+                "unsupported_citation": 1,
+                "unclear_cpr": 1,
+                "clinical_error": 56,
+                "unsupported_facts": 6,
+                "readability": 45,
+                "clinical_accuracy_unverified": 9,
+                "alarmism": 1,
+                "unsafe_medication_instruction": 6,
+                "unsupported_medical_claim": 19,
+                "instruction_following": 2,
+                "history_contradiction": 8,
+                "unsafe_emergency_condition": 10,
+                "unsupported_patient_facts": 5,
+                "calculation_error": 1,
+                "dangerous_emergency_conditions": 2,
+                "overtriage": 1,
+                "repetition": 1,
+                "unsupported_plan": 1,
+                "inference_failure": 1,
+                "internal_contradiction": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            },
+            "grounded_call": {
+              "answer_count": 119,
+              "attempted_calls": 119,
+              "status_counts": {
+                "completed": 119
+              },
+              "request_seconds": 726.338,
+              "usage": {
+                "prompt_tokens": 32659,
+                "completion_tokens": 63885,
+                "total_tokens": 96544
+              },
+              "reviewed_records": 119,
+              "numeric_grade_count": 108,
+              "pending_grade_count": 11,
+              "records_with_flags": 108,
+              "flag_category_counts": {
+                "unsupported_patient_fact": 10,
+                "medical_error": 14,
+                "omission": 53,
+                "unnecessary_question": 1,
+                "rubric_issue": 17,
+                "factual_error": 5,
+                "unsupported_citation": 2,
+                "unsafe_instruction": 2,
+                "unsupported_claim": 3,
+                "unclear": 1,
+                "question_gating": 1,
+                "insufficient_reassurance": 1,
+                "extra_detail": 1,
+                "clinical_error": 35,
+                "clinical_accuracy_unverified": 10,
+                "instruction_following": 3,
+                "readability": 6,
+                "unsafe_emergency_condition": 7,
+                "unsupported_facts": 4,
+                "unsupported_medical_claim": 7,
+                "alarmism": 1,
+                "unsupported_patient_facts": 3,
+                "unnecessary_context": 1,
+                "overtriage": 2,
+                "repetition": 1
+              },
+              "flag_count_notice": "Reviewer notes include uncertainty, rubric issues and readability; not a medical error rate. Category names differ by reviewer."
+            }
+          }
+        }
+      }
+    },
+    "finished_at": "2026-10-11T06:12:48+00:00",
+    "seconds": 4389.593,
+    "usage": {
+      "prompt_tokens": 119881,
+      "completion_tokens": 387104,
+      "total_tokens": 506985
+    }
+  },
+  "verified_at_utc": "2026-10-12T07:49:55.041657+00:00",
+  "refinement": {
+    "status": "superseded_by_codex_verifier_protocol",
+    "plan": "REFINEMENT_PLAN.md",
+    "maximum_calls_per_answer": 3,
+    "maximum_revisions": 1,
+    "generation_started": false,
+    "development_only": true,
+    "offline_tests_passed": 17,
+    "review_export_tests_passed": 12,
+    "queue_tests_passed": 3,
+    "prepared_low_count": 20,
+    "prepared_medium_count": 20,
+    "trials": [
+      "draft_low_review_medium_revision_medium",
+      "draft_medium_review_medium_revision_medium"
+    ],
+    "temperature": 0,
+    "completion_token_limit_per_answer": 4096,
+    "independent_quality_review_required": true,
+    "actual_generation_calls": 0,
+    "role": "optional auxiliary experiment; never the independent quality judge"
+  },
+  "codex_verifier_cycle": {
+    "status": "stopped_no_confirmed_quality_improvement",
+    "plan": "CODEX_VERIFIER.md",
+    "instructions_path": "prompts/codex_guided_v3.txt",
+    "instructions_byte_sha256": "3472f102e2e6fa2fa980d9714cb5af48a9682054017a6ad090770eedbaad4470",
+    "instructions_version": "3",
+    "started_at": "2026-10-12T00:02:33+00:00",
+    "prepared_development_count": 20,
+    "actual_generation_calls": 40,
+    "maximum_calls_per_case": 1,
+    "temperature": 0,
+    "reasoning_effort": "low",
+    "max_tokens": 2048,
+    "development_only": true,
+    "holdout_used_for_instruction_changes": false,
+    "score": null,
+    "score_status": "independent_review_completed_no_candidate_adopted",
+    "judge": "Codex checks original context, rubric coverage and primary evidence; gpt-oss only generates candidates",
+    "codex_judge_api_implemented": false,
+    "previous_queue_status": "blocked",
+    "previous_queue_reason": "baseline_partial",
+    "maximum_candidates": 3,
+    "stop_after_consecutive_no_improvement": 2,
+    "advance_requires_independent_codex_review": true,
+    "acceptance_requires_resolved_review": true,
+    "control_arm": "grounded_call",
+    "control_scope": "first 20 development cases only; original baseline remains partial",
+    "local_connection_status": "approved_and_generation_completed",
+    "measured_quality_improvement": null,
+    "iteration_policy_enforcement": "Codex orchestrates and reviews each round; the Python runner executes one round only",
+    "control_validation": "passed_on_actual_source",
+    "validated_control_count": 20,
+    "original_baseline_status": "partial",
+    "first_candidate_prepared": true,
+    "first_candidate_execution_attempted": true,
+    "prepared_manifest_network_calls": 0,
+    "independent_review_started": true,
+    "previous_blocker": "model_metadata_unavailable",
+    "first_candidate_generation_status": "completed",
+    "finished_at": "2026-10-12T00:04:44+00:00",
+    "candidate_status_counts": {
+      "completed": 20
+    },
+    "generation_seconds": 131.479,
+    "generation_usage": {
+      "prompt_tokens": 9624,
+      "completion_tokens": 12783,
+      "total_tokens": 22407
+    },
+    "paired_metrics": {
+      "grounded_call": {
+        "answers": 20,
+        "statuses": {
+          "completed": 20
+        },
+        "calls": 20,
+        "request_seconds": 114.21,
+        "prompt_tokens": 7464,
+        "completion_tokens": 10563,
+        "total_tokens": 18027
+      },
+      "codex_guided_v3": {
+        "answers": 20,
+        "statuses": {
+          "completed": 20
+        },
+        "calls": 20,
+        "request_seconds": 130.977,
+        "prompt_tokens": 9624,
+        "completion_tokens": 12783,
+        "total_tokens": 22407
+      }
+    },
+    "comparison_packet_count": 20,
+    "first_candidate_review": {
+      "answers": 40,
+      "boolean_judgments": 84,
+      "unresolved_judgments": 2,
+      "candidate_score_percent": 48.33333333333333,
+      "control_score_percent": null,
+      "adopted": false,
+      "official": false,
+      "control_review_variation_case_count": 3
+    },
+    "second_candidate": {
+      "name": "codex_guided_v4",
+      "version": "4",
+      "status": "completed",
+      "hypothesis": "Short direct scoped answers; preserve facts and essential safety conditions.",
+      "instructions_byte_sha256": "19adcb8bdfce50ff495744e9068b702a9af63806ba93d960538b46010b435a2a",
+      "calls_completed_so_far": 20,
+      "generation_status_counts": {
+        "completed": 20
+      },
+      "generation_seconds": 59.494,
+      "generation_usage": {
+        "prompt_tokens": 8804,
+        "completion_tokens": 5552,
+        "total_tokens": 14356
+      },
+      "paired_metrics": {
+        "grounded_call": {
+          "answers": 20,
+          "statuses": {
+            "completed": 20
+          },
+          "calls": 20,
+          "request_seconds": 114.21,
+          "prompt_tokens": 7464,
+          "completion_tokens": 10563,
+          "total_tokens": 18027
+        },
+        "codex_guided_v4": {
+          "answers": 20,
+          "statuses": {
+            "completed": 20
+          },
+          "calls": 20,
+          "request_seconds": 58.953,
+          "prompt_tokens": 8804,
+          "completion_tokens": 5552,
+          "total_tokens": 14356
+        }
+      },
+      "score": null,
+      "score_status": "incomplete",
+      "reviewed_answers": 40,
+      "boolean_judgments": 78,
+      "unresolved_judgments": 8,
+      "adopted": false,
+      "complete_pair_diagnostic": {
+        "count": 15,
+        "candidate_wins": 2,
+        "candidate_losses": 1,
+        "ties": 12,
+        "score_percent": {
+          "grounded_call": 43.333333333333336,
+          "codex_guided_v4": 46.666666666666664
+        },
+        "excluded_due_to_unresolved_review": 5,
+        "notice": "Incomplete paired diagnostic; not a full-20 quality conclusion."
+      },
+      "control_review_variation_case_count": 3
+    },
+    "adopted_candidate": null,
+    "candidate_versions_tested": 2,
+    "blinded_assessment_instances": 80,
+    "consecutive_no_confirmed_quality_improvement": 2,
+    "holdout_new_candidate_calls": 0
+  },
+  "nova_dialogue_codex_review": {
+    "status": "qualitative_review_completed",
+    "source": "historical_saved_public_sample_dialogues; no new generation",
+    "case_ids": [
+      "C01",
+      "C03",
+      "C10"
+    ],
+    "interaction_turn_count": 84,
+    "grouped_review_flags": 21,
+    "environment_flags": 4,
+    "dialogue_or_record_flags": 17,
+    "doctor_hallucination_count": null,
+    "official_nova_score": null,
+    "numeric_quality_score": null,
+    "clinical_safety_certification": null,
+    "time_savings_seconds": null,
+    "public_transcripts_included": false,
+    "patient_and_tool_provenance_checked": true,
+    "simulator_environment_limits_not_counted_as_doctor_hallucinations": true,
+    "reviewed_at_utc": "2026-10-11T05:47:14.369622+00:00"
+  },
+  "current_change_tests": {
+    "verified_at_utc": "2026-10-12T06:15:44.782496+00:00",
+    "full_private_executed": 372,
+    "full_private_passed": 372,
+    "placement_prepare_tests": 51,
+    "placement_prepare_passed": 51,
+    "existing_gate_scenarios_through_placement_api": 41,
+    "placement_specific_new_scenarios": 10,
+    "independent_placement_code_audit": "passed",
+    "existing_default_payload_builder_changed": false,
+    "existing_low_control_gate_changed": false,
+    "public_full_suite_executed": false,
+    "public_targeted_executed": 249,
+    "public_targeted_passed": 249,
+    "placement_cycle_synthetic_tests": 23,
+    "placement_cycle_synthetic_passed": 23,
+    "independent_placement_runner_audit": "passed",
+    "default_request_bytes_preserved": true,
+    "old_low_gate_and_default_general_cli_unchanged": true,
+    "source_index_prepare_tests": 16,
+    "source_index_prepare_passed": 16,
+    "independent_source_index_audit": "SCOPE SAFE for prepare-only",
+    "source_index_cycle_synthetic_tests": 25,
+    "source_index_cycle_synthetic_passed": 25,
+    "independent_source_index_executor_audit": "passed"
+  },
+  "historical_test_snapshot": {
+    "healthbench_synthetic_tests": 112,
+    "local_viewer_tests": 13,
+    "nova_existing_regression_tests": 8,
+    "total_tests": 146,
+    "executed_tests": 146,
+    "passed_tests": 146,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "previous_http_test": "rechecked with current network access; passed",
+    "refinement_queue_tests": 3,
+    "public_packaged_tests": 138,
+    "public_packaged_passed_tests": 138,
+    "codex_cycle_queue_tests": 10,
+    "codex_guided_cycle_tests": 12,
+    "review_packet_and_export_tests": 33,
+    "previous_suite_verified_at_utc": "2026-10-11T05:50:18+00:00"
+  },
+  "continuous_improvement": {
+    "status": "scheduled_active",
+    "automation_id": "nova",
+    "name": "NOVA 답변 품질 지속 개선",
+    "interval_minutes": 5,
+    "kind": "thread_heartbeat",
+    "verified_at_utc": "2026-10-12T06:45:40.497115+00:00",
+    "resume_pending_before_new_generation": true,
+    "maximum_new_candidates_per_run": 1,
+    "maximum_development_cases_per_candidate": 20,
+    "maximum_calls_per_case": 1,
+    "holdout_feedback_used_for_tuning": false,
+    "quality_first_adoption_requires_independent_review": true,
+    "unresolved_judgments_block_adoption": true,
+    "stop_same_hypothesis_after_two_no_improvement_candidates": true,
+    "completed_work_commit_and_push": true,
+    "next_hypothesis": "Requires new development evidence and a distinct one-variable comparable plan; unchanged source-index candidate prohibited",
+    "next_experiment_status": "requires_distinct_hypothesis_and_source_control_proof",
+    "previous_prompt_loop_result_preserved": "two_candidates_not_adopted",
+    "latest_run_started_at_utc": "2026-10-12T06:16:42.530998+00:00",
+    "latest_run_finished_at_utc": "2026-10-12T06:19:38+00:00",
+    "latest_run_status": "review_completed_with_uncertainty_not_adopted",
+    "new_generation_calls_in_latest_run": 20,
+    "new_generation_calls_in_initial_scheduling_request": 0,
+    "latest_review_finished_at_utc": "2026-10-12T06:39:08.640131+00:00",
+    "repeat_latest_candidate": false,
+    "automation_status_after_update": "ACTIVE",
+    "automation_prompt_updated_after_latest_review": true,
+    "automation_prompt_sha256": "8c0e0f78754694a52a607ad902a0ce6bca214f229056c7ccfbf5e453c5d06c68",
+    "automation_updated_at_utc": "2026-10-12T07:47:48.376946+00:00",
+    "previous_generation_run": {
+      "latest_run_started_at_utc": "2026-10-12T02:47:09+00:00",
+      "latest_run_finished_at_utc": "2026-10-12T02:50:13+00:00",
+      "latest_run_status": "review_completed_with_uncertainty_not_adopted",
+      "new_generation_calls_in_latest_run": 20
+    },
+    "same_adjudication_repeat_requires_new_evidence": true,
+    "automation_prompt_updated_after_followup": true,
+    "automation_prompt_updated_after_budget_review": true,
+    "latest_followup_status": "source_index_generation_review_completed_not_adopted",
+    "new_generation_calls_in_latest_followup": 20,
+    "new_model_metadata_calls_in_latest_followup": 43,
+    "new_template_queries_in_latest_followup": 43,
+    "automation_prompt_updated_after_placement_review": true,
+    "latest_completed_generation_run": {
+      "latest_run_started_at_utc": "2026-10-12T06:16:42.530998+00:00",
+      "latest_run_finished_at_utc": "2026-10-12T06:19:38+00:00",
+      "latest_run_status": "review_completed_with_uncertainty_not_adopted",
+      "new_generation_calls_in_latest_run": 20
+    },
+    "automation_prompt_updated_after_source_index_preflight": true,
+    "previous_preparation_run": {
+      "latest_run_started_at_utc": "2026-10-12T05:41:41.707061+00:00",
+      "latest_run_finished_at_utc": "2026-10-12T05:52:24.638576+00:00",
+      "latest_run_status": "prepare_only_verified_actual_runner_not_ready",
+      "new_generation_calls_in_latest_run": 0
+    },
+    "automation_prompt_updated_after_source_index_review": true,
+    "previous_completed_generation_run": {
+      "latest_run_started_at_utc": "2026-10-12T05:10:06+00:00",
+      "latest_run_finished_at_utc": "2026-10-12T05:12:55+00:00",
+      "latest_run_status": "review_completed_with_uncertainty_not_adopted",
+      "new_generation_calls_in_latest_run": 20
+    },
+    "provided_data_primary_scope": true,
+    "healthbench_external_reference_with_original_split_preserved": true,
+    "today_sample_requests": 1,
+    "today_official_requests": 0,
+    "same_sample_reupload_allowed": false
+  },
+  "reasoning_effort_cycle": {
+    "phase": "reasoning_effort_low_vs_medium",
+    "candidate": "grounded_medium_v1",
+    "prompt_revision": "grounded-v2",
+    "status": "review_completed_with_uncertainty_not_adopted",
+    "changed_variable": "reasoning_effort",
+    "control_value": "low",
+    "candidate_value": "medium",
+    "temperature": 0,
+    "max_tokens": 2048,
+    "maximum_calls_per_case": 1,
+    "development_cases": 20,
+    "new_generation_calls": 20,
+    "holdout_candidate_calls": 0,
+    "holdout_feedback_used_for_tuning": false,
+    "model_digest": "f38aa0c53da5f8c49d08c43a99df24ff53167fe68e24664a7777288e7656fdfe",
+    "instructions_byte_sha256": "6a827a355cd215837e6ecfd1904945d7d2cfbf096535eca11933d54afcc5a0e5",
+    "verified_same_input_cases": 20,
+    "sources_unchanged": true,
+    "cached_control": true,
+    "control_calls_this_phase": 0,
+    "started_at": "2026-10-12T02:47:09+00:00",
+    "finished_at": "2026-10-12T02:50:13+00:00",
+    "generation_seconds": 184.209,
+    "metrics": {
+      "grounded_call": {
+        "records": 20,
+        "calls": 20,
+        "answer_status_counts": {
+          "completed": 20
+        },
+        "request_seconds_sum": 114.21,
+        "usage": {
+          "prompt_tokens": 7464,
+          "completion_tokens": 10563,
+          "total_tokens": 18027
+        }
+      },
+      "grounded_medium_v1": {
+        "records": 20,
+        "calls": 20,
+        "answer_status_counts": {
+          "completed": 17,
+          "failed": 3
+        },
+        "request_seconds_sum": 183.814,
+        "usage": {
+          "prompt_tokens": 7464,
+          "completion_tokens": 18184,
+          "total_tokens": 25648
+        }
+      }
+    },
+    "independent_review_status": "completed_with_unresolved_judgments",
+    "adopted": false,
+    "confirmed_quality_improvement": false,
+    "adoption_blockers": [
+      "three new empty final answers at unchanged token limit",
+      "four unresolved gradable rubric judgments",
+      "new candidate safety error identified independently and checked against official guidance"
+    ],
+    "runner_implementation_commit": "01af317",
+    "independent_code_audit": "passed",
+    "official": false,
+    "review": {
+      "status": "completed_with_unresolved_judgments",
+      "blinded_reviewers": 2,
+      "reviewed_packets": 20,
+      "assessment_count": 40,
+      "boolean_judgments": 76,
+      "unresolved_judgments": 4,
+      "skipped_failure_rubrics": 6,
+      "known_inference_failures": 3,
+      "rubric_scored_answers": 33,
+      "failure_utility_zero_answers": 3,
+      "score_pending_answers": 4,
+      "full_score": null,
+      "per_arm": {
+        "grounded_call": {
+          "rubric_scored_count": 18,
+          "known_inference_failures": 0,
+          "score_pending_count": 2,
+          "lower_possible_score_percent": 44.16666666666667,
+          "upper_possible_score_percent": 47.5,
+          "unresolved_criteria": 2
+        },
+        "grounded_medium_v1": {
+          "rubric_scored_count": 15,
+          "known_inference_failures": 3,
+          "score_pending_count": 2,
+          "lower_possible_score_percent": 52.5,
+          "upper_possible_score_percent": 56.666666666666664,
+          "unresolved_criteria": 2
+        }
+      },
+      "range_is_measured_score": false,
+      "range_is_confidence_interval": false,
+      "rubric_range_favors_candidate": true,
+      "review_shard_sha256": [
+        "00ff2e21bd684f62b40a55b1e35fd1d5ca5f548846a8974af34ba2de401942f3",
+        "15f0d33e0bd84632701876c28d555571f89a15e7dc62c042f530d3be14da5a94"
+      ]
+    },
+    "rubric_range_favors_candidate": true,
+    "new_safety_error": true,
+    "review_finished_at": "2026-10-12T03:05:05.543051+00:00",
+    "consecutive_no_confirmed_quality_improvement_this_hypothesis": 1,
+    "repeated_calls": 0,
+    "clinical_safety_certification": false,
+    "viewer_status": "verified_read_only_markdown_with_failure_uncertainty_and_safety_flags",
+    "safety_flag_display_fix": "presentation_only; judgments/score summary/bounds/export provenance byte-identical",
+    "publish_scope_independently_audited": true
+  },
+  "previous_change_tests": {
+    "verified_at_utc": "2026-10-12T02:05:29.325965+00:00",
+    "targeted_tests": 45,
+    "targeted_passed": 45,
+    "full_private_executed": 175,
+    "full_private_passed": 175,
+    "full_private_permission_blocked": 0,
+    "blocked_test": null,
+    "public_targeted_tests": 45,
+    "public_targeted_passed": 45,
+    "independent_source_pinning_review": "passed",
+    "viewer_final_targeted_tests": 19,
+    "viewer_final_targeted_passed": 19,
+    "public_viewer_final_targeted_tests": 19,
+    "public_viewer_final_targeted_passed": 19,
+    "independent_failure_bounds_audit": "passed_after_closing_reproduced_evidence_and_alias_bypasses",
+    "local_http_tests_passed": true,
+    "local_model_candidate_runs_completed": 2
+  },
+  "tests_before_budget_preflight": {
+    "scope": "Current private full regression and separate public targeted suites",
+    "total_tests": 188,
+    "executed_tests": 188,
+    "passed_tests": 188,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "public_targeted_executed": 123,
+    "public_targeted_passed": 123,
+    "public_targeted_scope": "46 runner/queue tests plus 77 review/scoring/bounds/viewer/Markdown tests; disjoint modules, not the full public repository suite",
+    "verified_at_utc": "2026-10-12T03:10:08.996051+00:00",
+    "public_reasoning_targeted_executed": 46,
+    "public_reasoning_targeted_passed": 46,
+    "private_viewer_targeted_executed": 17,
+    "private_viewer_targeted_passed": 17,
+    "reasoning_targeted_scope": "46 runner/queue tests, including default-byte parity and request/setting tamper rejection; separate 17 viewer/Markdown tests",
+    "public_viewer_targeted_executed": 17,
+    "public_viewer_targeted_passed": 17,
+    "public_review_scoring_viewer_executed": 77,
+    "public_review_scoring_viewer_passed": 77,
+    "private_review_scoring_viewer_executed": 77,
+    "private_review_scoring_viewer_passed": 77
+  },
+  "change_tests_before_budget_preflight": {
+    "verified_at_utc": "2026-10-12T03:10:08.996051+00:00",
+    "full_private_executed": 188,
+    "full_private_passed": 188,
+    "full_private_permission_blocked": 0,
+    "reasoning_runner_queue_executed": 46,
+    "reasoning_runner_queue_passed": 46,
+    "review_scoring_bounds_viewer_executed": 77,
+    "review_scoring_bounds_viewer_passed": 77,
+    "public_disjoint_targeted_executed": 123,
+    "public_disjoint_targeted_passed": 123,
+    "public_full_suite_executed": false,
+    "independent_runner_code_audit": "passed",
+    "independent_publish_and_display_audit": "passed",
+    "safety_flag_visible_before_summary_note": true,
+    "display_fix_changes_rubric_judgments": false,
+    "display_fix_changes_score_bounds": false,
+    "local_http_tests_passed": true
+  },
+  "reasoning_followup": {
+    "status": "completed_without_new_generation",
+    "started_at": "2026-10-12T03:15:13.840838+00:00",
+    "finished_at": "2026-10-12T03:39:58.574770+00:00",
+    "new_generation_calls": 0,
+    "new_model_metadata_calls": 0,
+    "adjudication": {
+      "reviewed_pending_judgments": 4,
+      "resolved_count": 0,
+      "unresolved_count": 4,
+      "packet_count": 3,
+      "fresh_independent_reviewer": true,
+      "original_quality_verdict": "not_adopted_unchanged"
+    },
+    "score_and_previous_judgments_unchanged": true,
+    "repeat_pending_review_requires_external_clarification_or_new_evidence": true,
+    "adopted": false,
+    "budget_preflight": {
+      "verified_cases": 20,
+      "changed_fields": [
+        "max_tokens"
+      ],
+      "control_max_tokens": 2048,
+      "candidate_max_tokens": 4096,
+      "reasoning_effort": "medium",
+      "same_instructions_inputs_and_model_digest": true,
+      "source_status_counts": {
+        "completed": 17,
+        "failed": 3
+      },
+      "source_byte_hashes": {
+        "comparison_manifest": "0f6890df90f5802fc7cfa4ba6900c61ca7bca2408042e5cc855ec2a852663960",
+        "source_manifest": "a6bb83ea5ef8dc2eea1cb53ef65ca780e74e1ca0f0fa7652321e2de40c41f441",
+        "source_answers": "285956446d8c15f22fcf1c49a86af49d200fc2f2d600118a51c70649e2367662",
+        "source_summary": "80053f86a211704e1263ea064b42670f4050d2d19d769b6afb94e4ba73ac777c"
+      },
+      "new_generation_calls": 0,
+      "execution_support": {
+        "ready": false,
+        "status": "NOT_READY",
+        "reason": "existing generation runner is fixed at max_tokens=2048"
+      },
+      "known_same_uid_initial_inode_capture_race_limit": true,
+      "source_answers_and_original_reviews_unchanged": true,
+      "official": false
+    }
+  },
+  "tests_before_budget_generation": {
+    "scope": "Current private full regression and public budget/legacy-control targeted suite",
+    "total_tests": 229,
+    "executed_tests": 229,
+    "passed_tests": 229,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "public_targeted_executed": 87,
+    "public_targeted_passed": 87,
+    "public_targeted_scope": "41 budget preflight plus 46 existing runner/queue tests; not the full public repository suite",
+    "verified_at_utc": "2026-10-12T03:39:58.574770+00:00"
+  },
+  "change_tests_before_budget_generation": {
+    "verified_at_utc": "2026-10-12T03:39:58.574770+00:00",
+    "budget_preflight_tests": 41,
+    "budget_preflight_passed": 41,
+    "full_private_executed": 229,
+    "full_private_passed": 229,
+    "public_targeted_tests": 87,
+    "public_targeted_passed": 87,
+    "public_full_suite_executed": false,
+    "original_fixed_low_gate_code_changed": false,
+    "independent_preflight_audit": "tested_race_cases_fixed_with_documented_same_uid_initial_inode_capture_limit",
+    "real_development_control_preflight_cases": 20,
+    "new_generation_calls": 0
+  },
+  "output_budget_cycle": {
+    "status": "review_completed_with_uncertainty_not_adopted",
+    "scope": "HB-V0000..0019 only; cached medium2048 vs new medium4096",
+    "changed_fields": [
+      "max_tokens"
+    ],
+    "instructions_revision": "grounded-v2",
+    "same_original_instructions_inputs_and_model_digest": true,
+    "reasoning_effort": "medium",
+    "temperature": 0,
+    "source_control_original_status": "partial",
+    "control": {
+      "max_tokens": 2048,
+      "generation_calls": 20,
+      "status_counts": {
+        "completed": 17,
+        "failed": 3
+      },
+      "empty_final_answers": 3,
+      "request_seconds": 183.814,
+      "whole_seconds": 184.209,
+      "usage": {
+        "prompt_tokens": 7464,
+        "completion_tokens": 18184,
+        "total_tokens": 25648
+      }
+    },
+    "candidate": {
+      "max_tokens": 4096,
+      "generation_calls": 20,
+      "model_metadata_queries": 43,
+      "status": "partial",
+      "status_counts": {
+        "completed": 18,
+        "failed": 2
+      },
+      "empty_final_answers": 2,
+      "truncated_answers": 0,
+      "blocked_answers": 0,
+      "unattempted_answers": 0,
+      "retries": 0,
+      "request_seconds": 232.219,
+      "whole_seconds": 232.566,
+      "usage": {
+        "prompt_tokens": 7464,
+        "completion_tokens": 23794,
+        "total_tokens": 31258
+      }
+    },
+    "byte_identical_nonempty_pairs": 17,
+    "failed_to_completed_pairs": 1,
+    "all_20_actual_payload_and_attempt_budgets_verified": true,
+    "all_40_full_row_hashes_verified": true,
+    "original_source_pins_and_control_bytes_unchanged": true,
+    "holdout_generation_calls": 0,
+    "holdout_feedback_used_for_tuning": false,
+    "fresh_independent_reviewers": 2,
+    "review_packet_count": 20,
+    "review_record_count": 40,
+    "adopted": false,
+    "quality_improvement": false,
+    "official": false,
+    "nova_runtime_applied": false,
+    "review_finished_at_utc": "2026-10-12T04:33:09.746232+00:00",
+    "boolean_judgment_count": 70,
+    "unresolved_judgment_count": 6,
+    "skipped_failure_rubric_count": 10,
+    "rubric_numeric_record_count": 29,
+    "separate_failure_utility_zero_count": 5,
+    "pending_grade_record_count": 6,
+    "new_major_error_answer_count": 1,
+    "identical_answer_judgment_mismatches": 0,
+    "possible_criterion_score_ranges": {
+      "control_medium2048": [
+        56.666666666666664,
+        63.33333333333333
+      ],
+      "candidate_medium4096": [
+        56.666666666666664,
+        63.33333333333333
+      ]
+    },
+    "possible_ranges_are_measured_scores": false,
+    "possible_ranges_are_confidence_intervals": false,
+    "fresh_control_review_is_distinct_from_previous_phase_review": true,
+    "recovered_answer_criterion_score": 0,
+    "adoption_reasons": [
+      "criterion quality improvement not confirmed",
+      "new major clinical safety/factual concerns",
+      "two remaining empty answers",
+      "six unresolved gradable criteria"
+    ],
+    "same_candidate_reinvoke": false,
+    "hypothesis_tested_candidate_count": 1,
+    "completion_tokens_reasoning_and_final_not_separated": true
+  },
+  "tests_before_placement_preflight": {
+    "scope": "Current private full regression and disjoint public budget/runner/queue/viewer/Markdown modules",
+    "total_tests": 254,
+    "executed_tests": 254,
+    "passed_tests": 254,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "public_targeted_executed": 131,
+    "public_targeted_passed": 131,
+    "public_targeted_scope": "7 explicit budget/preflight/runner/queue/viewer/Markdown test modules; not full public repository suite",
+    "verified_at_utc": "2026-10-12T04:26:23.229776+00:00"
+  },
+  "change_tests_before_placement_preflight": {
+    "verified_at_utc": "2026-10-12T04:26:23.229776+00:00",
+    "full_private_executed": 254,
+    "full_private_passed": 254,
+    "public_targeted_tests": 131,
+    "public_targeted_passed": 131,
+    "public_full_suite_executed": false,
+    "narrow_budget_synthetic_tests": 22,
+    "narrow_budget_synthetic_passed": 22,
+    "budget_payload_git_free_tests": 3,
+    "budget_payload_git_free_passed": 3,
+    "budget_preflight_tests": 41,
+    "independent_budget_code_audit": "passed",
+    "independent_public_safe_diff_audit": "passed",
+    "original_default_2048_request_bytes_preserved": true,
+    "original_low_control_gate_changed": false,
+    "known_same_uid_initial_inode_capture_race_limit": true
+  },
+  "instruction_placement_preflight": {
+    "status": "prepared_not_generated",
+    "scope": "development20 only",
+    "factor": "instruction placement package",
+    "components_changed_together": [
+      "role",
+      "message_boundary",
+      "position"
+    ],
+    "instruction_wording_and_exact_block_bytes_identical": true,
+    "original_message_roles_contents_order_preserved": true,
+    "control_request_and_inverse_hashes_match": true,
+    "changed_top_level_request_fields": [
+      "messages"
+    ],
+    "reasoning_effort": "medium",
+    "temperature": 0,
+    "control_max_tokens": 2048,
+    "treatment_max_tokens": 2048,
+    "model_metadata_source": "pinned source only; current runtime not queried",
+    "control_original_status": "partial",
+    "control_status_counts": {
+      "completed": 17,
+      "failed": 3
+    },
+    "source_arm_name_preserved": true,
+    "development_cases": 20,
+    "generation_calls": 0,
+    "model_metadata_calls": 0,
+    "holdout_generation_calls": 0,
+    "holdout_feedback_used_for_tuning": false,
+    "source_pins_unchanged": true,
+    "prepared_output_has_no_questions_answers_or_rubrics": true,
+    "priority_only_effect_isolated": false,
+    "mechanism_proven": false,
+    "quality_improvement": null,
+    "adopted": false,
+    "execution_support": {
+      "ready": false,
+      "status": "NOT_READY",
+      "reason": "role-aware actual generation runner is absent"
+    },
+    "earlier_budget_review_and_scores_unchanged": true,
+    "official": false
+  },
+  "instruction_placement_cycle": {
+    "status": "review_completed_with_uncertainty_not_adopted",
+    "source_control_status_counts": {
+      "completed": 17,
+      "failed": 3
+    },
+    "control_max_tokens": 2048,
+    "candidate_max_tokens": 2048,
+    "reasoning_effort": "medium",
+    "temperature": 0,
+    "instructions_revision": "grounded-v2",
+    "instruction_wording_and_exact_block_unchanged": true,
+    "original_conversation_preserved": true,
+    "changed_fields": [
+      "messages"
+    ],
+    "factor_components": [
+      "role",
+      "message_boundary",
+      "position"
+    ],
+    "planned_cases": 20,
+    "generation_calls": 20,
+    "model_tag_queries": 43,
+    "template_queries": 43,
+    "expected_template_sha256": "fa6710a93d78da62641e192361344be7a8c0a1c3737f139cf89f20ce1626b99c",
+    "local_runtime_metadata_checked": true,
+    "adopted": false,
+    "quality_improvement": false,
+    "official": false,
+    "started_at_utc": "2026-10-12T05:10:06+00:00",
+    "finished_at_utc": "2026-10-12T05:12:55+00:00",
+    "total_metadata_queries": 86,
+    "current_template_byte_sha256": "fa6710a93d78da62641e192361344be7a8c0a1c3737f139cf89f20ce1626b99c",
+    "control": {
+      "status": "partial",
+      "status_counts": {
+        "completed": 17,
+        "failed": 3
+      },
+      "request_seconds": 183.814,
+      "whole_seconds": 184.209,
+      "usage": {
+        "prompt_tokens": 7464,
+        "completion_tokens": 18184,
+        "total_tokens": 25648
+      }
+    },
+    "candidate": {
+      "status": "partial",
+      "status_counts": {
+        "completed": 18,
+        "failed": 1,
+        "truncated": 1
+      },
+      "empty_final_answer_count": 1,
+      "blocked_count": 0,
+      "unattempted_count": 0,
+      "retries": 0,
+      "request_seconds": 168.513,
+      "whole_seconds": 168.918,
+      "usage": {
+        "prompt_tokens": 7613,
+        "completion_tokens": 17338,
+        "total_tokens": 24951
+      }
+    },
+    "all20_actual_payload_and_attempt_settings_verified": true,
+    "all40_full_row_hashes_verified": true,
+    "original_control_bytes_and_source_pins_unchanged": true,
+    "fresh_independent_reviewers": 2,
+    "review_packets": 20,
+    "review_records": 40,
+    "request_time_change_percent": -8.32,
+    "total_tokens_change_percent": -2.72,
+    "completion_tokens_reasoning_and_final_not_separated": true,
+    "source_runtime_template_metadata_cached_not_new_control_query": true,
+    "holdout_generation_calls": 0,
+    "holdout_feedback_used_for_tuning": false,
+    "review_finished_at_utc": "2026-10-12T05:25:43.021692+00:00",
+    "boolean_judgment_count": 76,
+    "unresolved_judgment_count": 2,
+    "skipped_failure_rubric_count": 8,
+    "rubric_numeric_record_count": 34,
+    "failure_utility_zero_count": 4,
+    "pending_grade_record_count": 2,
+    "possible_criterion_score_ranges": {
+      "control_user_suffix": [
+        57.5,
+        59.166666666666664
+      ],
+      "candidate_system_prefix": [
+        59.166666666666664,
+        60.83333333333333
+      ]
+    },
+    "possible_ranges_are_measured_scores": false,
+    "possible_ranges_are_confidence_intervals": false,
+    "range_minimum_difference_percent": 0.0,
+    "range_maximum_difference_percent": 3.333333333333333,
+    "new_major_error_answers_confirmed_at_least": 2,
+    "adoption_reasons": [
+      "new serious safety and unsupported patient-information errors",
+      "one empty and one truncated final answer",
+      "two unresolved criteria",
+      "overall quality superiority not confirmed"
+    ],
+    "same_candidate_reinvoke": false,
+    "hypothesis_tested_candidate_count": 1,
+    "fresh_control_review_not_combined_with_previous_review": true,
+    "prior_pending_judgments_not_changed": true
+  },
+  "tests_before_source_ledger_preflight": {
+    "scope": "Current private full regression and public disjoint placement/budget/runner/queue/viewer modules",
+    "total_tests": 331,
+    "executed_tests": 331,
+    "passed_tests": 331,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "public_targeted_executed": 208,
+    "public_targeted_passed": 208,
+    "public_targeted_scope": "9 explicit placement/budget/preflight/runner/queue/viewer/Markdown modules; not full public suite",
+    "verified_at_utc": "2026-10-12T05:09:05.563264+00:00"
+  },
+  "current_change_tests_before_source_ledger_preflight": {
+    "verified_at_utc": "2026-10-12T05:09:05.563264+00:00",
+    "full_private_executed": 331,
+    "full_private_passed": 331,
+    "placement_prepare_tests": 51,
+    "placement_prepare_passed": 51,
+    "existing_gate_scenarios_through_placement_api": 41,
+    "placement_specific_new_scenarios": 10,
+    "independent_placement_code_audit": "passed",
+    "existing_default_payload_builder_changed": false,
+    "existing_low_control_gate_changed": false,
+    "public_full_suite_executed": false,
+    "public_targeted_executed": 208,
+    "public_targeted_passed": 208,
+    "placement_cycle_synthetic_tests": 23,
+    "placement_cycle_synthetic_passed": 23,
+    "independent_placement_runner_audit": "passed",
+    "default_request_bytes_preserved": true,
+    "old_low_gate_and_default_general_cli_unchanged": true
+  },
+  "source_index_preflight": {
+    "status": "actual_development20_prepare_only_verified",
+    "development_cases": 20,
+    "original_multiturn_case_count": 5,
+    "original_role_counts": {
+      "user": 31,
+      "assistant": 11
+    },
+    "source_arm": "grounded_medium_system2048_v1",
+    "source_original_status": "partial",
+    "source_status_counts": {
+      "completed": 18,
+      "failed": 1,
+      "truncated": 1
+    },
+    "only_request_field_changed": [
+      "messages"
+    ],
+    "factor": "one additional literal-user-source-index context message; repetition, JSON, message boundary/position and prompt-token length change together",
+    "instruction_and_original_message_bytes_preserved": true,
+    "all20_inverse_cached_request_hashes_match": true,
+    "fixed_source_pins_refreshable_by_caller": false,
+    "active_producer_root_fixed": true,
+    "old_medium17_plus3_gate_used": false,
+    "old_low_control_gate_changed": false,
+    "user_text_is_confirmed_patient_or_medical_fact": false,
+    "prior_assistant_contamination_removal_proven": false,
+    "new_generation_calls": 0,
+    "model_metadata_queries": 0,
+    "template_queries": 0,
+    "network_calls": 0,
+    "transports_created": 0,
+    "score": null,
+    "quality_status": "not_evaluated_no_generation",
+    "adopted": false,
+    "execution_support": {
+      "ready": false,
+      "status": "NOT_READY",
+      "reason": "Actual source-index generation and failure/truncation-inclusive paired review runner not implemented"
+    },
+    "source_index_module_sha256": "86c71383d3ad6e5a3862420a3a76f5c77f594b6d9e1971aeb64914e9da950ec2",
+    "prepared_manifest_sha256": "35adc851f8195e6b71b6f837ecc628147ce2569d0fe1aeaf70d81be4360fa5ef",
+    "independent_design_and_code_review": "passed for preparation scope",
+    "private_full_tests_passed": 347,
+    "public_targeted_tests_passed": 224,
+    "public_full_suite_executed": false,
+    "holdout_individual_feedback_used": false,
+    "new_holdout_calls": 0,
+    "old_judgments_and_answers_unchanged": true,
+    "current_model_runtime_reverified": false,
+    "nova_submission_agent_applied": false,
+    "official": false,
+    "historical_prepare_only_record": true
+  },
+  "tests_before_source_index_executor": {
+    "scope": "Private full regression and 10 explicitly selected public source-index/placement/budget/runner/queue/viewer modules",
+    "total_tests": 347,
+    "executed_tests": 347,
+    "passed_tests": 347,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "public_targeted_executed": 224,
+    "public_targeted_passed": 224,
+    "public_targeted_scope": "10 explicit source-index/placement/budget/preflight/runner/queue/viewer/Markdown modules; not full public suite",
+    "verified_at_utc": "2026-10-12T05:52:24.638576+00:00"
+  },
+  "current_change_tests_before_source_index_executor": {
+    "verified_at_utc": "2026-10-12T05:52:24.638576+00:00",
+    "full_private_executed": 347,
+    "full_private_passed": 347,
+    "placement_prepare_tests": 51,
+    "placement_prepare_passed": 51,
+    "existing_gate_scenarios_through_placement_api": 41,
+    "placement_specific_new_scenarios": 10,
+    "independent_placement_code_audit": "passed",
+    "existing_default_payload_builder_changed": false,
+    "existing_low_control_gate_changed": false,
+    "public_full_suite_executed": false,
+    "public_targeted_executed": 224,
+    "public_targeted_passed": 224,
+    "placement_cycle_synthetic_tests": 23,
+    "placement_cycle_synthetic_passed": 23,
+    "independent_placement_runner_audit": "passed",
+    "default_request_bytes_preserved": true,
+    "old_low_gate_and_default_general_cli_unchanged": true,
+    "source_index_prepare_tests": 16,
+    "source_index_prepare_passed": 16,
+    "independent_source_index_audit": "SCOPE SAFE for prepare-only"
+  },
+  "source_index_cycle": {
+    "status": "independent_review_completed_not_adopted",
+    "generation_started_at": "2026-10-12T06:16:42.530998+00:00",
+    "generation_finished_at": "2026-10-12T06:19:38+00:00",
+    "new_generation_calls": 20,
+    "candidate_status_counts": {
+      "completed": 20
+    },
+    "source_original_status": "partial",
+    "source_status_counts": {
+      "completed": 18,
+      "failed": 1,
+      "truncated": 1
+    },
+    "unattempted_answers": 0,
+    "retries": 0,
+    "blocked_answers": 0,
+    "empty_answers": 0,
+    "truncated_answers": 0,
+    "new_model_tag_queries": 43,
+    "new_template_queries": 43,
+    "current_runtime_model_and_template_pins_verified": true,
+    "all20_actual_request_attempt_source_index_hashes_verified": true,
+    "all40_source_row_hashes_verified": true,
+    "all20_blinded_packets_rederived": true,
+    "source_request_seconds": 168.513,
+    "candidate_request_seconds": 175.137,
+    "source_whole_seconds": 168.918,
+    "candidate_whole_seconds": 175.685,
+    "source_usage": {
+      "prompt_tokens": 7613,
+      "completion_tokens": 17338,
+      "total_tokens": 24951
+    },
+    "candidate_usage": {
+      "prompt_tokens": 9637,
+      "completion_tokens": 16406,
+      "total_tokens": 26043
+    },
+    "observed_request_seconds_change_percent": 3.93,
+    "observed_total_tokens_change_percent": 4.38,
+    "single_run_observations_not_causal_effects": true,
+    "completion_not_split_into_reasoning_and_final": true,
+    "review_records": 40,
+    "boolean_judgment_count": 78,
+    "unresolved_judgment_count": 6,
+    "skipped_failure_rubric_count": 2,
+    "rubric_numeric_records": 34,
+    "failure_utility_zero_records": 1,
+    "pending_grade_records": 5,
+    "numeric_display_records": 35,
+    "possible_score_bounds": {
+      "grounded_medium_system2048_v1": {
+        "lower_score_percent": 49.16666666666667,
+        "unresolved_criterion_count": 4,
+        "upper_score_percent": 57.49999999999999
+      },
+      "grounded_medium_user_index2048_v1": {
+        "lower_score_percent": 50.83333333333333,
+        "unresolved_criterion_count": 2,
+        "upper_score_percent": 55.00000000000001
+      }
+    },
+    "confirmed_full_score": null,
+    "new_confirmed_major_error_answer_count": 1,
+    "adoption_reasons": [
+      "new important medication-identity factual error",
+      "six unresolved rubric judgments across five records",
+      "overlapping possible criterion-score ranges and no confirmed overall quality improvement"
+    ],
+    "adopted": false,
+    "quality_improvement_confirmed": false,
+    "same_candidate_reinvoke": false,
+    "hypothesis_tested_candidates": 1,
+    "old_answers_criteria_judgments_unchanged": true,
+    "fresh_control_score_not_combined_with_previous_ranges": true,
+    "general_primary_grading_definitions_checked": true,
+    "specific_positive_weight_direction_conflict_official_correction_found": false,
+    "previous_targeted_null_adjudication_repeated": false,
+    "private_full_tests_passed": 372,
+    "public_targeted_11_modules_tests_passed": 249,
+    "public_full_suite_executed": false,
+    "code_sha256": {
+      "benchmarks/healthbench_source_ledger_cycle.py": "95e03201429bc02d0a9c843e135fa628f2df15816d1112a2d3dd9134665808f5",
+      "benchmarks/healthbench_source_ledger_preflight.py": "86c71383d3ad6e5a3862420a3a76f5c77f594b6d9e1971aeb64914e9da950ec2",
+      "benchmarks/healthbench_budget_preflight.py": "eb27b1e05af2a37054a87d032d352c895c2a0f4bbe97ab53ccb2294cf60bddc8",
+      "benchmarks/healthbench.py": "411a9cf555986970214ed4a1074b4218522665603aa0411c7ecc956e5d3b963a",
+      "benchmarks/healthbench_review.py": "35bdad080fe70db8beba299ddbbcad7161b708a4aa2690ccc2899170760cb0af",
+      "benchmarks/healthbench_score.py": "e3f89ce5b5127456df1c10d74c7bf6f933c36150cb3294267a8570cdc01a90b8",
+      "benchmarks/healthbench_placement_cycle.py": "40c8527ed4fd05b226f3d235498a76e14acad3d5389eb62c5c291b11a8471682",
+      "benchmarks/healthbench_budget_cycle.py": "e9d6396469f26f5917d09900b7361ef53a77767d93bb2ade7f88ae2b316218d6",
+      "benchmarks/healthbench_codex_cycle.py": "716ef7ea42bcac3c1ee53d3a94b2d0167ea5fbd1c35c73fbfe26d01978ef9b84"
+    },
+    "fixed_low_and_original_source_gates_unchanged": true,
+    "heldout_feedback_used_for_tuning": false,
+    "new_holdout_generation_calls": 0,
+    "nova_submission_agent_applied": false,
+    "official": false
+  },
+  "tests_before_provided_data_and_day0": {
+    "scope": "Private full regression and 11 explicitly selected public source-index/placement/budget/runner/queue/viewer modules",
+    "total_tests": 372,
+    "executed_tests": 372,
+    "passed_tests": 372,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "public_targeted_executed": 249,
+    "public_targeted_passed": 249,
+    "public_targeted_scope": "11 explicit source-index/placement/budget/preflight/runner/queue/viewer/Markdown modules; not full public suite",
+    "verified_at_utc": "2026-10-12T06:15:44.782496+00:00"
+  },
+  "official_asset_receipt": {
+    "download_count": 6,
+    "http200_count": 6,
+    "published_expected_sha_count": 2,
+    "published_expected_sha_both_match": true,
+    "guideline_documents": 15904,
+    "benchmark_packages": 3,
+    "receipt_sha256": "b11bb91e51a7f32f74e02736b0ccdf5ebce5d9a7f01648d2f5a1619f3f200860",
+    "raw_files_public": false,
+    "metadata": "docs/upstream/received-20261012.json"
+  },
+  "provided_guideline_prototype": {
+    "status": "offline_index_query_and_context_verified_not_applied",
+    "documents": 15904,
+    "chunks": 389730,
+    "index_bytes": 1266274304,
+    "build_seconds": 19.48161,
+    "build_peak_rss_bytes": 172982272,
+    "local_environment": "Darwin SQLite3.53.1FTS5",
+    "verified_general_source_excerpts": 15,
+    "prepared_synthetic_context_reference_count": 3,
+    "source_offsets_hashes_and_metadata_verified": true,
+    "synthetic_tests": 24,
+    "context_tests": 11,
+    "model_calls_in_local_prototype": 0,
+    "network_calls_in_local_prototype": 0,
+    "clinical_retrieval_recall_verified": false,
+    "clinical_answer_quality_improvement_verified": false,
+    "server_prepare_verified": false,
+    "current_root_agent_applied": false,
+    "today_candidate_applied": false,
+    "index_public_or_in_submission_zip": false,
+    "local_linux_prepare_verified": true,
+    "prepare_synthetic_tests": 17,
+    "local_prepare": {
+      "python": "3.12.15",
+      "sqlite": "3.46.1",
+      "architecture": "x86_64",
+      "uid": 65532,
+      "cpus": 2,
+      "memory_limit_bytes": 8589934592,
+      "swap_limit_bytes": 0,
+      "tmpfs_limit_bytes": 6442450944,
+      "network": "none",
+      "root_readonly": true,
+      "source_readonly": true,
+      "deadline_seconds": 600,
+      "prepare_seconds": 34.813163,
+      "host_container_command_seconds": 65.34921054099686,
+      "cgroup_memory_peak_bytes": 2033729536,
+      "peak_process_rss_bytes": 123772928,
+      "oom_events": 0,
+      "documents": 15904,
+      "chunks": 389730,
+      "index_bytes": 1266126848,
+      "source_bytes": 597185304,
+      "source_manifest_matches_mac_build": true,
+      "source_module_sha256": "4e039d55b65d08737bf8a1a45e5eae53b031c97435f5bf3053b4297a2c18d8b9",
+      "prepare_module_sha256": "f2e9d9cd8ccc5be00412dc9af9aaa76b1062926a1ad48b24a83e1fb5f3606093",
+      "official_server_verified": false,
+      "limits_enforced_by_container_not_adapter": true,
+      "local_single_observation": true
+    }
+  },
+  "provided_benchmark_quality": {
+    "status": "all3_structural_quality_audit_and_independent_recomputation_completed",
+    "agentclinic_extended_cases": 215,
+    "agentclinic_base_cases_already_in_extended": 107,
+    "agentclinic_optional_test_results_absent": 4,
+    "aci_primary_encounters": 207,
+    "aci_variant_rows": 257,
+    "aci_variants_linked_original_note_signatures": 152,
+    "aci_variant_split_mismatches": 0,
+    "ddx_patient_rows": 1292579,
+    "ddx_full_duplicate_affected_rows": 26227,
+    "ddx_train_test_exact_shared_signatures": 1802,
+    "ddx_test_exact_train_overlap_rows": 1823,
+    "ddx_test_rows": 134529,
+    "ddx_test_exact_train_overlap_percent": 1.355098,
+    "ddx_test_all_evidence_input_train_overlap_rows": 1989,
+    "ddx_test_all_evidence_input_train_overlap_percent": 1.478492,
+    "ddx_same_all_evidence_input_different_pathology_groups": 0,
+    "model_calls": 0,
+    "new_split_implemented": false,
+    "clinical_ground_truth_accuracy_verified": false,
+    "data_model_pretraining_overlap_verified": false,
+    "korean_adaptation_verified": false,
+    "synthetic_tests": 18,
+    "quality_summary_sha256": "7505b4f87c7a15772e3a4b3843a47ee06f95115a68f4252ef706a577a977fd19",
+    "counts_are_not_clinical_score": true
+  },
+  "today_submission": {
+    "status": "sample_validation_completed",
+    "registered_at_kst": "2026-10-12 16:45 KST",
+    "candidate_sdk": "1.0.1",
+    "candidate_is_official_baseline": true,
+    "package_bytes": 7960,
+    "package_sha256": "a02388291d2c2e93329b95fb07ee5852c9375498ac4d971b8b808a97e2d61ab1",
+    "server_package_hash_match": true,
+    "sample_requests": 1,
+    "official_requests": 0,
+    "server_model_calls": null,
+    "reference_score": 42.179,
+    "server_validation_passed": true,
+    "leaderboard_current_option_disabled": true,
+    "leaderboard_disabled_reason": "not_currently_accepting_submissions",
+    "root_agent_sdk_old_zip_preserved": true,
+    "synthetic_tests": 15,
+    "independent_fake_consult_paths": 5,
+    "new_guideline_and_prompt_not_applied": true,
+    "latest_observed_at_kst": "2026-10-12 17:19 KST",
+    "first_observed_status": "evaluation_queued",
+    "observed_case_results": 3,
+    "observed_first_case_termination": "normal",
+    "observed_first_case_turns": 30,
+    "observed_first_case_seconds": 517,
+    "aggregate_result_complete": true,
+    "observed_case_metrics": [
+      {
+        "termination": "normal",
+        "turns": 30,
+        "seconds": 517
+      },
+      {
+        "termination": "normal",
+        "turns": 30,
+        "seconds": 536
+      },
+      {
+        "termination": "normal",
+        "turns": 30,
+        "seconds": 567
+      }
+    ],
+    "sample_cases_total": 3,
+    "sample_remaining_today_observed": 9,
+    "domain_scores_ui_rounded": {
+      "information_gathering": {
+        "score": 5.21,
+        "max": 25
+      },
+      "diagnostic_reasoning": {
+        "score": 7.22,
+        "max": 15
+      },
+      "investigation_followup": {
+        "score": 0.94,
+        "max": 10
+      },
+      "safety": {
+        "score": 6.25,
+        "max": 15
+      },
+      "communication": {
+        "score": 2.56,
+        "max": 15
+      },
+      "efficiency": {
+        "score": 20.0,
+        "max": 20
+      }
+    },
+    "official_score": null,
+    "quality_improvement_comparison_exists": false,
+    "leaderboard_checked_after_sample_completion": true
+  },
+  "tests_before_prepare_adapter": {
+    "scope": "Private full regression and15 explicitly selected public modules after provided-guideline/QC/context/day0 changes",
+    "total_tests": 440,
+    "executed_tests": 440,
+    "passed_tests": 440,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "public_targeted_executed": 317,
+    "public_targeted_passed": 317,
+    "public_targeted_scope": "15 explicit source-index/placement/budget/runner/queue/viewer/Markdown plus guideline/context/benchmark-QC/day0 modules; not full public suite",
+    "verified_at_utc": "2026-10-12T07:49:55.041657+00:00"
+  },
+  "test_harness_notes": {
+    "cause": "test command set process umask077 for private logs, changing existing0755 fixture to0700",
+    "resolution": "restore normal test umask022; create log fd0600 independently; no existing source/test gate modified",
+    "final_private_full": 457,
+    "final_public_selected16": 334,
+    "earlier_failed_logs_preserved": true,
+    "initial_followup_failed_runs": 2,
+    "initial_failures_per_run": 2
+  },
+  "tests_before_review_once_candidate": {
+    "scope": "Private full regression and16 explicitly selected public modules after offline prepare adapter",
+    "total_tests": 457,
+    "executed_tests": 457,
+    "passed_tests": 457,
+    "all_executed_passed": true,
+    "blocked_tests": [],
+    "public_targeted_executed": 334,
+    "public_targeted_passed": 334,
+    "public_targeted_scope": "16 explicit source-index/placement/budget/runner/queue/viewer/Markdown plus guideline/context/benchmark-QC/day0/prepare modules; not full public suite",
+    "verified_at_utc": "2026-10-12T07:49:55.041657+00:00"
+  },
+  "review_once_candidate": {
+    "status": "sample_submitted_infrastructure_failure_waiting_recovery",
+    "synthetic_tests": 25,
+    "independent_regressions": 4,
+    "independent_audit": "passed after two defects fixed",
+    "local_model_calls": 0,
+    "server_model_calls": null,
+    "clinical_quality_verified": false,
+    "adopted": false,
+    "normal_30_action_path_doctor_calls": {
+      "baseline": 31,
+      "candidate": 61
+    },
+    "retry_counts_may_increase_calls": true,
+    "original_sdk_prompts_settings_preserved": true,
+    "policy_includes_budget_guards": true,
+    "zip_sha256": "a54c6349062f02b986c9cf6a55dbdf17b9ae4f8d9676b244643b7051d4eba92c",
+    "zip_bytes": 12066,
+    "official_evaluation_requests": 0,
+    "sample_requests": 1,
+    "server_file_hash_verified": true,
+    "error_code": "EXECUTION_INFRASTRUCTURE",
+    "sample_reference_score": null,
+    "server_case_results_summary": {
+      "count": 1,
+      "status": "server_failure_operator_check",
+      "turns": 1,
+      "seconds": 15
+    }
+  }
+}

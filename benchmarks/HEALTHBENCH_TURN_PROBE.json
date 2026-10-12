@@ -1,0 +1,134 @@
+{
+  "experiment_id": "HBT01",
+  "kind": "HealthBench-derived multi-turn development probe",
+  "completed_at_utc": "2026-10-12T12:45:07.291256+00:00",
+  "source_scope": "Four selected inputs from existing dev20; holdout180 and original rubrics/answers excluded",
+  "source_cases": 4,
+  "doctor_responses": 12,
+  "case_turn_counts": [
+    4,
+    1,
+    4,
+    3
+  ],
+  "response_status_counts": {
+    "completed": 12,
+    "truncated": 0,
+    "empty": 0,
+    "failed_or_blocked": 0
+  },
+  "retries": 0,
+  "sum_generation_request_seconds": 106.411,
+  "reported_usage": {
+    "prompt_tokens": 13121,
+    "completion_tokens": 9737,
+    "total_tokens": 22858
+  },
+  "missing_usage_responses": 0,
+  "timing_scope": "Sum of measured generation request durations only; not whole task wall time; excludes metadata and human/reviewer work",
+  "token_scope": "Provider reported counts; completion may include reasoning; no separately measured visible-answer token total",
+  "patient_followups": {
+    "total": 8,
+    "synthetic_requests": 7,
+    "source_quote_replies": 1,
+    "new_clinical_facts_found_by_independent_audit": 0
+  },
+  "patient_generation_model_calls": 0,
+  "automatic_grader_API_calls": 0,
+  "review_work": "Separate Codex independent clinical review; not counted as automatic grader API calls",
+  "model_metadata_queries": 24,
+  "template_queries": 24,
+  "source_and_model_pins_verified_before_after_all_calls": true,
+  "model": "gpt-oss:20b",
+  "model_digest": "f38aa0c53da5f8c49d08c43a99df24ff53167fe68e24664a7777288e7656fdfe",
+  "settings": {
+    "reasoning_effort": "medium",
+    "max_output_tokens": 2048,
+    "temperature": 0,
+    "timeout_seconds": 90
+  },
+  "prompt_scope": "Frozen grounded_v2 plus general multi-turn task wrapper; no disease-specific protocol, RAG, NOVA action SDK or 30-character action constraint",
+  "synthetic_validation": {
+    "private_tests_passed": 21,
+    "public_selected_modules": 1,
+    "public_tests_passed": 21,
+    "full_suite_rerun": false
+  },
+  "independent_review": {
+    "completed": true,
+    "blinded_to": [
+      "model settings",
+      "runtime",
+      "tokens",
+      "original rubric",
+      "intended conclusion"
+    ],
+    "presence_counts": {
+      "response_to_presenting_question": {
+        "spontaneous": 4
+      },
+      "management_treatment_choices": {
+        "spontaneous": 3,
+        "prompted": 1
+      },
+      "exam_and_test_reason": {
+        "prompted": 3,
+        "na": 1
+      },
+      "care_followup_timing": {
+        "prompted": 2,
+        "spontaneous": 2
+      },
+      "warning_signs": {
+        "prompted": 1,
+        "spontaneous": 3
+      },
+      "immediate_emergency_action_for_current_state": {
+        "uncertain": 2,
+        "spontaneous": 1,
+        "na": 1
+      }
+    },
+    "presence_count_meaning": "Case counts of observed content presence and elicitation, not adequacy/accuracy scores",
+    "qualitative_finding_counts": {
+      "supported_concern_findings": 18,
+      "supported_positive_findings": 7,
+      "unresolved_propositions": 3,
+      "unsupported_propositions": 2
+    },
+    "supported_concern_severity_counts": {
+      "low": 8,
+      "moderate": 10
+    },
+    "finding_count_meaning": "Descriptive finding counts depend on how observations are split; they are not accuracy, benchmark or clinical-safety scores and are not suitable for ranking cases or systems.",
+    "cases_with_already_supplied_fact_requestion": 2,
+    "cases_with_reported_symptom_expansion": 1,
+    "cases_with_care_urgency_contradiction_corrected_after_explicit_followup": 1,
+    "observed_concern_categories": [
+      "treatment classification and evidence precision",
+      "test interpretation and monitoring omissions",
+      "product-specific dosing and contraindication scope",
+      "contradictory care timing",
+      "repeated questions and symptom paraphrase expansion"
+    ]
+  },
+  "decision": {
+    "clinical_improvement_verified": false,
+    "adopted_as_improvement": false,
+    "reason": "Probe revealed care-plan accuracy and interaction defects; no equivalent control or measured outcome"
+  },
+  "official_healthbench_score": null,
+  "NOVA_score": null,
+  "new_NOVA_submissions": 0,
+  "limitations": [
+    "Four selected development cases are not representative or an independent benchmark",
+    "Recovered source lacks original HealthBench IDs",
+    "Original context remains in the initial turn rather than simulating sequential fact discovery",
+    "Adaptive synthetic prompts can induce explanations and repairs",
+    "No new exam results, clinical course or treatment outcomes are simulated",
+    "Urgent case stops after first reply by prior design",
+    "No direct inference about E04 zero or E05 full-runtime behavior"
+  ],
+  "runner_sha256": "546a1dbc48df77a47f3a59c38c6e724f2a0763e1d29aad2972f26df7f715465e",
+  "test_sha256": "2ec8ceac18670d0b7011b4fcb0a4e62b013226d8f00db1af2ac72035e7ced26a"
+}

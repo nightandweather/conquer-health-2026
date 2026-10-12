@@ -1,0 +1,124 @@
+{
+  "design_id": "HBT03-DESIGN",
+  "created_at_utc": "2026-10-12T13:42:46.771313+00:00",
+  "status": "design_only_unexecuted",
+  "hypothesis": "An explicit check against already supplied user answers may reduce unnecessary repeated question components while preserving necessary clarification and immediate safety advice.",
+  "basis": {
+    "source": "Completed HBT01 independent review; no HBT02 generated answer inspected or used",
+    "observation": "Two first replies contain question components that the user had already answered; other components still requested unknown information.",
+    "existing_instructions": "grounded_v2 asks only necessary questions and preserves uncertainty; TASK_WRAPPER respects unavailable information. Neither explicitly checks each proposed question against already supplied user answers.",
+    "not_basis": [
+      "NOVA E04/E05 scores",
+      "HBT02 empty response as proof of clinical or prompt causality"
+    ],
+    "candidate_not_selected": {
+      "name": "Explain the purpose whenever recommending an examination or test",
+      "reason": "HBT01 prompted 3 does not imply three first-response omissions of the rationale for a proposed investigation; the first responses differ in whether they propose investigations and in general versus specific explanations. Existing classification is preserved, not declared erroneous."
+    }
+  },
+  "single_factor": {
+    "kind": "Append one general question-reuse instruction bundle to unchanged HBT01 first system message",
+    "exact_text": "Before asking a question, check whether the user has already clearly answered it. Re-ask only to resolve ambiguity, conflicting information, or a relevant change over time, and make that reason explicit.",
+    "utf8_sha256": "39647293df20d48c7f762084c37c64978ab3b03ed40bdcb258152bf04377a941",
+    "placement": "Two newlines after unchanged grounded_v2 and TASK_WRAPPER",
+    "inherits_HBT02_instruction": false,
+    "extracted_fact_ledger": false,
+    "new_review_call": false,
+    "latency_tokens_note": "Added system text may change token use, answer length, latency and failures; no equality or individual-sentence effect claimed."
+  },
+  "source_scope": {
+    "split": "Four existing HBT01 dev20 sources; one first-response request per source",
+    "selection": "Two previously identified question-repetition contexts plus two first-response preservation contexts; post-hoc selected development regression",
+    "all_target_turns": 1,
+    "excluded": [
+      "holdout180 contents",
+      "original benchmark rubrics and answers",
+      "historical target response in candidate input",
+      "later HBT01 follow-up questions or answers",
+      "all HBT02 generated responses",
+      "independent review text in candidate input"
+    ],
+    "historical_source_context": "Keep original request byte content unchanged except exact first-system append; earlier assistant content, if present in original source, remains unconfirmed."
+  },
+  "planned_limits": {
+    "new_candidate_count": 1,
+    "source_cases": 4,
+    "new_generation_requests": 4,
+    "requests_per_source_case": 1,
+    "attempts_per_request": 1,
+    "retries": 0,
+    "additional_multiturn_continuations": 0,
+    "patient_model_calls": 0,
+    "automatic_grader_API_calls": 0,
+    "NOVA_sample_submissions": 0,
+    "official_submissions": 0,
+    "max_output_tokens_each": 2048,
+    "max_configured_output_tokens_sum": 8192,
+    "timeout_seconds_each": 90,
+    "request_timeout_sum_seconds": 360,
+    "duration_note": "Configured request-timeout sum, not guaranteed request or whole-task wall time; metadata, implementation and review are separate.",
+    "cost_note": "Planned local generation only; no paid model endpoint added. Actual input/output tokens and monetary cost unknown; local hardware/power and Codex review usage separate.",
+    "actual_calls_this_design_stage": 0
+  },
+  "fixed": {
+    "settings": {
+      "model": "gpt-oss:20b",
+      "base_url": "http://127.0.0.1:11434/v1",
+      "reasoning_effort": "medium",
+      "max_tokens": 2048,
+      "temperature": 0,
+      "timeout": 90
+    },
+    "model_digest": "f38aa0c53da5f8c49d08c43a99df24ff53167fe68e24664a7777288e7656fdfe",
+    "template_byte_sha256": "fa6710a93d78da62641e192361344be7a8c0a1c3737f139cf89f20ce1626b99c",
+    "source_dataset_sha256": "cd3516c601da6f67fc7b6db3439efdf2659a91534c09c6bc1c5d363889ed4033",
+    "runner_reference_sha256": "546a1dbc48df77a47f3a59c38c6e724f2a0763e1d29aad2972f26df7f715465e",
+    "RAG": false,
+    "NOVA_SDK": false,
+    "thirty_character_constraint": false,
+    "live_model_identity_rechecked_this_design_stage": false,
+    "candidate_runtime_implemented": false
+  },
+  "comparison": {
+    "control": "Cached original HBT01 first replies; no regeneration of control or HBT02",
+    "future_review": "A fresh reviewer receives common source context and coded randomized A/B answers; hide hypothesis, instruction, arm, settings, time, tokens and prior reviews. This design critic cannot perform that fresh review.",
+    "blind_order": "Create and pin balanced A/B mapping privately before any generation.",
+    "interpretation": "Historical controls, one outcome per source, post-hoc reused cases; not causal, representative, independent or end-to-end multi-turn evaluation."
+  },
+  "judgment": {
+    "primary": "In both previously identified contexts, avoid the already answered components without removing still-needed unknown components or inventing patient facts.",
+    "question_unit": "Each component of a compound question; total question count alone is not a quality measure.",
+    "exceptions": "Ambiguous, conflicting or time-sensitive information can be clarified; a material reason for rechecking must be explicit. Do not mark conditional future warning signs as repeated questions.",
+    "preservation": [
+      "Necessary unanswered questions remain when materially relevant",
+      "User-reported negatives/history stay reports, not current examination results or confirmed diagnoses",
+      "Unknown information remains unknown; no made-up answer to eliminate a question",
+      "Relevant immediate action, care plan and safety advice are preserved and not delayed by questions",
+      "No removal of all questions, indiscriminate emergency escalation, or new material clinical error",
+      "Clinically justified reconfirmation remains possible"
+    ],
+    "review_outputs": "Private proposition-level true/false/null with evidence; separate presence, appropriateness, unsupported facts and technical failures. No automatic score or questionnaire-length proxy.",
+    "null_policy": "Previously unresolved HBT01 propositions remain null without new external evidence. Newly uncertain clinical claims require authoritative sources or null; no repeated adjudication just to pass.",
+    "technical_prerequisite": "All four next replies complete, nonempty and post-pin verified before blind export; no selective evaluation of successes.",
+    "technical_failure_policy": "No retry, alternate output folder, changed budget, relaxed gate or replacement case. Unknown dispatch blocks further execution and repetition. Preserve failures and unknowns.",
+    "decision": "Even a passed selected-context regression does not establish clinical improvement or authorize NOVA adoption/submission. Any new material safety concern or unresolved primary assessment blocks progression.",
+    "stop": "Same-candidate repeat prohibited. Stop this hypothesis after two failed executions; this HBT03 hypothesis has zero executions."
+  },
+  "execution_prerequisites": [
+    "Review frozen plan and independent artifact audit",
+    "Use a separate bounded execution namespace, never HBT01/HBT02 owner or state",
+    "Implement and synthetically check durable pre-dispatch reservation and exact request difference; no target leakage",
+    "Pin source, plan, prefixes, runtime, blind map, model and template before/after calls; stop on mismatch",
+    "Preserve HBT01 and HBT02 records and E05 code/ZIP; no NOVA upload"
+  ],
+  "actual": {
+    "runtime_code_changes": 0,
+    "model_calls": 0,
+    "patient_model_calls": 0,
+    "NOVA_submissions": 0,
+    "quality_result": null,
+    "official_HealthBench_score": null,
+    "NOVA_score": null
+  },
+  "publication_boundary": "Only generic design and aggregate observations; private source contexts and individual responses excluded."
+}

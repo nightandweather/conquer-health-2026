@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "origin_url": "https://nova.snubhai.org/docs/starter.zip",
+  "origin_archive_sha256": "29d62dd2b0509cf02ed0bbb83191bb1ec3f57da72a0eb58cc6cbadcca8513aaf",
+  "received_at_utc": "2026-10-12T07:06:56.051309+00:00",
+  "sdk_version": "1.0.1",
+  "source_files": {
+    "nova_sdk.py": {
+      "sha256": "fdd65302e82791ed862c22fe5a014ef443ab331d8986ec7c72b3923add6bc871",
+      "bytes": 7965
+    },
+    "requirements.txt": {
+      "sha256": "d2b2ed1aed141db4390d0e782a7fc25b97328de2828b70958d99c145ea1d0843",
+      "bytes": 168
+    },
+    "run.py": {
+      "sha256": "93f281f959f84b2a020e7923d72fe7d7852730d7bdb480d17e85268df0416263",
+      "bytes": 10107
+    }
+  },
+  "unmodified_official_three_file_fallback": true,
+  "server_validation_passed": null,
+  "quality_improvement": null
+}

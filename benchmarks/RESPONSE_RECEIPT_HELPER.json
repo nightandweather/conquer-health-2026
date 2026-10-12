@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-12T14:25:50.158005+00:00",
+  "kind": "standalone_structural_response_metadata_helper",
+  "status": "implemented_synthetic_verified_not_integrated",
+  "api": "response_metadata(response, *, selected_choice_index=0)",
+  "runtime_integration": false,
+  "scope": "Parsed JSON structure only; no transport, file I/O, clinical decision or completion gate",
+  "source_sha256": "b4487c37f09a2e8c56ecc81676a72130f7fb5ee8a5ec46825778c92dfb622ceb",
+  "test_sha256": "03cec66913cf58660ca265981600ed298930399fe0786808793f417a13a8a76d",
+  "synthetic_validation": {
+    "new_unique_unit_tests": 34,
+    "private_selected_modules": 1,
+    "public_selected_modules": 1,
+    "private_passed": 34,
+    "public_passed": 34,
+    "full_suite": false,
+    "independent_code_audit": "passed",
+    "initial_issue": "Unbounded integers could break JSON serialization",
+    "repair": "Reported counts and selected position bounded to 2**63-1; valid component sum up to 2**64-2; no original giant integer copied",
+    "independent_extra_boundary_checks": 4,
+    "extra_checks_added_to_unique_test_count": false
+  },
+  "metadata_contract": {
+    "selection": "positional list index, no alternate-choice fallback",
+    "content": "presence, fixed JSON type, character length, strict UTF8 byte length and SHA256; no body",
+    "reasoning_fields": [
+      "reasoning",
+      "reasoning_content"
+    ],
+    "reasoning": "presence, fixed JSON type, character and strict UTF8 byte lengths/encoding only; no body or hash",
+    "finish_reason_values": [
+      "stop",
+      "length"
+    ],
+    "usage_fields": [
+      "prompt_tokens",
+      "completion_tokens",
+      "total_tokens",
+      "completion_tokens_details.reasoning_tokens",
+      "prompt_tokens_details.cached_tokens"
+    ],
+    "reported_count_max": 9223372036854775807,
+    "selected_index_max": 9223372036854775807,
+    "effective_derived_total_max": 18446744073709551614,
+    "bounds_are_model_budgets": false,
+    "raw_usage_states": [
+      "reported",
+      "missing",
+      "invalid",
+      "unavailable"
+    ],
+    "effective_total_provenance": [
+      "reported",
+      "derived_prompt_plus_completion",
+      "unknown"
+    ],
+    "unknown_count": null,
+    "input_mutation": false,
+    "original_text_or_ids_copied": false
+  },
+  "new_activity": {
+    "model_generations": 0,
+    "live_metadata_queries": 0,
+    "live_template_queries": 0,
+    "NOVA_submissions": 0,
+    "clinical_rereviews": 0,
+    "actual_old_response_replays": 0
+  },
+  "preservation": {
+    "selected_files": 109,
+    "all_hashes_match": true,
+    "whole_backup_claim": false
+  },
+  "limitations": [
+    "Not integrated into any model runner or NOVA runtime",
+    "Does not recover missing old raw responses or determine upstream empty-answer causes",
+    "Reported usage metadata is not independently measured or reconciled",
+    "Content hashes are structural identifiers, not anonymization; any future actual per-response receipts remain private",
+    "No new clinical comparison; HBT02/HBT03 null results and non-adoption remain unchanged",
+    "One-dispatch reservations, no-retry rules and four-complete-response gate unchanged"
+  ],
+  "clinical_improvement": null,
+  "official_score": null
+}

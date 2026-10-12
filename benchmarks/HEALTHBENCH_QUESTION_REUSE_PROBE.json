@@ -1,0 +1,87 @@
+{
+  "experiment_id": "HBT03",
+  "kind": "Selected first-response development regression with historical controls; not a new complete multi-turn run",
+  "recorded_at_utc": "2026-10-12T13:53:55.044415+00:00",
+  "execution_status": "four_requests_consumed_review_prerequisite_failed",
+  "planned_source_cases": 4,
+  "attempted_source_cases": 4,
+  "unattempted_source_cases": 0,
+  "new_generation_requests": 4,
+  "response_status_counts": {
+    "completed": 3,
+    "failed": 1
+  },
+  "finish_reason_counts": {
+    "stop": 3,
+    "length": 1
+  },
+  "empty_answer_count": 1,
+  "length_termination_count": 1,
+  "nonempty_truncated_answer_count": 0,
+  "overlap_note": "One record is both failed-empty and length-terminated; not two failures.",
+  "retries": 0,
+  "additional_multiturn_continuations": 0,
+  "pending_requests": 0,
+  "sum_generation_request_seconds": 49.014,
+  "timing_scope": "Generation request duration sum only, not whole task. Metadata/preparation/audit/review excluded; no controlled runtime causal comparison.",
+  "reported_usage": {
+    "prompt_tokens": 1879,
+    "completion_tokens": 4363,
+    "total_tokens": 6242
+  },
+  "missing_usage_responses": 0,
+  "usage_scope": "Provider reported output may include reasoning; no separately measured displayed-answer tokens; exact empty-answer cause unknown.",
+  "model_metadata_queries": 8,
+  "template_queries": 8,
+  "source_model_template_pins_verified_before_after_all_four": true,
+  "settings": {
+    "model": "gpt-oss:20b",
+    "base_url": "http://127.0.0.1:11434/v1",
+    "reasoning_effort": "medium",
+    "max_tokens": 2048,
+    "temperature": 0,
+    "timeout": 90
+  },
+  "model_digest": "f38aa0c53da5f8c49d08c43a99df24ff53167fe68e24664a7777288e7656fdfe",
+  "template_sha256": "fa6710a93d78da62641e192361344be7a8c0a1c3737f139cf89f20ce1626b99c",
+  "intervention": "Append fixed general already-answered-question check to the original HBT01 first-system message only; HBT02 instruction/answers not inherited",
+  "synthetic_validation": {
+    "new_tests_passed": 23,
+    "private_full_suite": false,
+    "public_selected_modules": 2,
+    "public_tests_passed": 44,
+    "public_full_suite": false,
+    "independent_code_audit_passed": true
+  },
+  "review": {
+    "fresh_blinded_clinical_review_performed": false,
+    "reason": "One empty length-terminated response; predeclared four-complete-response export condition failed",
+    "blinded_packets_exported": 0,
+    "primary_repeated_question_resolution": null,
+    "necessary_clarification_and_safety_preservation": null,
+    "clinical_accuracy_comparison": null,
+    "prior_HBT01_unresolved_propositions_changed": false
+  },
+  "decision": {
+    "adopted": false,
+    "reason": "Incomplete usable response set; clinical review prerequisite failed",
+    "same_hypothesis_executions": 1,
+    "same_candidate_repeat_allowed": false,
+    "same_hypothesis_two_failure_stop_rule_retained": true
+  },
+  "patient_generation_model_calls": 0,
+  "automatic_grader_API_calls": 0,
+  "new_NOVA_submissions": 0,
+  "official_HealthBench_score": null,
+  "NOVA_score": null,
+  "limitations": [
+    "Post-hoc selected reused development cases with historical controls; not independent or representative",
+    "Single next response per source rather than a new full consultation",
+    "No claim that repeated-question problem or clinical accuracy improved",
+    "No attribution of the empty answer to the added instruction",
+    "No inference about NOVA E04/E05 score causes",
+    "HBT02 and HBT03 are different clinical-prompt hypotheses; each has one execution, despite both failing the same completeness prerequisite"
+  ],
+  "runner_sha256": "91d15cdba68b140add13daf465022d210fef5e0250aa75535ce544e28707e130",
+  "test_sha256": "d16c0ae1b8912494bd3f155f7c1b9ec3e569ef4a07fdaf41c741c184f6894f40"
+}

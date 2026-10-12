@@ -1,0 +1,13 @@
+{
+  "method_repository": "https://github.com/nightandweather/conquer-health-2026",
+  "method_commit": "2fc54f136852026b7005218b4508469a832bfa88",
+  "method_files": {
+    "submission/app.py": "d5b3481ceb87778fefd351df84451df4e3e6b08f",
+    "measurement/coeval_local.py": "d252cb8be93c4e1cfade1cf8f56dc913991fb25d"
+  },
+  "healthbench_reference": "https://github.com/openai/simple-evals/blob/main/healthbench_eval.py",
+  "healthbench_license_blob": "91ba98f3a21392ddd8c0e375f1f01e6d85d9e623",
+  "coeval_ids_reference": "https://github.com/lunit-io/CoEval/blob/main/src/coeval/data/conquer_val_ids.json",
+  "ollama_reference": "https://docs.ollama.com/api/openai-compatibility",
+  "ported_scope": "call settings and rubric aggregation; not full L2 submission or NOVA consultation agent"
+}
